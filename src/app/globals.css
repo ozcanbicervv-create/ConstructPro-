@@ -1,0 +1,274 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+:root {
+  --radius: 0.625rem;
+  /* ConstructPro - Construction Industry Yellow-Black Professional Color Palette */
+  --background: oklch(0.98 0.005 85); /* Very light warm white */
+  --foreground: oklch(0.15 0 0); /* Deep black for text */
+  --card: oklch(1 0 0); /* Pure white for cards */
+  --card-foreground: oklch(0.15 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.15 0 0);
+  
+  /* Primary - Construction Yellow (Main brand color) */
+  --primary: oklch(0.75 0.15 85); /* Construction Yellow #fbbf24 equivalent */
+  --primary-foreground: oklch(0.15 0 0); /* Black text on yellow */
+  
+  /* Secondary - Professional Black/Gray */
+  --secondary: oklch(0.25 0 0); /* Professional dark gray #1f2937 equivalent */
+  --secondary-foreground: oklch(0.98 0 0); /* White text on dark */
+  
+  /* Muted - Light grays for backgrounds */
+  --muted: oklch(0.96 0.005 85); /* Very light warm gray */
+  --muted-foreground: oklch(0.45 0 0); /* Medium gray for muted text */
+  
+  /* Accent - Darker Yellow for highlights */
+  --accent: oklch(0.65 0.18 75); /* Darker construction yellow #f59e0b equivalent */
+  --accent-foreground: oklch(0.15 0 0);
+  
+  /* Destructive - Construction Orange for warnings */
+  --destructive: oklch(0.65 0.25 45); /* Construction orange/red */
+  --destructive-foreground: oklch(0.98 0 0);
+  
+  --border: oklch(0.9 0.01 85); /* Light warm border */
+  --input: oklch(0.95 0.01 85); /* Light input background */
+  --ring: oklch(0.75 0.15 85); /* Yellow focus ring */
+  
+  /* Chart colors - Construction industry themed */
+  --chart-1: oklch(0.75 0.15 85); /* Primary Yellow */
+  --chart-2: oklch(0.25 0 0); /* Professional Black */
+  --chart-3: oklch(0.65 0.18 75); /* Accent Yellow */
+  --chart-4: oklch(0.45 0.12 65); /* Darker Yellow */
+  --chart-5: oklch(0.35 0 0); /* Dark Gray */
+  
+  /* Sidebar - Professional construction theme */
+  --sidebar: oklch(0.97 0.005 85); /* Light warm background */
+  --sidebar-foreground: oklch(0.15 0 0);
+  --sidebar-primary: oklch(0.75 0.15 85); /* Construction yellow */
+  --sidebar-primary-foreground: oklch(0.15 0 0);
+  --sidebar-accent: oklch(0.94 0.01 85); /* Slightly darker than sidebar */
+  --sidebar-accent-foreground: oklch(0.25 0 0);
+  --sidebar-border: oklch(0.9 0.01 85);
+  --sidebar-ring: oklch(0.75 0.15 85);
+}
+
+.dark {
+  /* Dark mode - Professional construction theme with yellow accents */
+  --background: oklch(0.12 0 0); /* Deep black background */
+  --foreground: oklch(0.95 0.01 85); /* Warm white text */
+  --card: oklch(0.18 0 0); /* Dark gray cards */
+  --card-foreground: oklch(0.95 0.01 85);
+  --popover: oklch(0.18 0 0);
+  --popover-foreground: oklch(0.95 0.01 85);
+  
+  /* Primary - Brighter yellow for dark mode visibility */
+  --primary: oklch(0.8 0.18 85); /* Brighter construction yellow */
+  --primary-foreground: oklch(0.12 0 0); /* Dark text on bright yellow */
+  
+  /* Secondary - Lighter gray for contrast */
+  --secondary: oklch(0.22 0 0); /* Lighter dark gray */
+  --secondary-foreground: oklch(0.95 0.01 85);
+  
+  /* Muted - Dark grays */
+  --muted: oklch(0.2 0 0); /* Dark muted background */
+  --muted-foreground: oklch(0.65 0.01 85); /* Light gray text */
+  
+  /* Accent - Vibrant yellow for dark mode */
+  --accent: oklch(0.75 0.2 80); /* Vibrant accent yellow */
+  --accent-foreground: oklch(0.12 0 0);
+  
+  /* Destructive - Bright orange for visibility */
+  --destructive: oklch(0.7 0.25 45); /* Bright construction orange */
+  --destructive-foreground: oklch(0.95 0 0);
+  
+  --border: oklch(0.25 0 0); /* Dark border */
+  --input: oklch(0.2 0 0); /* Dark input background */
+  --ring: oklch(0.8 0.18 85); /* Bright yellow focus ring */
+  
+  /* Chart colors - High contrast for dark mode */
+  --chart-1: oklch(0.8 0.18 85); /* Bright Yellow */
+  --chart-2: oklch(0.85 0.01 85); /* Light Gray */
+  --chart-3: oklch(0.75 0.2 80); /* Vibrant Yellow */
+  --chart-4: oklch(0.65 0.15 75); /* Medium Yellow */
+  --chart-5: oklch(0.55 0.01 85); /* Medium Gray */
+  
+  /* Sidebar - Dark professional theme */
+  --sidebar: oklch(0.15 0 0); /* Dark sidebar background */
+  --sidebar-foreground: oklch(0.95 0.01 85);
+  --sidebar-primary: oklch(0.8 0.18 85); /* Bright construction yellow */
+  --sidebar-primary-foreground: oklch(0.12 0 0);
+  --sidebar-accent: oklch(0.2 0 0); /* Slightly lighter than sidebar */
+  --sidebar-accent-foreground: oklch(0.95 0.01 85);
+  --sidebar-border: oklch(0.25 0 0);
+  --sidebar-ring: oklch(0.8 0.18 85);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* ConstructPro Construction Industry Custom Styles */
+@layer utilities {
+  /* Construction Yellow Gradients */
+  .gradient-primary {
+    background: linear-gradient(135deg, oklch(0.75 0.15 85) 0%, oklch(0.65 0.18 75) 100%);
+  }
+  
+  .gradient-accent {
+    background: linear-gradient(135deg, oklch(0.65 0.18 75) 0%, oklch(0.25 0 0) 100%);
+  }
+  
+  .text-gradient {
+    background: linear-gradient(135deg, oklch(0.75 0.15 85) 0%, oklch(0.45 0.12 65) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
+  /* Construction Industry Pattern */
+  .construction-pattern {
+    background-image: 
+      repeating-linear-gradient(45deg, transparent, transparent 35px, oklch(0.96 0.005 85) 35px, oklch(0.96 0.005 85) 70px);
+  }
+  
+  /* Professional Glass Effect */
+  .glass-effect {
+    backdrop-filter: blur(8px);
+    background: oklch(1 0 0 / 0.85);
+    border: 1px solid oklch(0.9 0.01 85 / 0.3);
+  }
+  
+  .dark .glass-effect {
+    background: oklch(0.18 0 0 / 0.85);
+    border: 1px solid oklch(0.25 0 0 / 0.3);
+  }
+  
+  /* Construction Industry Specific Utilities */
+  .construction-yellow {
+    background-color: oklch(0.75 0.15 85);
+    color: oklch(0.15 0 0);
+  }
+  
+  .construction-black {
+    background-color: oklch(0.25 0 0);
+    color: oklch(0.95 0.01 85);
+  }
+  
+  .construction-border {
+    border: 2px solid oklch(0.75 0.15 85);
+  }
+  
+  .construction-shadow {
+    box-shadow: 0 4px 20px oklch(0.75 0.15 85 / 0.2);
+  }
+}
+
+/* Animasyonlar */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 20px oklch(0.75 0.15 85 / 0.3);
+  }
+  50% {
+    box-shadow: 0 0 30px oklch(0.75 0.15 85 / 0.6);
+  }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-slide-up {
+  animation: slide-up 0.6s ease-out forwards;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* Özel scrollbar stilleri */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: oklch(0.96 0.005 85);
+  border-radius: 3px;
+}
+
+.dark .custom-scrollbar::-webkit-scrollbar-track {
+  background: oklch(0.2 0 0);
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: oklch(0.75 0.15 85);
+  border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: oklch(0.65 0.18 75);
+}
