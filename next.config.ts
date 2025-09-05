@@ -16,7 +16,7 @@ const nextConfig: NextConfig = {
   
   // Performance optimizations
   experimental: {
-    optimizeCss: true,
+    // optimizeCss: true, // Disabled to avoid critters dependency issue
   },
   
   // Image optimization
