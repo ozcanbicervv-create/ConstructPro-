@@ -38,7 +38,9 @@ Bu proje, ConstructPro Next.js uygulamasını Coolify platformu üzerinde deploy
 2. WHEN next.config.js ayarları yapıldığında THEN production deployment için gerekli konfigürasyonlar tamamlanmalı
 3. WHEN environment variables tanımlandığında THEN uygulama güvenli bir şekilde çalışmalı
 4. WHEN GitHub entegrasyonu kurulduğunda THEN otomatik deployment pipeline çalışır durumda olmalı
-5. IF deployment başarısız olursa THEN detaylı log bilgileri ve çözüm önerileri sunulmalı
+5. WHEN package-lock.json dosyası mevcut olduğunda THEN npm ci komutu başarılı bir şekilde çalışmalı
+6. IF npm ci komutu başarısız olursa THEN npm install alternatifi kullanılmalı ve package-lock.json yeniden oluşturulmalı
+7. IF deployment başarısız olursa THEN detaylı log bilgileri ve çözüm önerileri sunulmalı
 
 ### Requirement 4
 
@@ -61,3 +63,15 @@ Bu proje, ConstructPro Next.js uygulamasını Coolify platformu üzerinde deploy
 2. WHEN deployment süreci başladığında THEN real-time log takibi yapılabilmeli
 3. WHEN deployment tamamlandığında THEN uygulama yeni versiyonla çalışır durumda olmalı
 4. IF deployment başarısız olursa THEN otomatik rollback mekanizması devreye girmeli
+
+### Requirement 6
+
+**User Story:** Geliştirici olarak, npm dependency yönetimi sorunlarını çözmek istiyorum, böylece build sürecim kesintisiz çalışabilsin.
+
+#### Acceptance Criteria
+
+1. WHEN package-lock.json dosyası repository'de mevcut olduğunda THEN build süreci bu dosyayı kullanmalı
+2. WHEN npm ci komutu çalıştırıldığında THEN dependencies başarılı bir şekilde yüklenmeli
+3. IF package-lock.json dosyası bozuk veya uyumsuz ise THEN npm install ile yeniden oluşturulmalı
+4. WHEN build süreci başladığında THEN Node.js ve npm versiyonları uyumlu olmalı
+5. IF npm ci başarısız olursa THEN alternatif yükleme stratejileri denenmelidir

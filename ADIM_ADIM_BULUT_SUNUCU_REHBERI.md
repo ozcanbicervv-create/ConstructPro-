@@ -123,8 +123,8 @@ SSH bağlantısını açık bırak, yeni PowerShell penceresi aç.
 cd "C:\Users\mrbcr\OneDrive\Desktop\ConstructPro"
 
 # Scriptleri sunucuya gönder (IP adresini değiştir!)
-scp server-setup.sh root@164.90.123.45:/root/
-scp verify-setup.sh root@164.90.123.45:/root/
+scp server-setup.sh root@68.183.216.65:/root/
+scp verify-setup.sh root@68.183.216.65:/root/
 ```
 
 **Şifre isteyecek** - aynı root şifresini gir.

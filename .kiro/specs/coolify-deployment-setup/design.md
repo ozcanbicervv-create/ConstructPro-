@@ -112,9 +112,17 @@ sequenceDiagram
 # Multi-stage build for production optimization
 FROM node:18-alpine AS base
 FROM base AS deps
+# Handle npm ci fallback to npm install
+RUN if [ -f package-lock.json ]; then npm ci; else npm install && npm run build; fi
 FROM base AS builder  
 FROM base AS runner
 ```
+
+**NPM Dependency Management Strategy**
+- Primary: Use `npm ci` for faster, reliable builds when package-lock.json is available
+- Fallback: Use `npm install` if package-lock.json is missing or corrupted
+- Validation: Check package-lock.json integrity before build
+- Optimization: Cache node_modules layer for faster subsequent builds
 
 **Next.js Configuration**
 - Production build optimization
