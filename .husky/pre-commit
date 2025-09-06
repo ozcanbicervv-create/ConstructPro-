@@ -1,0 +1,8 @@
+#!/usr/bin/env sh
+
+# Run lint-staged to check staged files
+npx lint-staged
+
+# Note: Type checking disabled for now due to existing codebase issues
+# Uncomment the line below when ready to enforce type checking
+# npm run type-check
