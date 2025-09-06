@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { resourceMonitor } from '@/lib/monitoring';
+import { resourceMonitor } from '@/utils/monitoring';
 import { requestTracker } from '@/middleware/monitoring';
 
 /**

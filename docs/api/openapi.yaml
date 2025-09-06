@@ -1,0 +1,691 @@
+openapi: 3.0.3
+info:
+  title: ConstructPro API
+  description: |
+    Construction project management and collaboration platform API.
+    
+    This API provides comprehensive endpoints for managing construction projects,
+    user authentication, team collaboration, and real-time communication.
+    
+    ## Authentication
+    
+    The API uses NextAuth.js for authentication with JWT tokens. Most endpoints
+    require authentication via session cookies or JWT tokens.
+    
+    ## Rate Limiting
+    
+    API endpoints are rate-limited to prevent abuse. Current limits:
+    - Authentication endpoints: 5 requests per minute per IP
+    - General API endpoints: 100 requests per minute per authenticated user
+    
+    ## Error Handling
+    
+    The API uses standard HTTP status codes and returns consistent error responses:
+    
+    ```json
+    {
+      "message": "Error description",
+      "code": "ERROR_CODE",
+      "details": {}
+    }
+    ```
+    
+  version: 1.0.0
+  contact:
+    name: ConstructPro API Support
+    url: https://github.com/vovelet-tech/constructpro
+    email: support@constructpro.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: http://localhost:3000/api
+    description: Development server
+  - url: https://constructpro.com/api
+    description: Production server
+  - url: https://staging.constructpro.com/api
+    description: Staging server
+
+paths:
+  /health:
+    get:
+      tags:
+        - System
+      summary: Health check endpoint
+      description: |
+        Comprehensive health check endpoint that verifies the status of all system components
+        including database connectivity, memory usage, and disk space.
+        
+        Used by monitoring systems and load balancers to determine service health.
+      operationId: getHealthStatus
+      responses:
+        '200':
+          description: System is healthy
+          headers:
+            X-Health-Status:
+              description: Overall health status
+              schema:
+                type: string
+                enum: [healthy, warning, unhealthy]
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthStatus'
+              examples:
+                healthy:
+                  summary: Healthy system
+                  value:
+                    status: healthy
+                    timestamp: "2024-01-15T10:30:00Z"
+                    service: "ConstructPro"
+                    version: "1.0.0"
+                    environment: "production"
+                    uptime: 86400
+                    responseTime: 45
+                    checks:
+                      database:
+                        status: healthy
+                        latency: 12
+                      memory:
+                        status: healthy
+                        usage:
+                          used: 256
+                          total: 512
+                          percentage: 50
+                      disk:
+                        status: healthy
+        '503':
+          description: System is unhealthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthStatus'
+              examples:
+                unhealthy:
+                  summary: Unhealthy system
+                  value:
+                    status: unhealthy
+                    timestamp: "2024-01-15T10:30:00Z"
+                    service: "ConstructPro"
+                    error: "Database connection failed"
+                    responseTime: 5000
+    head:
+      tags:
+        - System
+      summary: Quick health check
+      description: Lightweight health check that returns only HTTP status
+      operationId: quickHealthCheck
+      responses:
+        '200':
+          description: System is healthy
+          headers:
+            X-Health-Status:
+              description: Health status
+              schema:
+                type: string
+                enum: [healthy]
+        '503':
+          description: System is unhealthy
+          headers:
+            X-Health-Status:
+              description: Health status
+              schema:
+                type: string
+                enum: [unhealthy]
+
+  /auth/register:
+    post:
+      tags:
+        - Authentication
+      summary: Register new user
+      description: |
+        Creates a new user account in the system. Validates input data,
+        checks for existing users, and creates a new user with hashed password.
+        
+        ## Validation Rules
+        - Email must be unique and valid format
+        - Password must be at least 6 characters with uppercase, lowercase, and number
+        - First and last names must be at least 2 characters
+        - Role defaults to WORKER if not specified
+      operationId: registerUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+            examples:
+              worker:
+                summary: Register construction worker
+                value:
+                  firstName: "John"
+                  lastName: "Doe"
+                  email: "john.doe@example.com"
+                  password: "SecurePass123"
+                  confirmPassword: "SecurePass123"
+                  company: "ABC Construction"
+                  title: "Site Supervisor"
+                  phone: "+1-555-0123"
+                  role: "WORKER"
+              manager:
+                summary: Register project manager
+                value:
+                  firstName: "Jane"
+                  lastName: "Smith"
+                  email: "jane.smith@example.com"
+                  password: "ManagerPass456"
+                  confirmPassword: "ManagerPass456"
+                  company: "XYZ Projects"
+                  title: "Project Manager"
+                  phone: "+1-555-0456"
+                  role: "MANAGER"
+      responses:
+        '201':
+          description: User created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegisterResponse'
+              examples:
+                success:
+                  summary: Successful registration
+                  value:
+                    message: "User created successfully"
+                    user:
+                      id: "clp123abc456"
+                      email: "john.doe@example.com"
+                      name: "John Doe"
+                      firstName: "John"
+                      lastName: "Doe"
+                      company: "ABC Construction"
+                      title: "Site Supervisor"
+                      phone: "+1-555-0123"
+                      role: "WORKER"
+                      createdAt: "2024-01-15T10:30:00Z"
+        '400':
+          description: Validation error or user already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                validation_error:
+                  summary: Validation error
+                  value:
+                    message: "Password must contain at least one uppercase letter, one lowercase letter, and one number"
+                user_exists:
+                  summary: User already exists
+                  value:
+                    message: "User with this email already exists"
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /user/profile:
+    get:
+      tags:
+        - User Management
+      summary: Get user profile
+      description: |
+        Retrieves the authenticated user's profile information including
+        personal details, preferences, and account status.
+        
+        Requires valid authentication session.
+      operationId: getUserProfile
+      security:
+        - sessionAuth: []
+      responses:
+        '200':
+          description: User profile retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfile'
+              examples:
+                complete_profile:
+                  summary: Complete user profile
+                  value:
+                    id: "clp123abc456"
+                    email: "john.doe@example.com"
+                    name: "John Doe"
+                    firstName: "John"
+                    lastName: "Doe"
+                    company: "ABC Construction"
+                    title: "Site Supervisor"
+                    phone: "+1-555-0123"
+                    role: "WORKER"
+                    theme: "light"
+                    language: "en"
+                    image: null
+                    isOnline: true
+                    lastActive: "2024-01-15T10:30:00Z"
+                    createdAt: "2024-01-15T09:00:00Z"
+        '401':
+          description: Unauthorized - authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                unauthorized:
+                  summary: Not authenticated
+                  value:
+                    message: "Unauthorized"
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    patch:
+      tags:
+        - User Management
+      summary: Update user profile
+      description: |
+        Updates the authenticated user's profile information.
+        Only provided fields will be updated, others remain unchanged.
+        
+        The user's display name will be automatically updated if both
+        firstName and lastName are provided.
+      operationId: updateUserProfile
+      security:
+        - sessionAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateProfileRequest'
+            examples:
+              basic_update:
+                summary: Update basic information
+                value:
+                  firstName: "John"
+                  lastName: "Smith"
+                  company: "New Construction Co"
+                  title: "Senior Supervisor"
+              preferences_update:
+                summary: Update preferences
+                value:
+                  theme: "dark"
+                  language: "es"
+      responses:
+        '200':
+          description: Profile updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfile'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  securitySchemes:
+    sessionAuth:
+      type: apiKey
+      in: cookie
+      name: next-auth.session-token
+      description: NextAuth.js session cookie
+    
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT token for API access
+
+  schemas:
+    HealthStatus:
+      type: object
+      required:
+        - status
+        - timestamp
+        - service
+      properties:
+        status:
+          type: string
+          enum: [healthy, warning, unhealthy]
+          description: Overall system health status
+        timestamp:
+          type: string
+          format: date-time
+          description: Timestamp of the health check
+        service:
+          type: string
+          description: Service name
+          example: "ConstructPro"
+        version:
+          type: string
+          description: Application version
+          example: "1.0.0"
+        environment:
+          type: string
+          description: Environment name
+          example: "production"
+        uptime:
+          type: integer
+          description: System uptime in seconds
+          example: 86400
+        responseTime:
+          type: integer
+          description: Health check response time in milliseconds
+          example: 45
+        checks:
+          type: object
+          description: Individual component health checks
+          properties:
+            database:
+              $ref: '#/components/schemas/DatabaseHealth'
+            memory:
+              $ref: '#/components/schemas/MemoryHealth'
+            disk:
+              $ref: '#/components/schemas/DiskHealth'
+        system:
+          type: object
+          description: System information
+          properties:
+            nodeVersion:
+              type: string
+              example: "v18.17.0"
+            platform:
+              type: string
+              example: "linux"
+            arch:
+              type: string
+              example: "x64"
+            pid:
+              type: integer
+              example: 1234
+        error:
+          type: string
+          description: Error message if system is unhealthy
+
+    DatabaseHealth:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          type: string
+          enum: [healthy, unhealthy, unavailable]
+        latency:
+          type: integer
+          description: Database response time in milliseconds
+        error:
+          type: string
+          description: Error message if database is unhealthy
+
+    MemoryHealth:
+      type: object
+      required:
+        - status
+        - usage
+      properties:
+        status:
+          type: string
+          enum: [healthy, warning, critical]
+        usage:
+          type: object
+          properties:
+            used:
+              type: integer
+              description: Used memory in MB
+            total:
+              type: integer
+              description: Total memory in MB
+            percentage:
+              type: integer
+              description: Memory usage percentage
+            rss:
+              type: integer
+              description: Resident set size in MB
+            external:
+              type: integer
+              description: External memory in MB
+        warning:
+          type: string
+          description: Warning message if memory usage is high
+
+    DiskHealth:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          type: string
+          enum: [healthy, warning, critical]
+        warning:
+          type: string
+          description: Warning message if disk usage is high
+
+    RegisterRequest:
+      type: object
+      required:
+        - firstName
+        - lastName
+        - email
+        - password
+        - confirmPassword
+      properties:
+        firstName:
+          type: string
+          minLength: 2
+          description: User's first name
+          example: "John"
+        lastName:
+          type: string
+          minLength: 2
+          description: User's last name
+          example: "Doe"
+        email:
+          type: string
+          format: email
+          description: User's email address (must be unique)
+          example: "john.doe@example.com"
+        password:
+          type: string
+          minLength: 6
+          pattern: '^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)'
+          description: Password (min 6 chars, must contain uppercase, lowercase, and number)
+          example: "SecurePass123"
+        confirmPassword:
+          type: string
+          description: Password confirmation (must match password)
+          example: "SecurePass123"
+        company:
+          type: string
+          description: User's company name
+          example: "ABC Construction"
+        title:
+          type: string
+          description: User's job title
+          example: "Site Supervisor"
+        phone:
+          type: string
+          description: User's phone number
+          example: "+1-555-0123"
+        role:
+          type: string
+          enum: [ADMIN, MANAGER, WORKER, CLIENT]
+          default: WORKER
+          description: User's role in the system
+
+    RegisterResponse:
+      type: object
+      required:
+        - message
+        - user
+      properties:
+        message:
+          type: string
+          example: "User created successfully"
+        user:
+          $ref: '#/components/schemas/UserProfile'
+
+    UpdateProfileRequest:
+      type: object
+      properties:
+        firstName:
+          type: string
+          minLength: 2
+          description: User's first name
+        lastName:
+          type: string
+          minLength: 2
+          description: User's last name
+        company:
+          type: string
+          description: User's company name
+        title:
+          type: string
+          description: User's job title
+        phone:
+          type: string
+          description: User's phone number
+        theme:
+          type: string
+          enum: [light, dark]
+          description: User's preferred theme
+        language:
+          type: string
+          description: User's preferred language code
+          example: "en"
+
+    UserProfile:
+      type: object
+      required:
+        - id
+        - email
+        - role
+        - createdAt
+      properties:
+        id:
+          type: string
+          description: Unique user identifier
+          example: "clp123abc456"
+        email:
+          type: string
+          format: email
+          description: User's email address
+          example: "john.doe@example.com"
+        name:
+          type: string
+          description: User's full name
+          example: "John Doe"
+        firstName:
+          type: string
+          description: User's first name
+          example: "John"
+        lastName:
+          type: string
+          description: User's last name
+          example: "Doe"
+        company:
+          type: string
+          nullable: true
+          description: User's company name
+          example: "ABC Construction"
+        title:
+          type: string
+          nullable: true
+          description: User's job title
+          example: "Site Supervisor"
+        phone:
+          type: string
+          nullable: true
+          description: User's phone number
+          example: "+1-555-0123"
+        role:
+          type: string
+          enum: [ADMIN, MANAGER, WORKER, CLIENT]
+          description: User's role in the system
+        theme:
+          type: string
+          enum: [light, dark]
+          nullable: true
+          description: User's preferred theme
+        language:
+          type: string
+          nullable: true
+          description: User's preferred language
+          example: "en"
+        image:
+          type: string
+          nullable: true
+          description: User's profile image URL
+        isOnline:
+          type: boolean
+          description: Whether user is currently online
+        lastActive:
+          type: string
+          format: date-time
+          nullable: true
+          description: User's last activity timestamp
+        createdAt:
+          type: string
+          format: date-time
+          description: Account creation timestamp
+
+    ErrorResponse:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+          description: Error message
+          example: "Validation failed"
+        code:
+          type: string
+          description: Error code for programmatic handling
+          example: "VALIDATION_ERROR"
+        details:
+          type: object
+          description: Additional error details
+          additionalProperties: true
+
+tags:
+  - name: System
+    description: System health and monitoring endpoints
+  - name: Authentication
+    description: User authentication and session management
+  - name: User Management
+    description: User profile and account management
+  - name: Projects
+    description: Construction project management
+  - name: Teams
+    description: Team collaboration and management
+  - name: Materials
+    description: Material management and comparison
+  - name: Real-time
+    description: WebSocket and real-time communication
+
+externalDocs:
+  description: ConstructPro Documentation
+  url: https://github.com/vovelet-tech/constructpro/docs

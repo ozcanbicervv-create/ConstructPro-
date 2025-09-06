@@ -1,0 +1,315 @@
+name: Quality Gates & Coverage
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  schedule:
+    # Run weekly quality report on Sundays at 3 AM UTC
+    - cron: '0 3 * * 0'
+
+env:
+  NODE_VERSION: '18'
+  COVERAGE_THRESHOLD: 80
+
+jobs:
+  # Code quality analysis
+  code-quality:
+    name: Code Quality Analysis
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch full history for better analysis
+          
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Run ESLint with detailed output
+        run: |
+          npx eslint . --ext .ts,.tsx,.js,.jsx --format json --output-file eslint-results.json || true
+          npx eslint . --ext .ts,.tsx,.js,.jsx --format stylish
+          
+      - name: Analyze ESLint results
+        run: |
+          if [ -f eslint-results.json ]; then
+            ERROR_COUNT=$(cat eslint-results.json | jq '[.[] | select(.errorCount > 0)] | length')
+            WARNING_COUNT=$(cat eslint-results.json | jq '[.[] | select(.warningCount > 0)] | length')
+            
+            echo "ESLint Results:"
+            echo "- Files with errors: $ERROR_COUNT"
+            echo "- Files with warnings: $WARNING_COUNT"
+            
+            if [ "$ERROR_COUNT" -gt 0 ]; then
+              echo "❌ ESLint found errors that must be fixed"
+              exit 1
+            fi
+          fi
+          
+      - name: Check code complexity
+        run: |
+          # Install complexity checker
+          npm install -g complexity-report
+          
+          # Generate complexity report
+          cr --format json --output complexity-report.json src/ || true
+          
+          if [ -f complexity-report.json ]; then
+            echo "Code complexity analysis completed"
+            # You can add thresholds here based on your requirements
+          fi
+          
+      - name: Upload quality reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: quality-reports
+          path: |
+            eslint-results.json
+            complexity-report.json
+          retention-days: 30
+
+  # Test coverage analysis
+  coverage-analysis:
+    name: Coverage Analysis
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Setup test database
+        run: |
+          npm run db:generate
+          npm run db:push
+        env:
+          DATABASE_URL: "file:./test.db"
+          
+      - name: Run tests with coverage
+        run: npm run test:coverage
+        
+      - name: Analyze coverage results
+        id: coverage
+        run: |
+          if [ -f coverage/coverage-summary.json ]; then
+            COVERAGE=$(cat coverage/coverage-summary.json | jq '.total.lines.pct')
+            echo "Current coverage: $COVERAGE%"
+            echo "coverage=$COVERAGE" >> $GITHUB_OUTPUT
+            
+            if (( $(echo "$COVERAGE < $COVERAGE_THRESHOLD" | bc -l) )); then
+              echo "❌ Coverage $COVERAGE% is below threshold $COVERAGE_THRESHOLD%"
+              echo "coverage-passed=false" >> $GITHUB_OUTPUT
+            else
+              echo "✅ Coverage $COVERAGE% meets threshold $COVERAGE_THRESHOLD%"
+              echo "coverage-passed=true" >> $GITHUB_OUTPUT
+            fi
+          else
+            echo "❌ Coverage report not found"
+            echo "coverage-passed=false" >> $GITHUB_OUTPUT
+          fi
+          
+      - name: Generate coverage badge
+        run: |
+          COVERAGE=${{ steps.coverage.outputs.coverage }}
+          COLOR="red"
+          
+          if (( $(echo "$COVERAGE >= 90" | bc -l) )); then
+            COLOR="brightgreen"
+          elif (( $(echo "$COVERAGE >= 80" | bc -l) )); then
+            COLOR="green"
+          elif (( $(echo "$COVERAGE >= 70" | bc -l) )); then
+            COLOR="yellow"
+          elif (( $(echo "$COVERAGE >= 60" | bc -l) )); then
+            COLOR="orange"
+          fi
+          
+          echo "Coverage badge: ![Coverage](https://img.shields.io/badge/coverage-${COVERAGE}%25-${COLOR})"
+          
+      - name: Upload coverage reports
+        uses: codecov/codecov-action@v4
+        with:
+          file: ./coverage/lcov.info
+          flags: unittests
+          name: codecov-umbrella
+          fail_ci_if_error: false
+          
+      - name: Comment coverage on PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const coverage = '${{ steps.coverage.outputs.coverage }}';
+            const passed = '${{ steps.coverage.outputs.coverage-passed }}';
+            const threshold = '${{ env.COVERAGE_THRESHOLD }}';
+            
+            const status = passed === 'true' ? '✅' : '❌';
+            const color = passed === 'true' ? 'green' : 'red';
+            
+            const body = `## 📊 Test Coverage Report
+            
+            ${status} **Coverage: ${coverage}%** (Threshold: ${threshold}%)
+            
+            ![Coverage](https://img.shields.io/badge/coverage-${coverage}%25-${color})
+            
+            ${passed === 'false' ? '⚠️ Coverage is below the required threshold. Please add more tests.' : ''}
+            
+            View detailed coverage report in the [Actions artifacts](${context.payload.pull_request.html_url}/checks).`;
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body
+            });
+
+  # Performance benchmarking
+  performance-benchmark:
+    name: Performance Benchmark
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Build application
+        run: npm run build
+        
+      - name: Install Lighthouse CI
+        run: npm install -g @lhci/cli
+        
+      - name: Run Lighthouse CI
+        run: |
+          # Start the application
+          npm run start &
+          SERVER_PID=$!
+          sleep 30
+          
+          # Run Lighthouse
+          lhci autorun --upload.target=temporary-public-storage || true
+          
+          # Stop the server
+          kill $SERVER_PID
+        env:
+          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+          
+      - name: Bundle size analysis
+        run: |
+          # Analyze bundle size
+          npx next-bundle-analyzer || true
+          
+          # Check for large bundles
+          find .next/static -name "*.js" -size +500k -exec echo "⚠️ Large bundle found: {} ($(du -h {} | cut -f1))" \;
+
+  # Documentation quality check
+  docs-quality:
+    name: Documentation Quality
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Check README quality
+        run: |
+          # Check if README exists and has minimum content
+          if [ ! -f README.md ]; then
+            echo "❌ README.md not found"
+            exit 1
+          fi
+          
+          README_LINES=$(wc -l < README.md)
+          if [ "$README_LINES" -lt 20 ]; then
+            echo "⚠️ README.md seems too short ($README_LINES lines)"
+          fi
+          
+          # Check for required sections
+          REQUIRED_SECTIONS=("Installation" "Usage" "Contributing")
+          for section in "${REQUIRED_SECTIONS[@]}"; do
+            if ! grep -qi "$section" README.md; then
+              echo "⚠️ README.md missing section: $section"
+            fi
+          done
+          
+      - name: Check API documentation
+        run: |
+          # Check if API documentation exists
+          if [ -d "docs/api" ]; then
+            echo "✅ API documentation directory found"
+            API_FILES=$(find docs/api -name "*.md" | wc -l)
+            echo "Found $API_FILES API documentation files"
+          else
+            echo "⚠️ No API documentation found in docs/api/"
+          fi
+          
+      - name: Spell check documentation
+        run: |
+          # Install spell checker
+          npm install -g cspell
+          
+          # Check spelling in documentation files
+          cspell "**/*.md" --config .cspell.json || true
+          
+      - name: Link checker
+        run: |
+          # Install link checker
+          npm install -g markdown-link-check
+          
+          # Check links in markdown files
+          find . -name "*.md" -not -path "./node_modules/*" -exec markdown-link-check {} \; || true
+
+  # Quality gates summary
+  quality-summary:
+    name: Quality Gates Summary
+    runs-on: ubuntu-latest
+    needs: [code-quality, coverage-analysis, performance-benchmark, docs-quality]
+    if: always()
+    
+    steps:
+      - name: Generate quality report
+        run: |
+          echo "## 📋 Quality Gates Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Check | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Code Quality | ${{ needs.code-quality.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Coverage Analysis | ${{ needs.coverage-analysis.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Performance Benchmark | ${{ needs.performance-benchmark.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Documentation Quality | ${{ needs.docs-quality.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Determine overall status
+          if [[ "${{ needs.code-quality.result }}" == "success" && 
+                "${{ needs.coverage-analysis.result }}" == "success" && 
+                "${{ needs.performance-benchmark.result }}" == "success" && 
+                "${{ needs.docs-quality.result }}" == "success" ]]; then
+            echo "### 🎉 All quality gates passed!" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "### ⚠️ Some quality gates failed" >> $GITHUB_STEP_SUMMARY
+            echo "Please review the failed checks and address the issues." >> $GITHUB_STEP_SUMMARY
+          fi

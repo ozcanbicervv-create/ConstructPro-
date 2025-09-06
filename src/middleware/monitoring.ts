@@ -4,7 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { resourceMonitor } from '@/lib/monitoring';
+import { resourceMonitor } from '@/utils/monitoring';
 
 export interface RequestMetrics {
   method: string;

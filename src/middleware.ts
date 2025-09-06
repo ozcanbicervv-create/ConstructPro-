@@ -25,6 +25,15 @@ export default withAuth(
         if (req.nextUrl.pathname.startsWith("/auth")) {
           return true;
         }
+        // Allow access to public API endpoints
+        if (req.nextUrl.pathname.startsWith("/api/health") || 
+            req.nextUrl.pathname.startsWith("/api/docs")) {
+          return true;
+        }
+        // Allow access to NextAuth API routes
+        if (req.nextUrl.pathname.startsWith("/api/auth")) {
+          return true;
+        }
         // Require token for protected pages
         return !!token;
       },
@@ -34,6 +43,7 @@ export default withAuth(
 
 export const config = {
   matcher: [
+    // Protected pages
     "/dashboard/:path*",
     "/projects/:path*",
     "/materials/:path*",
@@ -41,6 +51,9 @@ export const config = {
     "/ar-tools/:path*",
     "/admin/:path*",
     "/profile/:path*",
-    "/auth/:path*",
+    // API routes
+    "/api/:path*",
+    // Static files that need security headers (excluding test-auth)
+    "/((?!_next/static|_next/image|favicon.ico|test-auth|api/auth/test-login).*)",
   ],
 };

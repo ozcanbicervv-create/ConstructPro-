@@ -14,7 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Loader2, HardHat } from "lucide-react";
 
-import { signUpSchema, type SignUpInput } from "@/lib/validations/auth";
+import { signUpSchema, type SignUpInput } from "@/utils/validations/auth";
 
 export default function SignUpPage() {
   const [isLoading, setIsLoading] = useState(false);

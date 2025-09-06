@@ -14,7 +14,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Loader2, HardHat } from "lucide-react";
 
-import { signInSchema, type SignInInput } from "@/lib/validations/auth";
+import { signInSchema, type SignInInput } from "@/utils/validations/auth";
 
 export default function SignInPage() {
   const [isLoading, setIsLoading] = useState(false);
