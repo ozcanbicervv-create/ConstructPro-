@@ -1,59 +1,107 @@
-# Dependencies (but keep package-lock.json)
+# ConstructPro Docker Build Optimization
+# Ignore files and directories that shouldn't be included in Docker build context
+
+# Dependencies
 node_modules
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-# Keep package-lock.json for npm ci
-!package-lock.json
 
-# Next.js
+# Next.js build output
 .next/
 out/
 
-# Production
-build
-
-# Misc
-.DS_Store
-*.tgz
-*.tar.gz
-
-# Debug
-*.log
-
-# Local env files
-.env*.local
-.env
-
-# Vercel
-.vercel
-
-# TypeScript
-*.tsbuildinfo
-
-# IDE
-.vscode
-.idea
-
-# OS
-Thumbs.db
+# Development files
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
 
 # Database
 db/
 *.db
 *.sqlite
 
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
 # Git
-.git
+.git/
 .gitignore
 
 # Documentation
 README.md
-DURUM_KONTROL_REHBERI.md
-COOLIFY_GITHUB_ENTEGRASYON_REHBERI.md
+*.md
+docs/
 
-# Keep fix scripts
-!fix-package-lock.sh
+# Test files
+__tests__/
+*.test.js
+*.test.ts
+*.spec.js
+*.spec.ts
+coverage/
 
-# Kiro
+# Logs
+logs/
+*.log
+
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+
+# Dependency directories
+jspm_packages/
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Microbundle cache
+.rpt2_cache/
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/
+
+# Optional REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# Kiro AI files (not needed in container)
 .kiro/
+
+# Examples directory
+examples/
+
+# Docker files (don't include other Dockerfiles in build)
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+
+# Build test results
+docker-build-test.md

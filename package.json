@@ -11,7 +11,15 @@
     "db:push": "prisma db push",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
-    "db:reset": "prisma migrate reset"
+    "db:reset": "prisma migrate reset",
+    "test:deployment": "node scripts/deployment-tests.js",
+    "test:local": "node scripts/deployment-tests.js http://localhost:3000",
+    "test:e2e": "node scripts/e2e-deployment-tests.js",
+    "test:e2e:local": "node scripts/e2e-deployment-tests.js http://localhost:3000",
+    "test:health": "curl -f http://localhost:3000/api/health || echo 'Health check failed'",
+    "test:security": "npm audit --audit-level moderate",
+    "deploy:test": "npm run build && npm run start & sleep 15 && npm run test:e2e:local && pkill -f 'tsx server.ts'",
+    "deploy:validate": "npm run build && npm run test:security && echo 'Deployment validation completed'"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

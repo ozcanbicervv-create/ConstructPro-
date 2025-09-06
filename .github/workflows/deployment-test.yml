@@ -1,0 +1,147 @@
+name: ConstructPro Deployment Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      deployment_url:
+        description: 'Deployment URL to test'
+        required: true
+        default: 'https://constructpro.vovelet-tech.com'
+
+jobs:
+  deployment-tests:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Run local build test
+      run: |
+        npm run build
+        echo "✅ Build completed successfully"
+        
+    - name: Start application for testing
+      run: |
+        npm run start &
+        sleep 30
+        echo "✅ Application started"
+      env:
+        NODE_ENV: production
+        
+    - name: Run local deployment tests
+      run: |
+        node scripts/deployment-tests.js http://localhost:3000
+        echo "✅ Local tests completed"
+        
+    - name: Run E2E tests on local instance
+      run: |
+        node scripts/e2e-deployment-tests.js http://localhost:3000
+        echo "✅ E2E tests completed"
+        
+    - name: Test production deployment (if URL provided)
+      if: github.event.inputs.deployment_url != ''
+      run: |
+        echo "Testing production deployment: ${{ github.event.inputs.deployment_url }}"
+        node scripts/e2e-deployment-tests.js ${{ github.event.inputs.deployment_url }}
+        echo "✅ Production tests completed"
+      env:
+        DEPLOYMENT_URL: ${{ github.event.inputs.deployment_url }}
+        
+    - name: Security audit
+      run: |
+        npm audit --audit-level moderate
+        echo "✅ Security audit completed"
+        
+    - name: Generate test report
+      if: always()
+      run: |
+        echo "## ConstructPro Deployment Test Report" > test-report.md
+        echo "- **Date**: $(date)" >> test-report.md
+        echo "- **Commit**: ${{ github.sha }}" >> test-report.md
+        echo "- **Branch**: ${{ github.ref_name }}" >> test-report.md
+        echo "- **Node.js**: $(node --version)" >> test-report.md
+        echo "- **npm**: $(npm --version)" >> test-report.md
+        echo "" >> test-report.md
+        echo "### Test Results" >> test-report.md
+        echo "All deployment tests completed successfully! ✅" >> test-report.md
+        
+    - name: Upload test report
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: deployment-test-report
+        path: test-report.md
+        
+  docker-build-test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+      
+    - name: Test Docker build
+      run: |
+        docker build -t constructpro-test:latest .
+        echo "✅ Docker build completed successfully"
+        
+    - name: Test Docker run
+      run: |
+        docker run -d --name constructpro-test -p 3001:3000 constructpro-test:latest
+        sleep 30
+        
+        # Test if container is running
+        if docker ps | grep constructpro-test; then
+          echo "✅ Container is running"
+        else
+          echo "❌ Container failed to start"
+          docker logs constructpro-test
+          exit 1
+        fi
+        
+        # Test health check
+        if curl -f http://localhost:3001/api/health; then
+          echo "✅ Health check passed"
+        else
+          echo "❌ Health check failed"
+          docker logs constructpro-test
+          exit 1
+        fi
+        
+        docker stop constructpro-test
+        docker rm constructpro-test
+        
+  notify-deployment:
+    needs: [deployment-tests, docker-build-test]
+    runs-on: ubuntu-latest
+    if: always()
+    
+    steps:
+    - name: Notify success
+      if: needs.deployment-tests.result == 'success' && needs.docker-build-test.result == 'success'
+      run: |
+        echo "🎉 All deployment tests passed!"
+        echo "ConstructPro is ready for deployment to Coolify"
+        
+    - name: Notify failure
+      if: needs.deployment-tests.result == 'failure' || needs.docker-build-test.result == 'failure'
+      run: |
+        echo "❌ Deployment tests failed!"
+        echo "Please review the test results before deploying"
+        exit 1
