@@ -3,10 +3,14 @@
   "version": "0.1.0",
   "private": true,
   "description": "Construction project management and collaboration platform built with Next.js, TypeScript, and modern web technologies",
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
   "scripts": {
     "dev": "nodemon --exec \"npx tsx server.ts\" --watch server.ts --watch src --ext ts,tsx,js,jsx",
     "build": "next build",
-    "start": "NODE_ENV=production tsx server.ts",
+    "start": "node start.js",
     "lint": "next lint",
     "db:push": "prisma db push",
     "db:generate": "prisma generate",

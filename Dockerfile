@@ -1,80 +1,60 @@
-# Multi-stage build for ConstructPro Next.js Application
-# Stage 1: Dependencies
-FROM node:18-alpine AS deps
+# ConstructPro Dockerfile - Optimized for Coolify deployment
+FROM node:18-alpine AS base
+
+# Install dependencies only when needed
+FROM base AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
 # Copy package files
-COPY package.json package-lock.json* ./
+COPY package.json ./
+COPY package-lock.json* ./
 
-# Install dependencies with fallback strategy
-RUN if [ -f package-lock.json ]; then \
-        echo "Using npm ci with package-lock.json" && \
-        npm ci --only=production; \
-    else \
-        echo "No package-lock.json found, using npm install" && \
-        npm install --only=production; \
-    fi
+# Install dependencies using npm install (more forgiving than npm ci)
+RUN npm install --frozen-lockfile || npm install
 
-# Stage 2: Builder
-FROM node:18-alpine AS builder
+# Rebuild the source code only when needed
+FROM base AS builder
 WORKDIR /app
-
-# Copy package files for dev dependencies
-COPY package.json package-lock.json* ./
-
-# Install all dependencies (including dev dependencies for build)
-RUN if [ -f package-lock.json ]; then \
-        echo "Installing all dependencies with npm ci" && \
-        npm ci; \
-    else \
-        echo "Installing all dependencies with npm install" && \
-        npm install; \
-    fi
-
-# Copy source code
+COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Generate Prisma client
-RUN npx prisma generate
+# Generate Prisma client (skip if no schema)
+RUN if [ -f prisma/schema.prisma ]; then npx prisma generate; fi
 
-# Build the application
-ENV NEXT_TELEMETRY_DISABLED 1
+# Build Next.js application
+ENV NEXT_TELEMETRY_DISABLED=1
 RUN npm run build
 
-# Stage 3: Runner
-FROM node:18-alpine AS runner
+# Production image, copy all the files and run next
+FROM base AS runner
 WORKDIR /app
 
-ENV NODE_ENV production
-ENV NEXT_TELEMETRY_DISABLED 1
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
 
-# Create non-root user
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
-# Copy necessary files
+# Copy built application
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
-COPY --from=builder /app/prisma ./prisma
-COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 
-# Copy server.ts and related files
+# Copy Prisma files if they exist
+COPY --from=builder /app/prisma ./prisma 2>/dev/null || true
+COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma 2>/dev/null || true
+
+# Copy server files and dependencies
 COPY --from=builder /app/server.ts ./
 COPY --from=builder /app/src ./src
-
-# Copy tsx and other necessary executables
 COPY --from=builder /app/node_modules ./node_modules
 
-# Set correct permissions
 USER nextjs
 
-# Expose port
 EXPOSE 3000
 
-ENV PORT 3000
-ENV HOSTNAME "0.0.0.0"
+ENV PORT=3000
+ENV HOSTNAME="0.0.0.0"
 
-# Start the application using tsx
 CMD ["npx", "tsx", "server.ts"]
