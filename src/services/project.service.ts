@@ -1,566 +1,498 @@
-import { apiService } from './api.service';
-import type { 
-  CreateProjectRequest,
-  UpdateProjectRequest,
-  ProjectSearchRequest,
-  CreateTaskRequest,
-  UpdateTaskRequest,
-  TaskSearchRequest,
-  CreateMaterialRequest,
-  UpdateMaterialRequest,
-  MaterialSearchRequest,
-  MaterialComparisonRequest,
-  MaterialComparisonResponse,
-  FileUploadRequest,
-  FileUploadResponse,
-  BulkFileUploadRequest,
-  BulkFileUploadResponse,
-  PaginatedResponse,
-  ApiResponse 
-} from '@/types/api.types';
-import type { 
-  Project, 
-  Task, 
-  Material, 
-  ProjectDocument,
-  ProjectStats,
-  ProjectDashboard,
-  Milestone,
-  ProjectPhase
-} from '@/types/project.types';
+import { prisma } from '@/utils/db';
+import { CreateProjectRequest, UpdateProjectRequest, ProjectFilters } from '@/utils/validation-schemas';
+import { PaginationParams, PaginatedResponse, createPaginatedResponse } from '@/utils/api-helpers';
+import { Project, Prisma } from '@prisma/client';
 
-/**
- * Project service for handling project management operations
- * Manages projects, tasks, materials, documents, and related functionality
- */
+// Extended project type with relations
+export type ProjectWithRelations = Project & {
+  manager: {
+    id: string;
+    name: string | null;
+    email: string;
+    firstName: string | null;
+    lastName: string | null;
+  };
+  tasks: Array<{
+    id: string;
+    title: string;
+    status: string;
+    priority: string;
+    dueDate: Date | null;
+  }>;
+  materials: Array<{
+    id: string;
+    name: string;
+    quantity: number;
+    totalCost: number;
+  }>;
+  documents: Array<{
+    id: string;
+    name: string;
+    type: string;
+    fileSize: number;
+  }>;
+  members: Array<{
+    id: string;
+    role: string;
+    user: {
+      id: string;
+      name: string | null;
+      email: string;
+    };
+  }>;
+  milestones: Array<{
+    id: string;
+    name: string;
+    dueDate: Date;
+    completed: boolean;
+  }>;
+  phases: Array<{
+    id: string;
+    name: string;
+    status: string;
+    startDate: Date;
+    endDate: Date;
+  }>;
+};
+
 export class ProjectService {
-  private readonly PROJECT_ENDPOINTS = {
-    PROJECTS: '/api/projects',
-    PROJECT_BY_ID: (id: string) => `/api/projects/${id}`,
-    PROJECT_TASKS: (id: string) => `/api/projects/${id}/tasks`,
-    PROJECT_MATERIALS: (id: string) => `/api/projects/${id}/materials`,
-    PROJECT_DOCUMENTS: (id: string) => `/api/projects/${id}/documents`,
-    PROJECT_TEAM: (id: string) => `/api/projects/${id}/team`,
-    PROJECT_MILESTONES: (id: string) => `/api/projects/${id}/milestones`,
-    PROJECT_PHASES: (id: string) => `/api/projects/${id}/phases`,
-    PROJECT_STATS: (id: string) => `/api/projects/${id}/stats`,
-    
-    TASKS: '/api/tasks',
-    TASK_BY_ID: (id: string) => `/api/tasks/${id}`,
-    TASK_COMMENTS: (id: string) => `/api/tasks/${id}/comments`,
-    TASK_ATTACHMENTS: (id: string) => `/api/tasks/${id}/attachments`,
-    
-    MATERIALS: '/api/materials',
-    MATERIAL_BY_ID: (id: string) => `/api/materials/${id}`,
-    MATERIAL_COMPARISON: '/api/materials/compare',
-    
-    DOCUMENTS: '/api/documents',
-    DOCUMENT_BY_ID: (id: string) => `/api/documents/${id}`,
-    DOCUMENT_UPLOAD: '/api/documents/upload',
-    DOCUMENT_BULK_UPLOAD: '/api/documents/bulk-upload',
-    
-    DASHBOARD: '/api/dashboard',
-    SEARCH: '/api/search',
-  } as const;
+  // Create a new project
+  static async createProject(data: CreateProjectRequest, managerId: string): Promise<Project> {
+    const project = await prisma.project.create({
+      data: {
+        ...data,
+        managerId,
+        startDate: new Date(data.startDate),
+        endDate: new Date(data.endDate),
+        budget: data.budget ? new Prisma.Decimal(data.budget) : null,
+      },
+      include: {
+        manager: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            firstName: true,
+            lastName: true,
+          },
+        },
+      },
+    });
 
-  // Project Management Methods
+    // Add the manager as a project member with OWNER role
+    await prisma.projectMember.create({
+      data: {
+        projectId: project.id,
+        userId: managerId,
+        role: 'OWNER',
+      },
+    });
 
-  /**
-   * Get all projects with optional filtering and pagination
-   */
-  async getProjects(searchParams?: ProjectSearchRequest): Promise<PaginatedResponse<Project>> {
-    try {
-      const response = await apiService.get<Project[]>(
-        this.PROJECT_ENDPOINTS.PROJECTS,
-        searchParams
-      );
-
-      return response as PaginatedResponse<Project>;
-    } catch (error) {
-      console.error('Get projects error:', error);
-      throw error;
-    }
+    return project;
   }
 
-  /**
-   * Get project by ID
-   */
-  async getProject(id: string): Promise<ApiResponse<Project>> {
-    try {
-      return await apiService.get<Project>(this.PROJECT_ENDPOINTS.PROJECT_BY_ID(id));
-    } catch (error) {
-      console.error('Get project error:', error);
-      throw error;
+  // Get projects with filtering and pagination
+  static async getProjects(
+    filters: ProjectFilters,
+    pagination: PaginationParams,
+    userId?: string
+  ): Promise<PaginatedResponse<ProjectWithRelations>> {
+    const where: Prisma.ProjectWhereInput = {};
+
+    // Apply filters
+    if (filters.status) {
+      where.status = filters.status;
     }
+
+    if (filters.priority) {
+      where.priority = filters.priority;
+    }
+
+    if (filters.managerId) {
+      where.managerId = filters.managerId;
+    }
+
+    if (filters.search) {
+      where.OR = [
+        { name: { contains: filters.search } },
+        { description: { contains: filters.search } },
+        { location: { contains: filters.search } },
+      ];
+    }
+
+    if (filters.startDateFrom || filters.startDateTo) {
+      where.startDate = {};
+      if (filters.startDateFrom) {
+        where.startDate.gte = new Date(filters.startDateFrom);
+      }
+      if (filters.startDateTo) {
+        where.startDate.lte = new Date(filters.startDateTo);
+      }
+    }
+
+    if (filters.endDateFrom || filters.endDateTo) {
+      where.endDate = {};
+      if (filters.endDateFrom) {
+        where.endDate.gte = new Date(filters.endDateFrom);
+      }
+      if (filters.endDateTo) {
+        where.endDate.lte = new Date(filters.endDateTo);
+      }
+    }
+
+    if (filters.budgetMin !== undefined || filters.budgetMax !== undefined) {
+      where.budget = {};
+      if (filters.budgetMin !== undefined) {
+        where.budget.gte = new Prisma.Decimal(filters.budgetMin);
+      }
+      if (filters.budgetMax !== undefined) {
+        where.budget.lte = new Prisma.Decimal(filters.budgetMax);
+      }
+    }
+
+    if (filters.location) {
+      where.location = { contains: filters.location };
+    }
+
+    // If userId is provided, filter to projects where user is a member or manager
+    if (userId) {
+      where.OR = [
+        { managerId: userId },
+        { members: { some: { userId } } },
+      ];
+    }
+
+    const [projects, total] = await Promise.all([
+      prisma.project.findMany({
+        where,
+        skip: pagination.skip,
+        take: pagination.limit,
+        orderBy: [
+          { priority: 'desc' },
+          { startDate: 'asc' },
+        ],
+        include: {
+          manager: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              firstName: true,
+              lastName: true,
+            },
+          },
+          tasks: {
+            select: {
+              id: true,
+              title: true,
+              status: true,
+              priority: true,
+              dueDate: true,
+            },
+            take: 5, // Limit to recent tasks
+            orderBy: { createdAt: 'desc' },
+          },
+          materials: {
+            select: {
+              id: true,
+              name: true,
+              quantity: true,
+              totalCost: true,
+            },
+            take: 5, // Limit to recent materials
+          },
+          documents: {
+            select: {
+              id: true,
+              name: true,
+              type: true,
+              fileSize: true,
+            },
+            take: 5, // Limit to recent documents
+          },
+          members: {
+            select: {
+              id: true,
+              role: true,
+              user: {
+                select: {
+                  id: true,
+                  name: true,
+                  email: true,
+                },
+              },
+            },
+          },
+          milestones: {
+            select: {
+              id: true,
+              name: true,
+              dueDate: true,
+              completed: true,
+            },
+            orderBy: { dueDate: 'asc' },
+          },
+          phases: {
+            select: {
+              id: true,
+              name: true,
+              status: true,
+              startDate: true,
+              endDate: true,
+            },
+            orderBy: { order: 'asc' },
+          },
+        },
+      }),
+      prisma.project.count({ where }),
+    ]);
+
+    return createPaginatedResponse(projects, total, pagination.page, pagination.limit);
   }
 
-  /**
-   * Create new project
-   */
-  async createProject(projectData: CreateProjectRequest): Promise<ApiResponse<Project>> {
-    try {
-      return await apiService.post<Project>(
-        this.PROJECT_ENDPOINTS.PROJECTS,
-        projectData
-      );
-    } catch (error) {
-      console.error('Create project error:', error);
-      throw error;
+  // Get a single project by ID with full relations
+  static async getProjectById(id: string, userId?: string): Promise<ProjectWithRelations | null> {
+    const project = await prisma.project.findUnique({
+      where: { id },
+      include: {
+        manager: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            firstName: true,
+            lastName: true,
+          },
+        },
+        tasks: {
+          select: {
+            id: true,
+            title: true,
+            status: true,
+            priority: true,
+            dueDate: true,
+          },
+          orderBy: { createdAt: 'desc' },
+        },
+        materials: {
+          select: {
+            id: true,
+            name: true,
+            quantity: true,
+            totalCost: true,
+          },
+        },
+        documents: {
+          select: {
+            id: true,
+            name: true,
+            type: true,
+            fileSize: true,
+          },
+        },
+        members: {
+          select: {
+            id: true,
+            role: true,
+            user: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+              },
+            },
+          },
+        },
+        milestones: {
+          select: {
+            id: true,
+            name: true,
+            dueDate: true,
+            completed: true,
+          },
+          orderBy: { dueDate: 'asc' },
+        },
+        phases: {
+          select: {
+            id: true,
+            name: true,
+            status: true,
+            startDate: true,
+            endDate: true,
+          },
+          orderBy: { order: 'asc' },
+        },
+      },
+    });
+
+    if (!project) {
+      return null;
     }
-  }
 
-  /**
-   * Update existing project
-   */
-  async updateProject(id: string, projectData: UpdateProjectRequest): Promise<ApiResponse<Project>> {
-    try {
-      return await apiService.patch<Project>(
-        this.PROJECT_ENDPOINTS.PROJECT_BY_ID(id),
-        projectData
-      );
-    } catch (error) {
-      console.error('Update project error:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Delete project
-   */
-  async deleteProject(id: string): Promise<ApiResponse<void>> {
-    try {
-      return await apiService.delete<void>(this.PROJECT_ENDPOINTS.PROJECT_BY_ID(id));
-    } catch (error) {
-      console.error('Delete project error:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Get project statistics
-   */
-  async getProjectStats(id: string): Promise<ApiResponse<ProjectStats>> {
-    try {
-      return await apiService.get<ProjectStats>(this.PROJECT_ENDPOINTS.PROJECT_STATS(id));
-    } catch (error) {
-      console.error('Get project stats error:', error);
-      throw error;
-    }
-  }
-
-  // Task Management Methods
-
-  /**
-   * Get tasks with optional filtering
-   */
-  async getTasks(searchParams?: TaskSearchRequest): Promise<PaginatedResponse<Task>> {
-    try {
-      const response = await apiService.get<Task[]>(
-        this.TASK_ENDPOINTS.TASKS,
-        searchParams
-      );
-
-      return response as PaginatedResponse<Task>;
-    } catch (error) {
-      console.error('Get tasks error:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Get project tasks
-   */
-  async getProjectTasks(projectId: string, searchParams?: TaskSearchRequest): Promise<PaginatedResponse<Task>> {
-    try {
-      const response = await apiService.get<Task[]>(
-        this.PROJECT_ENDPOINTS.PROJECT_TASKS(projectId),
-        searchParams
-      );
-
-      return response as PaginatedResponse<Task>;
-    } catch (error) {
-      console.error('Get project tasks error:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Get task by ID
-   */
-  async getTask(id: string): Promise<ApiResponse<Task>> {
-    try {
-      return await apiService.get<Task>(this.TASK_ENDPOINTS.TASK_BY_ID(id));
-    } catch (error) {
-      console.error('Get task error:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Create new task
-   */
-  async createTask(taskData: CreateTaskRequest): Promise<ApiResponse<Task>> {
-    try {
-      return await apiService.post<Task>(
-        this.TASK_ENDPOINTS.TASKS,
-        taskData
-      );
-    } catch (error) {
-      console.error('Create task error:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Update existing task
-   */
-  async updateTask(id: string, taskData: UpdateTaskRequest): Promise<ApiResponse<Task>> {
-    try {
-      return await apiService.patch<Task>(
-        this.TASK_ENDPOINTS.TASK_BY_ID(id),
-        taskData
-      );
-    } catch (error) {
-      console.error('Update task error:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Delete task
-   */
-  async deleteTask(id: string): Promise<ApiResponse<void>> {
-    try {
-      return await apiService.delete<void>(this.TASK_ENDPOINTS.TASK_BY_ID(id));
-    } catch (error) {
-      console.error('Delete task error:', error);
-      throw error;
-    }
-  }
-
-  // Material Management Methods
-
-  /**
-   * Get materials with optional filtering
-   */
-  async getMaterials(searchParams?: MaterialSearchRequest): Promise<PaginatedResponse<Material>> {
-    try {
-      const response = await apiService.get<Material[]>(
-        this.MATERIALS_ENDPOINTS.MATERIALS,
-        searchParams
-      );
-
-      return response as PaginatedResponse<Material>;
-    } catch (error) {
-      console.error('Get materials error:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Get project materials
-   */
-  async getProjectMaterials(projectId: string, searchParams?: MaterialSearchRequest): Promise<PaginatedResponse<Material>> {
-    try {
-      const response = await apiService.get<Material[]>(
-        this.PROJECT_ENDPOINTS.PROJECT_MATERIALS(projectId),
-        searchParams
-      );
-
-      return response as PaginatedResponse<Material>;
-    } catch (error) {
-      console.error('Get project materials error:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Get material by ID
-   */
-  async getMaterial(id: string): Promise<ApiResponse<Material>> {
-    try {
-      return await apiService.get<Material>(this.MATERIALS_ENDPOINTS.MATERIAL_BY_ID(id));
-    } catch (error) {
-      console.error('Get material error:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Create new material
-   */
-  async createMaterial(materialData: CreateMaterialRequest): Promise<ApiResponse<Material>> {
-    try {
-      return await apiService.post<Material>(
-        this.MATERIALS_ENDPOINTS.MATERIALS,
-        materialData
-      );
-    } catch (error) {
-      console.error('Create material error:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Update existing material
-   */
-  async updateMaterial(id: string, materialData: UpdateMaterialRequest): Promise<ApiResponse<Material>> {
-    try {
-      return await apiService.patch<Material>(
-        this.MATERIALS_ENDPOINTS.MATERIAL_BY_ID(id),
-        materialData
-      );
-    } catch (error) {
-      console.error('Update material error:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Delete material
-   */
-  async deleteMaterial(id: string): Promise<ApiResponse<void>> {
-    try {
-      return await apiService.delete<void>(this.MATERIALS_ENDPOINTS.MATERIAL_BY_ID(id));
-    } catch (error) {
-      console.error('Delete material error:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Compare materials from different suppliers
-   */
-  async compareMaterials(comparisonData: MaterialComparisonRequest): Promise<ApiResponse<MaterialComparisonResponse>> {
-    try {
-      return await apiService.post<MaterialComparisonResponse>(
-        this.MATERIALS_ENDPOINTS.MATERIAL_COMPARISON,
-        comparisonData
-      );
-    } catch (error) {
-      console.error('Compare materials error:', error);
-      throw error;
-    }
-  }
-
-  // Document Management Methods
-
-  /**
-   * Get project documents
-   */
-  async getProjectDocuments(projectId: string): Promise<ApiResponse<ProjectDocument[]>> {
-    try {
-      return await apiService.get<ProjectDocument[]>(
-        this.PROJECT_ENDPOINTS.PROJECT_DOCUMENTS(projectId)
-      );
-    } catch (error) {
-      console.error('Get project documents error:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Upload single document
-   */
-  async uploadDocument(
-    file: File,
-    uploadData: Omit<FileUploadRequest, 'file'>,
-    onProgress?: (progress: number) => void
-  ): Promise<ApiResponse<FileUploadResponse>> {
-    try {
-      return await apiService.uploadFile<FileUploadResponse>(
-        this.DOCUMENTS_ENDPOINTS.DOCUMENT_UPLOAD,
-        file,
-        uploadData,
-        onProgress
-      );
-    } catch (error) {
-      console.error('Upload document error:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Upload multiple documents
-   */
-  async uploadDocuments(uploadData: BulkFileUploadRequest): Promise<ApiResponse<BulkFileUploadResponse>> {
-    try {
-      const formData = new FormData();
+    // Check if user has access to this project
+    if (userId) {
+      const hasAccess = project.managerId === userId || 
+        project.members.some(member => member.user.id === userId);
       
-      uploadData.files.forEach((file, index) => {
-        formData.append(`files[${index}]`, file);
+      if (!hasAccess) {
+        return null;
+      }
+    }
+
+    return project;
+  }
+
+  // Update a project
+  static async updateProject(
+    id: string,
+    data: UpdateProjectRequest,
+    userId: string
+  ): Promise<Project | null> {
+    // First check if user has permission to update this project
+    const existingProject = await prisma.project.findUnique({
+      where: { id },
+      include: {
+        members: {
+          where: { userId },
+        },
+      },
+    });
+
+    if (!existingProject) {
+      return null;
+    }
+
+    // Check if user is manager or has appropriate role
+    const isManager = existingProject.managerId === userId;
+    const isOwnerOrManager = existingProject.members.some(
+      member => member.userId === userId && ['OWNER', 'MANAGER'].includes(member.role)
+    );
+
+    if (!isManager && !isOwnerOrManager) {
+      throw new Error('Insufficient permissions');
+    }
+
+    const updateData: Prisma.ProjectUpdateInput = { ...data };
+
+    // Convert date strings to Date objects
+    if (data.startDate) {
+      updateData.startDate = new Date(data.startDate);
+    }
+    if (data.endDate) {
+      updateData.endDate = new Date(data.endDate);
+    }
+    if (data.budget !== undefined) {
+      updateData.budget = data.budget ? new Prisma.Decimal(data.budget) : null;
+    }
+
+    return await prisma.project.update({
+      where: { id },
+      data: updateData,
+      include: {
+        manager: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            firstName: true,
+            lastName: true,
+          },
+        },
+      },
+    });
+  }
+
+  // Delete a project (soft delete by setting status to CANCELLED)
+  static async deleteProject(id: string, userId: string): Promise<boolean> {
+    // Check if user has permission to delete this project
+    const project = await prisma.project.findUnique({
+      where: { id },
+      include: {
+        members: {
+          where: { userId },
+        },
+      },
+    });
+
+    if (!project) {
+      return false;
+    }
+
+    // Only project manager or owner can delete
+    const isManager = project.managerId === userId;
+    const isOwner = project.members.some(
+      member => member.userId === userId && member.role === 'OWNER'
+    );
+
+    if (!isManager && !isOwner) {
+      throw new Error('Insufficient permissions');
+    }
+
+    // Perform cascade delete of related data
+    await prisma.$transaction(async (tx) => {
+      // Delete task attachments
+      await tx.taskAttachment.deleteMany({
+        where: {
+          task: {
+            projectId: id,
+          },
+        },
       });
 
-      // Add other data
-      Object.entries(uploadData).forEach(([key, value]) => {
-        if (key !== 'files') {
-          formData.append(key, String(value));
-        }
+      // Delete task comments
+      await tx.taskComment.deleteMany({
+        where: {
+          task: {
+            projectId: id,
+          },
+        },
       });
 
-      return await apiService.post<BulkFileUploadResponse>(
-        this.DOCUMENTS_ENDPOINTS.DOCUMENT_BULK_UPLOAD,
-        formData
-      );
-    } catch (error) {
-      console.error('Upload documents error:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Delete document
-   */
-  async deleteDocument(id: string): Promise<ApiResponse<void>> {
-    try {
-      return await apiService.delete<void>(this.DOCUMENTS_ENDPOINTS.DOCUMENT_BY_ID(id));
-    } catch (error) {
-      console.error('Delete document error:', error);
-      throw error;
-    }
-  }
-
-  // Milestone and Phase Management
-
-  /**
-   * Get project milestones
-   */
-  async getProjectMilestones(projectId: string): Promise<ApiResponse<Milestone[]>> {
-    try {
-      return await apiService.get<Milestone[]>(
-        this.PROJECT_ENDPOINTS.PROJECT_MILESTONES(projectId)
-      );
-    } catch (error) {
-      console.error('Get project milestones error:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Get project phases
-   */
-  async getProjectPhases(projectId: string): Promise<ApiResponse<ProjectPhase[]>> {
-    try {
-      return await apiService.get<ProjectPhase[]>(
-        this.PROJECT_ENDPOINTS.PROJECT_PHASES(projectId)
-      );
-    } catch (error) {
-      console.error('Get project phases error:', error);
-      throw error;
-    }
-  }
-
-  // Dashboard and Analytics
-
-  /**
-   * Get dashboard data
-   */
-  async getDashboard(): Promise<ApiResponse<ProjectDashboard>> {
-    try {
-      return await apiService.get<ProjectDashboard>(this.DASHBOARD_ENDPOINTS.DASHBOARD);
-    } catch (error) {
-      console.error('Get dashboard error:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Search across projects, tasks, and materials
-   */
-  async search(query: string, filters?: Record<string, any>): Promise<ApiResponse<any>> {
-    try {
-      return await apiService.get<any>(this.SEARCH_ENDPOINTS.SEARCH, {
-        query,
-        ...filters,
+      // Delete tasks
+      await tx.task.deleteMany({
+        where: { projectId: id },
       });
-    } catch (error) {
-      console.error('Search error:', error);
-      throw error;
-    }
-  }
 
-  // Team Management
+      // Delete material orders
+      await tx.materialOrder.deleteMany({
+        where: {
+          material: {
+            projectId: id,
+          },
+        },
+      });
 
-  /**
-   * Get project team members
-   */
-  async getProjectTeam(projectId: string): Promise<ApiResponse<any[]>> {
-    try {
-      return await apiService.get<any[]>(
-        this.PROJECT_ENDPOINTS.PROJECT_TEAM(projectId)
-      );
-    } catch (error) {
-      console.error('Get project team error:', error);
-      throw error;
-    }
-  }
+      // Delete materials
+      await tx.material.deleteMany({
+        where: { projectId: id },
+      });
 
-  /**
-   * Add team member to project
-   */
-  async addTeamMember(projectId: string, memberData: any): Promise<ApiResponse<any>> {
-    try {
-      return await apiService.post<any>(
-        this.PROJECT_ENDPOINTS.PROJECT_TEAM(projectId),
-        memberData
-      );
-    } catch (error) {
-      console.error('Add team member error:', error);
-      throw error;
-    }
-  }
+      // Delete project documents
+      await tx.projectDocument.deleteMany({
+        where: { projectId: id },
+      });
 
-  /**
-   * Remove team member from project
-   */
-  async removeTeamMember(projectId: string, memberId: string): Promise<ApiResponse<void>> {
-    try {
-      return await apiService.delete<void>(
-        `${this.PROJECT_ENDPOINTS.PROJECT_TEAM(projectId)}/${memberId}`
-      );
-    } catch (error) {
-      console.error('Remove team member error:', error);
-      throw error;
-    }
-  }
+      // Delete project members
+      await tx.projectMember.deleteMany({
+        where: { projectId: id },
+      });
 
-  // Helper method aliases for backward compatibility
-  private get TASK_ENDPOINTS() {
-    return {
-      TASKS: this.PROJECT_ENDPOINTS.TASKS,
-      TASK_BY_ID: this.PROJECT_ENDPOINTS.TASK_BY_ID,
-    };
-  }
+      // Delete milestones
+      await tx.milestone.deleteMany({
+        where: { projectId: id },
+      });
 
-  private get MATERIALS_ENDPOINTS() {
-    return {
-      MATERIALS: this.PROJECT_ENDPOINTS.MATERIALS,
-      MATERIAL_BY_ID: this.PROJECT_ENDPOINTS.MATERIAL_BY_ID,
-      MATERIAL_COMPARISON: this.PROJECT_ENDPOINTS.MATERIAL_COMPARISON,
-    };
-  }
+      // Delete project phases
+      await tx.projectPhase.deleteMany({
+        where: { projectId: id },
+      });
 
-  private get DOCUMENTS_ENDPOINTS() {
-    return {
-      DOCUMENTS: this.PROJECT_ENDPOINTS.DOCUMENTS,
-      DOCUMENT_BY_ID: this.PROJECT_ENDPOINTS.DOCUMENT_BY_ID,
-      DOCUMENT_UPLOAD: this.PROJECT_ENDPOINTS.DOCUMENT_UPLOAD,
-      DOCUMENT_BULK_UPLOAD: this.PROJECT_ENDPOINTS.DOCUMENT_BULK_UPLOAD,
-    };
-  }
+      // Finally delete the project
+      await tx.project.delete({
+        where: { id },
+      });
+    });
 
-  private get DASHBOARD_ENDPOINTS() {
-    return {
-      DASHBOARD: this.PROJECT_ENDPOINTS.DASHBOARD,
-    };
-  }
-
-  private get SEARCH_ENDPOINTS() {
-    return {
-      SEARCH: this.PROJECT_ENDPOINTS.SEARCH,
-    };
+    return true;
   }
 }
-
-// Create singleton instance
-export const projectService = new ProjectService();

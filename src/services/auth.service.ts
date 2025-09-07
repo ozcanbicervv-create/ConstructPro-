@@ -1,365 +1,388 @@
-import { apiService } from './api.service';
-import type { 
-  LoginRequest, 
-  LoginResponse, 
-  RegisterRequest, 
-  RegisterResponse,
-  RefreshTokenRequest,
-  RefreshTokenResponse,
-  ForgotPasswordRequest,
-  ResetPasswordRequest,
-  ChangePasswordRequest,
-  ApiResponse 
-} from '@/types/api.types';
-import type { User } from '@/types/user.types';
+import { prisma } from '@/utils/db';
+import { hash, compare } from 'bcryptjs';
+import { sign, verify } from 'jsonwebtoken';
+import { authenticator } from 'otplib';
+import { randomBytes } from 'crypto';
+import { User, UserRole } from '@prisma/client';
 
-/**
- * Authentication service for handling user authentication operations
- * Manages login, registration, token refresh, and password operations
- */
+export interface AuthResponse {
+  user: Omit<User, 'password' | 'mfaSecret'>;
+  accessToken: string;
+  refreshToken: string;
+  requiresMFA?: boolean;
+}
+
+export interface MFASetupResponse {
+  secret: string;
+  qrCodeUrl: string;
+  backupCodes: string[];
+}
+
+export interface LoginRequest {
+  email: string;
+  password: string;
+  mfaCode?: string;
+}
+
+export interface RegisterRequest {
+  email: string;
+  password: string;
+  firstName?: string;
+  lastName?: string;
+  company?: string;
+  title?: string;
+  phone?: string;
+  role?: UserRole;
+}
+
+export interface Permission {
+  resource: string;
+  actions: string[];
+}
+
 export class AuthService {
-  private readonly AUTH_ENDPOINTS = {
-    LOGIN: '/api/auth/login',
-    REGISTER: '/api/auth/register',
-    LOGOUT: '/api/auth/logout',
-    REFRESH: '/api/auth/refresh',
-    FORGOT_PASSWORD: '/api/auth/forgot-password',
-    RESET_PASSWORD: '/api/auth/reset-password',
-    CHANGE_PASSWORD: '/api/auth/change-password',
-    VERIFY_EMAIL: '/api/auth/verify-email',
-    RESEND_VERIFICATION: '/api/auth/resend-verification',
-    ME: '/api/auth/me',
-  } as const;
+  private static readonly JWT_ACCESS_SECRET = process.env.JWT_ACCESS_SECRET || 'access-secret';
+  private static readonly JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || 'refresh-secret';
+  private static readonly ACCESS_TOKEN_EXPIRY = '15m';
+  private static readonly REFRESH_TOKEN_EXPIRY = '7d';
 
-  private readonly STORAGE_KEYS = {
-    ACCESS_TOKEN: 'auth_access_token',
-    REFRESH_TOKEN: 'auth_refresh_token',
-    USER: 'auth_user',
-    EXPIRES_AT: 'auth_expires_at',
-  } as const;
+  // Role-based permissions for construction industry
+  private static readonly ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
+    ADMIN: [
+      { resource: 'projects', actions: ['create', 'read', 'update', 'delete', 'manage'] },
+      { resource: 'users', actions: ['create', 'read', 'update', 'delete', 'manage'] },
+      { resource: 'tasks', actions: ['create', 'read', 'update', 'delete', 'assign'] },
+      { resource: 'materials', actions: ['create', 'read', 'update', 'delete', 'order'] },
+      { resource: 'documents', actions: ['create', 'read', 'update', 'delete', 'approve', 'share'] },
+      { resource: 'team', actions: ['read', 'assign', 'manage'] },
+      { resource: 'reports', actions: ['create', 'read', 'export'] },
+      { resource: 'system', actions: ['configure', 'monitor', 'backup'] }
+    ],
+    PROJECT_MANAGER: [
+      { resource: 'projects', actions: ['create', 'read', 'update', 'manage'] },
+      { resource: 'tasks', actions: ['create', 'read', 'update', 'delete', 'assign'] },
+      { resource: 'materials', actions: ['create', 'read', 'update', 'order'] },
+      { resource: 'documents', actions: ['create', 'read', 'update', 'approve', 'share'] },
+      { resource: 'team', actions: ['read', 'assign', 'manage'] },
+      { resource: 'reports', actions: ['create', 'read', 'export'] }
+    ],
+    SITE_SUPERVISOR: [
+      { resource: 'projects', actions: ['read'] },
+      { resource: 'tasks', actions: ['read', 'update', 'assign'] },
+      { resource: 'materials', actions: ['read', 'update'] },
+      { resource: 'documents', actions: ['create', 'read', 'update'] },
+      { resource: 'team', actions: ['read', 'assign'] },
+      { resource: 'reports', actions: ['create', 'read'] }
+    ],
+    WORKER: [
+      { resource: 'projects', actions: ['read'] },
+      { resource: 'tasks', actions: ['read', 'update'] },
+      { resource: 'materials', actions: ['read'] },
+      { resource: 'documents', actions: ['read', 'create'] },
+      { resource: 'reports', actions: ['read'] }
+    ],
+    CLIENT: [
+      { resource: 'projects', actions: ['read'] },
+      { resource: 'tasks', actions: ['read'] },
+      { resource: 'documents', actions: ['read'] },
+      { resource: 'reports', actions: ['read'] }
+    ],
+    SUPPLIER: [
+      { resource: 'materials', actions: ['read', 'update'] },
+      { resource: 'orders', actions: ['read', 'update'] },
+      { resource: 'documents', actions: ['read', 'create'] }
+    ]
+  };
 
   /**
-   * Login user with email and password
+   * Authenticate user with email/password and optional MFA
    */
-  async login(credentials: LoginRequest): Promise<ApiResponse<LoginResponse>> {
-    try {
-      const response = await apiService.post<LoginResponse>(
-        this.AUTH_ENDPOINTS.LOGIN,
-        credentials
-      );
+  static async login(credentials: LoginRequest): Promise<AuthResponse> {
+    const user = await prisma.user.findUnique({
+      where: { email: credentials.email }
+    });
 
-      if (response.success && response.data) {
-        await this.handleAuthSuccess(response.data);
+    if (!user || !user.password) {
+      throw new Error('Invalid credentials');
+    }
+
+    const isPasswordValid = await compare(credentials.password, user.password);
+    if (!isPasswordValid) {
+      throw new Error('Invalid credentials');
+    }
+
+    // Check if MFA is enabled
+    if (user.mfaEnabled && user.mfaSecret) {
+      if (!credentials.mfaCode) {
+        return {
+          user: this.sanitizeUser(user),
+          accessToken: '',
+          refreshToken: '',
+          requiresMFA: true
+        };
       }
 
-      return response;
-    } catch (error) {
-      console.error('Login error:', error);
-      throw error;
+      const isValidMFA = authenticator.verify({
+        token: credentials.mfaCode,
+        secret: user.mfaSecret
+      });
+
+      if (!isValidMFA) {
+        // Check backup codes
+        const backupCodes = (user.backupCodes as string[]) || [];
+        const isValidBackupCode = backupCodes.includes(credentials.mfaCode);
+        
+        if (!isValidBackupCode) {
+          throw new Error('Invalid MFA code');
+        }
+
+        // Remove used backup code
+        const updatedBackupCodes = backupCodes.filter(code => code !== credentials.mfaCode);
+        await prisma.user.update({
+          where: { id: user.id },
+          data: { backupCodes: updatedBackupCodes }
+        });
+      }
     }
+
+    // Update last active timestamp
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { 
+        lastActive: new Date(),
+        isOnline: true
+      }
+    });
+
+    const tokens = this.generateTokens(user);
+    
+    return {
+      user: this.sanitizeUser(user),
+      ...tokens
+    };
   }
 
   /**
    * Register new user
    */
-  async register(userData: RegisterRequest): Promise<ApiResponse<RegisterResponse>> {
-    try {
-      const response = await apiService.post<RegisterResponse>(
-        this.AUTH_ENDPOINTS.REGISTER,
-        userData
-      );
+  static async register(userData: RegisterRequest): Promise<AuthResponse> {
+    // Check if user already exists
+    const existingUser = await prisma.user.findUnique({
+      where: { email: userData.email }
+    });
 
-      if (response.success && response.data) {
-        await this.handleAuthSuccess(response.data);
-      }
-
-      return response;
-    } catch (error) {
-      console.error('Registration error:', error);
-      throw error;
+    if (existingUser) {
+      throw new Error('User with this email already exists');
     }
+
+    // Hash password
+    const hashedPassword = await hash(userData.password, 12);
+
+    // Create user
+    const user = await prisma.user.create({
+      data: {
+        email: userData.email,
+        password: hashedPassword,
+        firstName: userData.firstName,
+        lastName: userData.lastName,
+        name: userData.firstName && userData.lastName 
+          ? `${userData.firstName} ${userData.lastName}` 
+          : userData.email,
+        company: userData.company,
+        title: userData.title,
+        phone: userData.phone,
+        role: userData.role || UserRole.WORKER
+      }
+    });
+
+    const tokens = this.generateTokens(user);
+
+    return {
+      user: this.sanitizeUser(user),
+      ...tokens
+    };
   }
 
   /**
-   * Logout user and clear stored tokens
+   * Setup MFA for user
    */
-  async logout(): Promise<ApiResponse<void>> {
+  static async enableMFA(userId: string): Promise<MFASetupResponse> {
+    const user = await prisma.user.findUnique({
+      where: { id: userId }
+    });
+
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    // Generate secret
+    const secret = authenticator.generateSecret();
+    
+    // Generate backup codes
+    const backupCodes = Array.from({ length: 10 }, () => 
+      randomBytes(4).toString('hex').toUpperCase()
+    );
+
+    // Generate QR code URL
+    const qrCodeUrl = authenticator.keyuri(
+      user.email,
+      'ConstructPro',
+      secret
+    );
+
+    // Save secret (but don't enable MFA yet)
+    await prisma.user.update({
+      where: { id: userId },
+      data: {
+        mfaSecret: secret,
+        backupCodes: backupCodes
+      }
+    });
+
+    return {
+      secret,
+      qrCodeUrl,
+      backupCodes
+    };
+  }
+
+  /**
+   * Verify MFA setup and enable it
+   */
+  static async verifyMFA(userId: string, code: string): Promise<boolean> {
+    const user = await prisma.user.findUnique({
+      where: { id: userId }
+    });
+
+    if (!user || !user.mfaSecret) {
+      throw new Error('MFA not set up');
+    }
+
+    const isValid = authenticator.verify({
+      token: code,
+      secret: user.mfaSecret
+    });
+
+    if (isValid) {
+      await prisma.user.update({
+        where: { id: userId },
+        data: { mfaEnabled: true }
+      });
+    }
+
+    return isValid;
+  }
+
+  /**
+   * Disable MFA for user
+   */
+  static async disableMFA(userId: string, password: string): Promise<void> {
+    const user = await prisma.user.findUnique({
+      where: { id: userId }
+    });
+
+    if (!user || !user.password) {
+      throw new Error('User not found');
+    }
+
+    const isPasswordValid = await compare(password, user.password);
+    if (!isPasswordValid) {
+      throw new Error('Invalid password');
+    }
+
+    await prisma.user.update({
+      where: { id: userId },
+      data: {
+        mfaEnabled: false,
+        mfaSecret: null,
+        backupCodes: []
+      }
+    });
+  }
+
+  /**
+   * Refresh access token
+   */
+  static async refreshToken(refreshToken: string): Promise<AuthResponse> {
     try {
-      // Call logout endpoint to invalidate server-side session
-      const response = await apiService.post<void>(this.AUTH_ENDPOINTS.LOGOUT);
+      const payload = verify(refreshToken, this.JWT_REFRESH_SECRET) as any;
       
-      // Clear local storage regardless of server response
-      this.clearAuthData();
-      apiService.clearAuthToken();
+      const user = await prisma.user.findUnique({
+        where: { id: payload.userId }
+      });
 
-      return response;
-    } catch (error) {
-      // Clear local data even if server call fails
-      this.clearAuthData();
-      apiService.clearAuthToken();
-      console.error('Logout error:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Refresh authentication token
-   */
-  async refreshToken(): Promise<ApiResponse<RefreshTokenResponse>> {
-    try {
-      const refreshToken = this.getRefreshToken();
-      
-      if (!refreshToken) {
-        throw new Error('No refresh token available');
+      if (!user) {
+        throw new Error('User not found');
       }
 
-      const response = await apiService.post<RefreshTokenResponse>(
-        this.AUTH_ENDPOINTS.REFRESH,
-        { refreshToken } as RefreshTokenRequest
-      );
+      const tokens = this.generateTokens(user);
 
-      if (response.success && response.data) {
-        // Update stored tokens
-        this.setAccessToken(response.data.token);
-        this.setRefreshToken(response.data.refreshToken);
-        this.setExpiresAt(response.data.expiresAt);
-        
-        // Update API service token
-        apiService.setAuthToken(response.data.token);
-      }
-
-      return response;
+      return {
+        user: this.sanitizeUser(user),
+        ...tokens
+      };
     } catch (error) {
-      console.error('Token refresh error:', error);
-      // Clear auth data if refresh fails
-      this.clearAuthData();
-      apiService.clearAuthToken();
-      throw error;
+      throw new Error('Invalid refresh token');
     }
   }
 
   /**
-   * Request password reset
+   * Logout user
    */
-  async forgotPassword(email: string): Promise<ApiResponse<void>> {
-    try {
-      return await apiService.post<void>(
-        this.AUTH_ENDPOINTS.FORGOT_PASSWORD,
-        { email } as ForgotPasswordRequest
-      );
-    } catch (error) {
-      console.error('Forgot password error:', error);
-      throw error;
-    }
+  static async logout(userId: string): Promise<void> {
+    await prisma.user.update({
+      where: { id: userId },
+      data: { isOnline: false }
+    });
   }
 
   /**
-   * Reset password with token
+   * Check if user has permission for resource and action
    */
-  async resetPassword(resetData: ResetPasswordRequest): Promise<ApiResponse<void>> {
-    try {
-      return await apiService.post<void>(
-        this.AUTH_ENDPOINTS.RESET_PASSWORD,
-        resetData
-      );
-    } catch (error) {
-      console.error('Reset password error:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Change user password
-   */
-  async changePassword(passwordData: ChangePasswordRequest): Promise<ApiResponse<void>> {
-    try {
-      return await apiService.post<void>(
-        this.AUTH_ENDPOINTS.CHANGE_PASSWORD,
-        passwordData
-      );
-    } catch (error) {
-      console.error('Change password error:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Verify email address
-   */
-  async verifyEmail(token: string): Promise<ApiResponse<void>> {
-    try {
-      return await apiService.post<void>(
-        `${this.AUTH_ENDPOINTS.VERIFY_EMAIL}?token=${token}`
-      );
-    } catch (error) {
-      console.error('Email verification error:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Resend email verification
-   */
-  async resendVerification(): Promise<ApiResponse<void>> {
-    try {
-      return await apiService.post<void>(this.AUTH_ENDPOINTS.RESEND_VERIFICATION);
-    } catch (error) {
-      console.error('Resend verification error:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Get current user profile
-   */
-  async getCurrentUser(): Promise<ApiResponse<User>> {
-    try {
-      return await apiService.get<User>(this.AUTH_ENDPOINTS.ME);
-    } catch (error) {
-      console.error('Get current user error:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Check if user is authenticated
-   */
-  isAuthenticated(): boolean {
-    const token = this.getAccessToken();
-    const expiresAt = this.getExpiresAt();
+  static checkPermission(userRole: UserRole, resource: string, action: string): boolean {
+    const permissions = this.ROLE_PERMISSIONS[userRole] || [];
     
-    if (!token || !expiresAt) {
-      return false;
-    }
-
-    // Check if token is expired
-    const now = new Date().getTime();
-    const expiry = new Date(expiresAt).getTime();
-    
-    return now < expiry;
+    return permissions.some(permission => 
+      permission.resource === resource && 
+      permission.actions.includes(action)
+    );
   }
 
   /**
-   * Get stored user data
+   * Get all permissions for user role
    */
-  getUser(): User | null {
-    try {
-      const userData = localStorage.getItem(this.STORAGE_KEYS.USER);
-      return userData ? JSON.parse(userData) : null;
-    } catch (error) {
-      console.error('Error getting user data:', error);
-      return null;
-    }
+  static getUserPermissions(userRole: UserRole): Permission[] {
+    return this.ROLE_PERMISSIONS[userRole] || [];
   }
 
   /**
-   * Initialize auth service (call on app startup)
+   * Generate JWT tokens
    */
-  async initialize(): Promise<void> {
-    const token = this.getAccessToken();
-    
-    if (token && this.isAuthenticated()) {
-      // Set token in API service
-      apiService.setAuthToken(token);
-      
-      try {
-        // Verify token is still valid by fetching current user
-        const response = await this.getCurrentUser();
-        
-        if (response.success && response.data) {
-          this.setUser(response.data);
-        } else {
-          // Token is invalid, clear auth data
-          this.clearAuthData();
-        }
-      } catch (error) {
-        // Token verification failed, clear auth data
-        console.error('Token verification failed:', error);
-        this.clearAuthData();
-      }
-    }
+  private static generateTokens(user: User): { accessToken: string; refreshToken: string } {
+    const payload = {
+      userId: user.id,
+      email: user.email,
+      role: user.role
+    };
+
+    const accessToken = sign(payload, this.JWT_ACCESS_SECRET, {
+      expiresIn: this.ACCESS_TOKEN_EXPIRY
+    });
+
+    const refreshToken = sign(
+      { userId: user.id },
+      this.JWT_REFRESH_SECRET,
+      { expiresIn: this.REFRESH_TOKEN_EXPIRY }
+    );
+
+    return { accessToken, refreshToken };
   }
 
   /**
-   * Handle successful authentication
+   * Remove sensitive fields from user object
    */
-  private async handleAuthSuccess(authData: LoginResponse | RegisterResponse): Promise<void> {
-    this.setAccessToken(authData.token);
-    this.setRefreshToken(authData.refreshToken);
-    this.setExpiresAt(authData.expiresAt);
-    this.setUser(authData.user);
-    
-    // Set token in API service
-    apiService.setAuthToken(authData.token);
-  }
-
-  /**
-   * Storage methods
-   */
-  private getAccessToken(): string | null {
-    return localStorage.getItem(this.STORAGE_KEYS.ACCESS_TOKEN);
-  }
-
-  private setAccessToken(token: string): void {
-    localStorage.setItem(this.STORAGE_KEYS.ACCESS_TOKEN, token);
-  }
-
-  private getRefreshToken(): string | null {
-    return localStorage.getItem(this.STORAGE_KEYS.REFRESH_TOKEN);
-  }
-
-  private setRefreshToken(token: string): void {
-    localStorage.setItem(this.STORAGE_KEYS.REFRESH_TOKEN, token);
-  }
-
-  private getExpiresAt(): string | null {
-    return localStorage.getItem(this.STORAGE_KEYS.EXPIRES_AT);
-  }
-
-  private setExpiresAt(expiresAt: string): void {
-    localStorage.setItem(this.STORAGE_KEYS.EXPIRES_AT, expiresAt);
-  }
-
-  private setUser(user: User): void {
-    localStorage.setItem(this.STORAGE_KEYS.USER, JSON.stringify(user));
-  }
-
-  private clearAuthData(): void {
-    localStorage.removeItem(this.STORAGE_KEYS.ACCESS_TOKEN);
-    localStorage.removeItem(this.STORAGE_KEYS.REFRESH_TOKEN);
-    localStorage.removeItem(this.STORAGE_KEYS.USER);
-    localStorage.removeItem(this.STORAGE_KEYS.EXPIRES_AT);
-  }
-
-  /**
-   * Auto-refresh token before expiry
-   */
-  async setupAutoRefresh(): Promise<void> {
-    const expiresAt = this.getExpiresAt();
-    
-    if (!expiresAt) return;
-
-    const expiry = new Date(expiresAt).getTime();
-    const now = new Date().getTime();
-    const timeUntilExpiry = expiry - now;
-    
-    // Refresh 5 minutes before expiry
-    const refreshTime = timeUntilExpiry - (5 * 60 * 1000);
-    
-    if (refreshTime > 0) {
-      setTimeout(async () => {
-        try {
-          await this.refreshToken();
-          // Setup next auto-refresh
-          this.setupAutoRefresh();
-        } catch (error) {
-          console.error('Auto-refresh failed:', error);
-          // Redirect to login or show notification
-        }
-      }, refreshTime);
-    }
+  private static sanitizeUser(user: User): Omit<User, 'password' | 'mfaSecret'> {
+    const { password, mfaSecret, ...sanitizedUser } = user;
+    return sanitizedUser;
   }
 }
-
-// Create singleton instance
-export const authService = new AuthService();

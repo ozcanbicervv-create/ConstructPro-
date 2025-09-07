@@ -86,6 +86,35 @@ export interface ChangePasswordRequest {
   newPassword: string;
 }
 
+// Multi-Factor Authentication API types
+export interface EnableMFARequest {
+  password: string;
+}
+
+export interface EnableMFAResponse {
+  secret: string;
+  qrCode: string;
+  backupCodes: string[];
+}
+
+export interface VerifyMFARequest {
+  code: string;
+}
+
+export interface DisableMFARequest {
+  password: string;
+  code: string;
+}
+
+// Enhanced authentication response
+export interface AuthResponse {
+  token: string;
+  refreshToken: string;
+  expiresAt: string;
+  user: import('./user.types').User;
+  mfaRequired?: boolean;
+}
+
 // User-related types
 export interface UpdateUserProfileRequest {
   firstName?: string;

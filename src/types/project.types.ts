@@ -1,38 +1,43 @@
 // Project management type definitions
+import { User, ProjectMember } from './user.types';
 
 export interface Project {
   id: string;
   name: string;
-  description: string;
-  client: string;
+  description?: string;
+  managerId: string;
   status: ProjectStatus;
-  progress: number; // percentage 0-100
-  timeline: ProjectTimeline;
-  budget: ProjectBudget;
-  team: ProjectTeamMember[];
-  materials: Material[];
-  tasks: Task[];
-  documents: ProjectDocument[];
-  location: ProjectLocation;
   priority: ProjectPriority;
-  type: ProjectType;
-  tags: string[];
+  startDate: Date;
+  endDate: Date;
+  budget?: number;
+  location?: string;
+  metadata?: any;
+  manager?: User;
+  tasks?: Task[];
+  materials?: Material[];
+  documents?: ProjectDocument[];
+  members?: ProjectMember[];
+  milestones?: Milestone[];
+  phases?: ProjectPhase[];
   createdAt: Date;
   updatedAt: Date;
-  createdBy: string;
-  lastModifiedBy: string;
 }
 
-export type ProjectStatus = 
-  | 'planning' 
-  | 'in-progress' 
-  | 'active'
-  | 'on-hold' 
-  | 'completed' 
-  | 'cancelled'
-  | 'archived';
+export enum ProjectStatus {
+  PLANNING = 'PLANNING',
+  IN_PROGRESS = 'IN_PROGRESS',
+  ON_HOLD = 'ON_HOLD',
+  COMPLETED = 'COMPLETED',
+  CANCELLED = 'CANCELLED'
+}
 
-export type ProjectPriority = 'low' | 'medium' | 'high' | 'critical';
+export enum ProjectPriority {
+  LOW = 'LOW',
+  MEDIUM = 'MEDIUM',
+  HIGH = 'HIGH',
+  URGENT = 'URGENT'
+}
 
 export type ProjectType = 
   | 'residential' 
@@ -131,25 +136,19 @@ export interface ProjectTeamMember {
 
 export interface Material {
   id: string;
-  name: string;
-  category: MaterialCategory;
-  brand?: string;
-  model?: string;
-  quantity: number;
-  unit: string;
-  unitPrice: number;
-  totalPrice: number;
-  supplier?: Supplier;
-  status: MaterialStatus;
-  deliveryDate?: Date;
-  actualDeliveryDate?: Date;
-  location?: string;
-  notes?: string;
-  specifications: Record<string, any>;
-  attachments: string[];
   projectId: string;
-  orderedBy: string;
-  receivedBy?: string;
+  name: string;
+  description?: string;
+  category?: string;
+  unit: string;
+  quantity: number;
+  unitPrice: number;
+  totalCost: number;
+  supplierId?: string;
+  specifications?: any;
+  project?: Project;
+  supplier?: MaterialSupplier;
+  orders?: MaterialOrder[];
   createdAt: Date;
   updatedAt: Date;
 }
@@ -190,47 +189,95 @@ export interface Supplier {
 
 export interface Task {
   id: string;
-  title: string;
-  description: string;
-  project: string; // project name for display
   projectId: string;
+  assignedTo?: string;
+  createdBy: string;
+  title: string;
+  description?: string;
   status: TaskStatus;
   priority: TaskPriority;
-  assignee: string; // assignee name for display
-  assignedTo: string[]; // user IDs
-  dependencies: string[];
-  startDate: Date;
-  dueDate: Date;
-  completedAt?: Date;
-  estimatedHours: number;
-  actualHours: number;
-  progress: number; // percentage 0-100
-  tags: string[];
-  comments: TaskComment[];
-  attachments: string[];
-  subtasks: Subtask[];
-  createdBy: string;
+  dueDate?: Date;
+  estimatedHours?: number;
+  actualHours?: number;
+  metadata?: any;
+  project?: Project;
+  assignee?: User;
+  creator?: User;
+  comments?: TaskComment[];
+  attachments?: TaskAttachment[];
   createdAt: Date;
   updatedAt: Date;
 }
 
-export type TaskStatus = 
-  | 'todo' 
-  | 'in-progress' 
-  | 'review' 
-  | 'completed' 
-  | 'blocked'
-  | 'cancelled';
+export enum TaskStatus {
+  TODO = 'TODO',
+  IN_PROGRESS = 'IN_PROGRESS',
+  IN_REVIEW = 'IN_REVIEW',
+  COMPLETED = 'COMPLETED',
+  BLOCKED = 'BLOCKED'
+}
 
-export type TaskPriority = 'low' | 'medium' | 'high' | 'critical';
+export enum TaskPriority {
+  LOW = 'LOW',
+  MEDIUM = 'MEDIUM',
+  HIGH = 'HIGH',
+  URGENT = 'URGENT'
+}
 
 export interface TaskComment {
   id: string;
+  taskId: string;
+  userId: string;
   content: string;
-  authorId: string;
-  authorName: string;
+  task?: Task;
+  user?: User;
   createdAt: Date;
-  attachments: string[];
+  updatedAt: Date;
+}
+
+export interface TaskAttachment {
+  id: string;
+  taskId: string;
+  name: string;
+  filePath: string;
+  fileSize: number;
+  mimeType: string;
+  task?: Task;
+  createdAt: Date;
+}
+
+export interface MaterialSupplier {
+  id: string;
+  name: string;
+  contactInfo?: any;
+  rating?: number;
+  materials?: Material[];
+  orders?: MaterialOrder[];
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface MaterialOrder {
+  id: string;
+  materialId: string;
+  supplierId: string;
+  quantity: number;
+  unitPrice: number;
+  totalCost: number;
+  status: OrderStatus;
+  orderDate: Date;
+  material?: Material;
+  supplier?: MaterialSupplier;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export enum OrderStatus {
+  PENDING = 'PENDING',
+  CONFIRMED = 'CONFIRMED',
+  SHIPPED = 'SHIPPED',
+  DELIVERED = 'DELIVERED',
+  CANCELLED = 'CANCELLED'
 }
 
 export interface Subtask {
@@ -244,34 +291,28 @@ export interface Subtask {
 
 export interface ProjectDocument {
   id: string;
+  projectId: string;
   name: string;
-  type: DocumentType;
-  category: DocumentCategory;
-  url: string;
-  size: number;
-  mimeType: string;
-  uploadedBy: string;
-  uploadedAt: Date;
-  version: number;
-  tags: string[];
   description?: string;
-  isPublic: boolean;
-  accessLevel: 'public' | 'team' | 'managers' | 'admin';
-  downloadCount: number;
-  lastAccessedAt?: Date;
+  filePath: string;
+  fileSize: number;
+  mimeType: string;
+  type: DocumentType;
+  version: string;
+  uploadedBy: string;
+  project?: Project;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
-export type DocumentType = 
-  | 'blueprint' 
-  | 'contract' 
-  | 'permit' 
-  | 'photo' 
-  | 'report' 
-  | 'invoice'
-  | 'specification'
-  | 'drawing'
-  | 'certificate'
-  | 'other';
+export enum DocumentType {
+  BLUEPRINT = 'BLUEPRINT',
+  SPECIFICATION = 'SPECIFICATION',
+  CONTRACT = 'CONTRACT',
+  PHOTO = 'PHOTO',
+  REPORT = 'REPORT',
+  OTHER = 'OTHER'
+}
 
 export type DocumentCategory = 
   | 'planning'
@@ -301,36 +342,36 @@ export interface ProjectLocation {
 
 export interface Milestone {
   id: string;
+  projectId: string;
   name: string;
-  description: string;
+  description?: string;
   dueDate: Date;
+  completed: boolean;
   completedAt?: Date;
-  status: MilestoneStatus;
-  progress: number; // percentage 0-100
-  dependencies: string[];
-  deliverables: string[];
-  criteria: string[];
-  assignedTo: string[];
+  project?: Project;
+  createdAt: Date;
+  updatedAt: Date;
 }
-
-export type MilestoneStatus = 'pending' | 'in-progress' | 'completed' | 'overdue' | 'cancelled';
 
 export interface ProjectPhase {
   id: string;
+  projectId: string;
   name: string;
-  description: string;
+  description?: string;
   startDate: Date;
   endDate: Date;
-  actualStartDate?: Date;
-  actualEndDate?: Date;
-  status: ProjectStatus;
-  progress: number; // percentage 0-100
-  tasks: string[];
-  milestones: string[];
-  budget: number;
-  spent: number;
-  dependencies: string[];
-  deliverables: string[];
+  status: PhaseStatus;
+  order: number;
+  project?: Project;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export enum PhaseStatus {
+  PLANNED = 'PLANNED',
+  IN_PROGRESS = 'IN_PROGRESS',
+  COMPLETED = 'COMPLETED',
+  DELAYED = 'DELAYED'
 }
 
 // Project statistics and metrics

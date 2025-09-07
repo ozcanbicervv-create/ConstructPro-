@@ -1,67 +1,107 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { readFileSync } from 'fs';
-import { join } from 'path';
+import swaggerSpec from '@/lib/swagger';
 
-/**
- * API Documentation Endpoint
- * Serves the OpenAPI specification in JSON format
- */
 export async function GET(request: NextRequest) {
   try {
-    // Read the OpenAPI JSON file (we'll convert YAML to JSON)
-    const jsonPath = join(process.cwd(), 'docs', 'api', 'openapi.json');
-    const jsonContent = readFileSync(jsonPath, 'utf8');
-    
-    // Parse JSON
-    const openApiSpec = JSON.parse(jsonContent);
-    
-    // Add dynamic server URLs based on request
-    const protocol = request.headers.get('x-forwarded-proto') || 'http';
-    const host = request.headers.get('host') || 'localhost:3000';
-    const baseUrl = `${protocol}://${host}`;
-    
-    // Update servers in the spec
-    if (openApiSpec && typeof openApiSpec === 'object' && 'servers' in openApiSpec) {
-      const spec = openApiSpec as any;
-      spec.servers = [
-        {
-          url: `${baseUrl}/api`,
-          description: 'Current server'
-        },
-        ...(spec.servers || [])
-      ];
+    const url = new URL(request.url);
+    const format = url.searchParams.get('format');
+
+    // Return JSON format for API consumption
+    if (format === 'json') {
+      return NextResponse.json(swaggerSpec);
     }
-    
-    return NextResponse.json(openApiSpec, {
+
+    // Return HTML documentation page
+    const html = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ConstructPro API Documentation</title>
+    <link rel="stylesheet" type="text/css" href="https://unpkg.com/swagger-ui-dist@5.9.0/swagger-ui.css" />
+    <style>
+        html {
+            box-sizing: border-box;
+            overflow: -moz-scrollbars-vertical;
+            overflow-y: scroll;
+        }
+        *, *:before, *:after {
+            box-sizing: inherit;
+        }
+        body {
+            margin:0;
+            background: #fafafa;
+        }
+        .swagger-ui .topbar {
+            background-color: #2563eb;
+        }
+        .swagger-ui .topbar .download-url-wrapper .select-label {
+            color: white;
+        }
+        .swagger-ui .topbar .download-url-wrapper input[type=text] {
+            border: 2px solid #1d4ed8;
+        }
+    </style>
+</head>
+<body>
+    <div id="swagger-ui"></div>
+    <script src="https://unpkg.com/swagger-ui-dist@5.9.0/swagger-ui-bundle.js"></script>
+    <script src="https://unpkg.com/swagger-ui-dist@5.9.0/swagger-ui-standalone-preset.js"></script>
+    <script>
+        window.onload = function() {
+            const ui = SwaggerUIBundle({
+                url: '/api/docs?format=json',
+                dom_id: '#swagger-ui',
+                deepLinking: true,
+                presets: [
+                    SwaggerUIBundle.presets.apis,
+                    SwaggerUIStandalonePreset
+                ],
+                plugins: [
+                    SwaggerUIBundle.plugins.DownloadUrl
+                ],
+                layout: "StandaloneLayout",
+                tryItOutEnabled: true,
+                requestInterceptor: function(request) {
+                    // Add correlation ID to all requests
+                    request.headers['X-Correlation-ID'] = 'swagger-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+                    return request;
+                },
+                responseInterceptor: function(response) {
+                    // Log response for debugging
+                    console.log('API Response:', response);
+                    return response;
+                }
+            });
+            
+            // Add custom styling
+            setTimeout(() => {
+                const logo = document.querySelector('.topbar-wrapper .link');
+                if (logo) {
+                    logo.innerHTML = '<span style="color: white; font-weight: bold; font-size: 1.5em;">ConstructPro API</span>';
+                }
+            }, 1000);
+        };
+    </script>
+</body>
+</html>`;
+
+    return new NextResponse(html, {
       headers: {
-        'Content-Type': 'application/json',
-        'Cache-Control': 'public, max-age=300', // Cache for 5 minutes
-      },
+        'Content-Type': 'text/html',
+        'Cache-Control': 'public, max-age=3600'
+      }
     });
   } catch (error) {
     console.error('Error serving API documentation:', error);
-    
     return NextResponse.json(
       {
-        error: 'Failed to load API documentation',
-        message: error instanceof Error ? error.message : 'Unknown error',
+        error: 'DOCUMENTATION_ERROR',
+        message: 'Failed to serve API documentation',
+        timestamp: new Date().toISOString()
       },
       { status: 500 }
     );
   }
-}
-
-/**
- * API Documentation Metadata
- * Returns basic information about the API documentation
- */
-export async function HEAD(request: NextRequest) {
-  return new NextResponse(null, {
-    status: 200,
-    headers: {
-      'Content-Type': 'application/json',
-      'X-API-Version': '1.0.0',
-      'X-Documentation-Format': 'OpenAPI 3.0.3',
-    },
-  });
 }

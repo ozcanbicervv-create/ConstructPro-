@@ -95,3 +95,58 @@ const sessionStorageMock = {
   clear: jest.fn(),
 };
 global.sessionStorage = sessionStorageMock;
+
+// Mock Next.js server environment
+global.Request = class Request {
+  constructor(input, init) {
+    this.url = input;
+    this.method = init?.method || 'GET';
+    this.headers = new Map(Object.entries(init?.headers || {}));
+    this.body = init?.body;
+  }
+  
+  async json() {
+    return JSON.parse(this.body);
+  }
+};
+
+global.Response = class Response {
+  constructor(body, init) {
+    this.body = body;
+    this.status = init?.status || 200;
+    this.headers = new Map(Object.entries(init?.headers || {}));
+  }
+  
+  async json() {
+    return JSON.parse(this.body);
+  }
+};
+
+global.Headers = class Headers extends Map {};
+
+// Mock URL constructor
+global.URL = class URL {
+  constructor(url) {
+    this.href = url;
+    this.searchParams = new URLSearchParams();
+  }
+};
+
+global.URLSearchParams = class URLSearchParams {
+  constructor(init) {
+    this.params = new Map();
+    if (init) {
+      Object.entries(init).forEach(([key, value]) => {
+        this.params.set(key, value);
+      });
+    }
+  }
+  
+  get(key) {
+    return this.params.get(key);
+  }
+  
+  set(key, value) {
+    this.params.set(key, value);
+  }
+};
