@@ -68,16 +68,18 @@ async function createCustomServer() {
       // Apply performance monitoring middleware
       const startTime = Date.now();
       
-      // Track response time
+      // Track response time (only if available)
       res.on('finish', () => {
         const duration = Date.now() - startTime;
         const route = req.url || 'unknown';
-        performanceMonitor.trackHttpRequest(
-          req.method || 'GET',
-          route,
-          res.statusCode || 200,
-          duration
-        );
+        if (performanceMonitor && performanceMonitor.trackHttpRequest) {
+          performanceMonitor.trackHttpRequest(
+            req.method || 'GET',
+            route,
+            res.statusCode || 200,
+            duration
+          );
+        }
       });
       
       handle(req, res);
@@ -101,14 +103,18 @@ async function createCustomServer() {
       console.log(`📊 Performance monitoring enabled`);
       console.log(`🗄️ Cache and session management active`);
       
-      // Log initial performance metrics
-      performanceMonitor.getPerformanceSummary().then(summary => {
-        console.log('📈 Initial performance metrics:', {
-          requestCount: summary.requestCount,
-          errorRate: summary.errorRate,
-          memoryUsage: `${(summary.systemMetrics.memoryUsage * 100).toFixed(2)}%`,
+      // Log initial performance metrics (only if available)
+      if (performanceMonitor) {
+        performanceMonitor.getPerformanceSummary().then(summary => {
+          console.log('📈 Initial performance metrics:', {
+            requestCount: summary.requestCount,
+            errorRate: summary.errorRate,
+            memoryUsage: `${(summary.systemMetrics.memoryUsage * 100).toFixed(2)}%`,
+          });
+        }).catch(error => {
+          console.warn('Failed to get performance summary:', error);
         });
-      });
+      }
     });
 
   } catch (err) {

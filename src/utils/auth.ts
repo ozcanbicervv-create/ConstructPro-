@@ -38,7 +38,7 @@ export const authOptions: NextAuthOptions = {
         return {
           id: user.id,
           email: user.email,
-          name: user.name,
+          name: user.name || `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.email,
           role: user.role,
         };
       }

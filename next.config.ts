@@ -24,12 +24,32 @@ const nextConfig: NextConfig = {
     formats: ['image/webp', 'image/avif'],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
+    minimumCacheTTL: 60,
+    dangerouslyAllowSVG: true,
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
   
-  // Experimental features for React 19 compatibility
+  // Experimental features for React 19 compatibility and performance
   experimental: {
     reactCompiler: false,
     ppr: false,
+    optimizeCss: true,
+    optimizePackageImports: [
+      '@radix-ui/react-icons',
+      'lucide-react',
+      'framer-motion',
+      'recharts',
+      '@tanstack/react-query',
+      '@tanstack/react-table',
+    ],
+    turbo: {
+      rules: {
+        '*.svg': {
+          loaders: ['@svgr/webpack'],
+          as: '*.js',
+        },
+      },
+    },
   },
   
   // Static file serving optimization
@@ -40,6 +60,130 @@ const nextConfig: NextConfig = {
   
   // Power optimizations
   poweredByHeader: false,
+  
+  // Webpack optimization configuration
+  webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {
+    // Production optimizations
+    if (!dev) {
+      // Bundle splitting optimization
+      config.optimization = {
+        ...config.optimization,
+        splitChunks: {
+          chunks: 'all',
+          cacheGroups: {
+            // Vendor chunk for stable dependencies
+            vendor: {
+              test: /[\\/]node_modules[\\/]/,
+              name: 'vendors',
+              priority: 10,
+              reuseExistingChunk: true,
+            },
+            // UI components chunk
+            ui: {
+              test: /[\\/]src[\\/]components[\\/]ui[\\/]/,
+              name: 'ui-components',
+              priority: 20,
+              reuseExistingChunk: true,
+            },
+            // Design system chunk
+            designSystem: {
+              test: /[\\/]src[\\/]components[\\/]design-system[\\/]/,
+              name: 'design-system',
+              priority: 20,
+              reuseExistingChunk: true,
+            },
+            // Common utilities chunk
+            utils: {
+              test: /[\\/]src[\\/](lib|utils|hooks)[\\/]/,
+              name: 'utils',
+              priority: 15,
+              reuseExistingChunk: true,
+            },
+            // Large libraries
+            charts: {
+              test: /[\\/]node_modules[\\/](recharts|d3)[\\/]/,
+              name: 'charts',
+              priority: 30,
+              reuseExistingChunk: true,
+            },
+            motion: {
+              test: /[\\/]node_modules[\\/]framer-motion[\\/]/,
+              name: 'motion',
+              priority: 30,
+              reuseExistingChunk: true,
+            },
+            radix: {
+              test: /[\\/]node_modules[\\/]@radix-ui[\\/]/,
+              name: 'radix-ui',
+              priority: 25,
+              reuseExistingChunk: true,
+            },
+          },
+        },
+        // Module concatenation for better tree shaking
+        concatenateModules: true,
+        // Minimize bundle size
+        minimize: true,
+        // Remove empty chunks
+        removeEmptyChunks: true,
+        // Merge duplicate chunks
+        mergeDuplicateChunks: true,
+      };
+
+      // Tree shaking optimization
+      config.optimization.usedExports = true;
+      config.optimization.sideEffects = false;
+
+      // Module resolution optimization
+      config.resolve.alias = {
+        ...config.resolve.alias,
+        // Optimize lodash imports
+        'lodash': 'lodash-es',
+        // Optimize date-fns imports
+        'date-fns': 'date-fns/esm',
+      };
+    }
+
+    // SVG optimization
+    config.module.rules.push({
+      test: /\.svg$/,
+      use: [
+        {
+          loader: '@svgr/webpack',
+          options: {
+            svgo: true,
+            svgoConfig: {
+              plugins: [
+                {
+                  name: 'preset-default',
+                  params: {
+                    overrides: {
+                      removeViewBox: false,
+                    },
+                  },
+                },
+                'removeDimensions',
+              ],
+            },
+          },
+        },
+      ],
+    });
+
+    // Bundle analyzer in development
+    if (process.env.ANALYZE === 'true') {
+      const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
+      config.plugins.push(
+        new BundleAnalyzerPlugin({
+          analyzerMode: 'server',
+          analyzerPort: isServer ? 8888 : 8889,
+          openAnalyzer: true,
+        })
+      );
+    }
+
+    return config;
+  },
   
   // Environment variables for production
   env: {

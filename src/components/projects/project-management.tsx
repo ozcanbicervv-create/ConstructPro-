@@ -8,7 +8,7 @@ import { Progress } from '@/components/ui/progress'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import ARIntegration from './ar-integration'
+import ARIntegration from '../ar/ar-integration'
 import { 
   BarChart3, 
   Calendar, 

@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import { trackDatabaseQuery } from './performance';
+import { performanceMonitor } from './performance';
 
 // Database connection pool configuration
 export const databaseConfig = {
@@ -30,43 +30,46 @@ export class OptimizedPrismaClient extends PrismaClient {
         },
       },
     });
+  }
 
-    // Add query logging middleware
-    this.$use(async (params, next) => {
-      const startTime = Date.now();
+  // Helper method to track query performance
+  private async executeWithTracking<T>(
+    operation: string,
+    model: string,
+    queryFn: () => Promise<T>
+  ): Promise<T> {
+    const startTime = Date.now();
+    
+    try {
+      const result = await queryFn();
+      const duration = Date.now() - startTime;
       
-      try {
-        const result = await next(params);
-        const duration = Date.now() - startTime;
-        
-        // Track query performance
-        trackDatabaseQuery(params.action, params.model || 'unknown', duration);
-        
-        // Log slow queries
-        if (duration > databaseConfig.slowQueryThreshold) {
-          console.warn(`🐌 Slow query detected:`, {
-            model: params.model,
-            action: params.action,
-            duration: `${duration}ms`,
-            args: params.args,
-          });
-        }
-        
-        return result;
-      } catch (error) {
-        const duration = Date.now() - startTime;
-        trackDatabaseQuery(params.action, params.model || 'unknown', duration);
-        
-        console.error('Database query error:', {
-          model: params.model,
-          action: params.action,
+      // Track query performance
+      performanceMonitor.trackDatabaseQuery(operation, model, duration);
+      
+      // Log slow queries
+      if (duration > databaseConfig.slowQueryThreshold) {
+        console.warn(`🐌 Slow query detected:`, {
+          model,
+          operation,
           duration: `${duration}ms`,
-          error: error instanceof Error ? error.message : 'Unknown error',
         });
-        
-        throw error;
       }
-    });
+      
+      return result;
+    } catch (error) {
+      const duration = Date.now() - startTime;
+      performanceMonitor.trackDatabaseQuery(operation, model, duration);
+      
+      console.error('Database query error:', {
+        model,
+        operation,
+        duration: `${duration}ms`,
+        error: error instanceof Error ? error.message : 'Unknown error',
+      });
+      
+      throw error;
+    }
   }
 
   // Optimized project queries
@@ -77,62 +80,64 @@ export class OptimizedPrismaClient extends PrismaClient {
     page?: number;
     limit?: number;
   }) {
-    const { userId, status, search, page = 1, limit = 10 } = filters;
-    const offset = (page - 1) * limit;
+    return this.executeWithTracking('findMany', 'Project', async () => {
+      const { userId, status, search, page = 1, limit = 10 } = filters;
+      const offset = (page - 1) * limit;
 
-    const where: any = {};
-    
-    if (userId) {
-      where.OR = [
-        { managerId: userId },
-        { team: { some: { userId } } },
-      ];
-    }
-    
-    if (status) {
-      where.status = status;
-    }
-    
-    if (search) {
-      where.OR = [
-        { name: { contains: search, mode: 'insensitive' } },
-        { description: { contains: search, mode: 'insensitive' } },
-        { location: { contains: search, mode: 'insensitive' } },
-      ];
-    }
+      const where: any = {};
+      
+      if (userId) {
+        where.OR = [
+          { managerId: userId },
+          { team: { some: { userId } } },
+        ];
+      }
+      
+      if (status) {
+        where.status = status;
+      }
+      
+      if (search) {
+        where.OR = [
+          { name: { contains: search, mode: 'insensitive' } },
+          { description: { contains: search, mode: 'insensitive' } },
+          { location: { contains: search, mode: 'insensitive' } },
+        ];
+      }
 
-    const [projects, total] = await Promise.all([
-      this.project.findMany({
-        where,
-        include: {
-          manager: {
-            select: {
-              id: true,
-              firstName: true,
-              lastName: true,
-              email: true,
+      const [projects, total] = await Promise.all([
+        this.project.findMany({
+          where,
+          include: {
+            manager: {
+              select: {
+                id: true,
+                firstName: true,
+                lastName: true,
+                email: true,
+              },
+            },
+            _count: {
+              select: {
+                tasks: true,
+                materials: true,
+                documents: true,
+                team: true,
+              },
             },
           },
-          _count: {
-            select: {
-              tasks: true,
-              materials: true,
-              documents: true,
-              team: true,
-            },
-          },
-        },
-        orderBy: [
-          { priority: 'desc' },
-          { updatedAt: 'desc' },
-        ],
-        skip: offset,
-        take: limit,
-      }),
-      this.project.count({ where }),
-    ]);
+          orderBy: [
+            { priority: 'desc' },
+            { updatedAt: 'desc' },
+          ],
+          skip: offset,
+          take: limit,
+        }),
+        this.project.count({ where }),
+      ]);
 
-    return { projects, total };
+      return { projects, total };
+    });
   }
 
   // Optimized task queries with aggregations

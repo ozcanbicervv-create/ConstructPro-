@@ -382,8 +382,6 @@ async function GET(request: NextRequest) {
   });
 }
 
-export { GET };
-
 // Apply middleware
 const handler = withErrorHandler(withRequestCorrelation(GET));
 export { handler as GET };

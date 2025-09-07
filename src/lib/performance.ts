@@ -1,303 +1,381 @@
-import { register, collectDefaultMetrics, Counter, Histogram, Gauge } from 'prom-client';
-import { cacheManager } from './redis';
+/**
+ * Performance monitoring and optimization utilities
+ * Implements Core Web Vitals tracking and performance budgets
+ */
 
-// Initialize default metrics collection
-collectDefaultMetrics();
+// Dynamic import for web-vitals to avoid SSR issues
+let webVitals: any = null;
 
-// Custom metrics
-export const httpRequestDuration = new Histogram({
-  name: 'http_request_duration_seconds',
-  help: 'Duration of HTTP requests in seconds',
-  labelNames: ['method', 'route', 'status_code'],
-  buckets: [0.1, 0.3, 0.5, 0.7, 1, 3, 5, 7, 10],
-});
+async function loadWebVitals() {
+  if (typeof window !== 'undefined' && !webVitals) {
+    try {
+      webVitals = await import('web-vitals');
+    } catch (error) {
+      console.warn('Failed to load web-vitals:', error);
+    }
+  }
+  return webVitals;
+}
 
-export const httpRequestTotal = new Counter({
-  name: 'http_requests_total',
-  help: 'Total number of HTTP requests',
-  labelNames: ['method', 'route', 'status_code'],
-});
+// Performance thresholds based on Core Web Vitals
+export const PERFORMANCE_THRESHOLDS = {
+  // Largest Contentful Paint (LCP)
+  LCP: {
+    good: 2500,
+    needsImprovement: 4000,
+  },
+  // First Input Delay (FID)
+  FID: {
+    good: 100,
+    needsImprovement: 300,
+  },
+  // Cumulative Layout Shift (CLS)
+  CLS: {
+    good: 0.1,
+    needsImprovement: 0.25,
+  },
+  // First Contentful Paint (FCP)
+  FCP: {
+    good: 1800,
+    needsImprovement: 3000,
+  },
+  // Time to First Byte (TTFB)
+  TTFB: {
+    good: 800,
+    needsImprovement: 1800,
+  },
+} as const;
 
-export const activeConnections = new Gauge({
-  name: 'active_connections',
-  help: 'Number of active connections',
-});
+// Performance metric types
+export interface PerformanceMetric {
+  name: string;
+  value: number;
+  rating: 'good' | 'needs-improvement' | 'poor';
+  timestamp: number;
+  id: string;
+  navigationType?: string;
+}
 
-export const databaseQueryDuration = new Histogram({
-  name: 'database_query_duration_seconds',
-  help: 'Duration of database queries in seconds',
-  labelNames: ['operation', 'table'],
-  buckets: [0.01, 0.05, 0.1, 0.3, 0.5, 1, 2, 5],
-});
+// Performance budget configuration
+export interface PerformanceBudget {
+  maxBundleSize: number; // in KB
+  maxImageSize: number; // in KB
+  maxFontSize: number; // in KB
+  maxCSSSize: number; // in KB
+  maxJSSize: number; // in KB
+  maxLCP: number; // in ms
+  maxFID: number; // in ms
+  maxCLS: number; // score
+}
 
-export const cacheHitRate = new Counter({
-  name: 'cache_operations_total',
-  help: 'Total cache operations',
-  labelNames: ['operation', 'result'],
-});
-
-export const apiRateLimitHits = new Counter({
-  name: 'api_rate_limit_hits_total',
-  help: 'Total API rate limit hits',
-  labelNames: ['endpoint', 'user_id'],
-});
+export const DEFAULT_PERFORMANCE_BUDGET: PerformanceBudget = {
+  maxBundleSize: 500, // 500KB total bundle
+  maxImageSize: 200, // 200KB per image
+  maxFontSize: 100, // 100KB total fonts
+  maxCSSSize: 50, // 50KB total CSS
+  maxJSSize: 400, // 400KB total JS
+  maxLCP: 2500, // 2.5s LCP
+  maxFID: 100, // 100ms FID
+  maxCLS: 0.1, // 0.1 CLS score
+};
 
 // Performance monitoring class
 export class PerformanceMonitor {
-  private static instance: PerformanceMonitor;
-  private alertThresholds = {
-    responseTime: 5000, // 5 seconds
-    errorRate: 0.05, // 5%
-    memoryUsage: 0.9, // 90%
-    cpuUsage: 0.8, // 80%
-  };
+  private metrics: PerformanceMetric[] = [];
+  private budget: PerformanceBudget;
+  private reportingEndpoint?: string;
 
-  static getInstance(): PerformanceMonitor {
-    if (!PerformanceMonitor.instance) {
-      PerformanceMonitor.instance = new PerformanceMonitor();
-    }
-    return PerformanceMonitor.instance;
+  constructor(budget: PerformanceBudget = DEFAULT_PERFORMANCE_BUDGET, reportingEndpoint?: string) {
+    this.budget = budget;
+    this.reportingEndpoint = reportingEndpoint;
+    this.initializeWebVitals();
   }
 
-  // Track HTTP request metrics
-  trackHttpRequest(method: string, route: string, statusCode: number, duration: number): void {
-    httpRequestDuration
-      .labels(method, route, statusCode.toString())
-      .observe(duration / 1000);
+  private async initializeWebVitals() {
+    // Only initialize on client-side
+    if (typeof window === 'undefined') return;
+    
+    try {
+      const vitals = await loadWebVitals();
+      if (vitals) {
+        // Track Core Web Vitals
+        vitals.getCLS(this.handleMetric.bind(this));
+        vitals.getFID(this.handleMetric.bind(this));
+        vitals.getFCP(this.handleMetric.bind(this));
+        vitals.getLCP(this.handleMetric.bind(this));
+        vitals.getTTFB(this.handleMetric.bind(this));
+      }
+    } catch (error) {
+      console.warn('Failed to initialize web vitals:', error);
+    }
+  }
 
-    httpRequestTotal
-      .labels(method, route, statusCode.toString())
-      .inc();
+  private handleMetric(metric: any) {
+    const performanceMetric: PerformanceMetric = {
+      name: metric.name,
+      value: metric.value,
+      rating: this.getRating(metric.name, metric.value),
+      timestamp: Date.now(),
+      id: metric.id,
+      navigationType: metric.navigationType,
+    };
 
-    // Check for performance alerts
-    if (duration > this.alertThresholds.responseTime) {
-      this.triggerAlert('slow_response', {
-        method,
-        route,
-        duration,
-        threshold: this.alertThresholds.responseTime,
+    this.metrics.push(performanceMetric);
+    this.reportMetric(performanceMetric);
+    this.checkBudget(performanceMetric);
+  }
+
+  private getRating(name: string, value: number): 'good' | 'needs-improvement' | 'poor' {
+    const thresholds = PERFORMANCE_THRESHOLDS[name as keyof typeof PERFORMANCE_THRESHOLDS];
+    if (!thresholds) return 'good';
+
+    if (value <= thresholds.good) return 'good';
+    if (value <= thresholds.needsImprovement) return 'needs-improvement';
+    return 'poor';
+  }
+
+  private async reportMetric(metric: PerformanceMetric) {
+    // Console logging for development
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`[Performance] ${metric.name}: ${metric.value}ms (${metric.rating})`);
+    }
+
+    // Send to analytics endpoint (only on client-side)
+    if (this.reportingEndpoint && typeof window !== 'undefined') {
+      try {
+        await fetch(this.reportingEndpoint, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            metric,
+            userAgent: navigator.userAgent,
+            url: window.location.href,
+            timestamp: Date.now(),
+          }),
+        });
+      } catch (error) {
+        console.warn('Failed to report performance metric:', error);
+      }
+    }
+  }
+
+  private checkBudget(metric: PerformanceMetric) {
+    let budgetExceeded = false;
+    let budgetValue = 0;
+
+    switch (metric.name) {
+      case 'LCP':
+        budgetValue = this.budget.maxLCP;
+        budgetExceeded = metric.value > budgetValue;
+        break;
+      case 'FID':
+        budgetValue = this.budget.maxFID;
+        budgetExceeded = metric.value > budgetValue;
+        break;
+      case 'CLS':
+        budgetValue = this.budget.maxCLS;
+        budgetExceeded = metric.value > budgetValue;
+        break;
+    }
+
+    if (budgetExceeded) {
+      console.warn(
+        `[Performance Budget] ${metric.name} exceeded budget: ${metric.value} > ${budgetValue}`
+      );
+      
+      // Trigger alert or notification
+      this.triggerBudgetAlert(metric, budgetValue);
+    }
+  }
+
+  private triggerBudgetAlert(metric: PerformanceMetric, budgetValue: number) {
+    // In production, this could trigger alerts to monitoring systems
+    if (process.env.NODE_ENV === 'production') {
+      // Send alert to monitoring service
+      console.error(`Performance budget exceeded for ${metric.name}`);
+    }
+  }
+
+  // Public methods
+  public getMetrics(): PerformanceMetric[] {
+    return [...this.metrics];
+  }
+
+  public getMetricsByName(name: string): PerformanceMetric[] {
+    return this.metrics.filter(metric => metric.name === name);
+  }
+
+  public getAverageMetric(name: string): number {
+    const metrics = this.getMetricsByName(name);
+    if (metrics.length === 0) return 0;
+    return metrics.reduce((sum, metric) => sum + metric.value, 0) / metrics.length;
+  }
+
+  public getBudgetStatus(): { metric: string; current: number; budget: number; status: 'pass' | 'fail' }[] {
+    return [
+      {
+        metric: 'LCP',
+        current: this.getAverageMetric('LCP'),
+        budget: this.budget.maxLCP,
+        status: this.getAverageMetric('LCP') <= this.budget.maxLCP ? 'pass' : 'fail',
+      },
+      {
+        metric: 'FID',
+        current: this.getAverageMetric('FID'),
+        budget: this.budget.maxFID,
+        status: this.getAverageMetric('FID') <= this.budget.maxFID ? 'pass' : 'fail',
+      },
+      {
+        metric: 'CLS',
+        current: this.getAverageMetric('CLS'),
+        budget: this.budget.maxCLS,
+        status: this.getAverageMetric('CLS') <= this.budget.maxCLS ? 'pass' : 'fail',
+      },
+    ];
+  }
+}
+
+// Resource loading optimization utilities
+export class ResourceOptimizer {
+  private static preloadedResources = new Set<string>();
+  private static criticalResources = new Set<string>();
+
+  // Preload critical resources
+  static preloadResource(href: string, as: string, crossorigin?: string) {
+    if (typeof window === 'undefined') return;
+    if (this.preloadedResources.has(href)) return;
+
+    const link = document.createElement('link');
+    link.rel = 'preload';
+    link.href = href;
+    link.as = as;
+    if (crossorigin) link.crossOrigin = crossorigin;
+
+    document.head.appendChild(link);
+    this.preloadedResources.add(href);
+  }
+
+  // Prefetch non-critical resources
+  static prefetchResource(href: string) {
+    if (typeof window === 'undefined') return;
+    
+    const link = document.createElement('link');
+    link.rel = 'prefetch';
+    link.href = href;
+    document.head.appendChild(link);
+  }
+
+  // Mark resources as critical
+  static markCritical(resource: string) {
+    this.criticalResources.add(resource);
+  }
+
+  // Lazy load images with intersection observer
+  static lazyLoadImages() {
+    if (typeof window === 'undefined') return;
+    
+    if ('IntersectionObserver' in window) {
+      const imageObserver = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const img = entry.target as HTMLImageElement;
+            if (img.dataset.src) {
+              img.src = img.dataset.src;
+              img.classList.remove('lazy');
+              observer.unobserve(img);
+            }
+          }
+        });
+      });
+
+      document.querySelectorAll('img[data-src]').forEach(img => {
+        imageObserver.observe(img);
       });
     }
   }
 
-  // Track database query metrics
-  trackDatabaseQuery(operation: string, table: string, duration: number): void {
-    databaseQueryDuration
-      .labels(operation, table)
-      .observe(duration / 1000);
-  }
+  // Optimize font loading
+  static optimizeFontLoading() {
+    // Preload critical fonts
+    const criticalFonts = [
+      '/fonts/inter-var.woff2',
+      '/fonts/poppins-var.woff2',
+    ];
 
-  // Track cache operations
-  trackCacheOperation(operation: 'hit' | 'miss' | 'set' | 'delete', key?: string): void {
-    cacheHitRate.labels(operation, operation === 'hit' ? 'success' : 'failure').inc();
+    criticalFonts.forEach(font => {
+      this.preloadResource(font, 'font', 'anonymous');
+    });
   }
+}
 
-  // Track rate limit hits
-  trackRateLimitHit(endpoint: string, userId?: string): void {
-    apiRateLimitHits.labels(endpoint, userId || 'anonymous').inc();
-  }
-
-  // Get performance metrics
-  async getMetrics(): Promise<string> {
-    return register.metrics();
-  }
-
-  // Get performance summary
-  async getPerformanceSummary(): Promise<{
-    responseTime: {
-      avg: number;
-      p95: number;
-      p99: number;
-    };
-    requestCount: number;
-    errorRate: number;
-    cacheStats: any;
-    systemMetrics: {
-      memoryUsage: number;
-      cpuUsage: number;
-    };
+// Bundle size analyzer
+export class BundleAnalyzer {
+  static async analyzeBundleSize(): Promise<{
+    totalSize: number;
+    chunks: { name: string; size: number }[];
+    recommendations: string[];
   }> {
-    try {
-      // Get cache statistics
-      const cacheStats = await cacheManager.getStats();
-
-      // Calculate response time metrics (simplified)
-      const metrics = await register.getSingleMetric('http_request_duration_seconds');
-      const responseTimeData = metrics ? await metrics.get() : null;
-
-      // Get request count
-      const requestMetrics = await register.getSingleMetric('http_requests_total');
-      const requestData = requestMetrics ? await requestMetrics.get() : null;
-
-      // Calculate error rate
-      const totalRequests = requestData?.values.reduce((sum, metric) => sum + metric.value, 0) || 0;
-      const errorRequests = requestData?.values
-        .filter(metric => {
-          const statusCode = parseInt(metric.labels.status_code || '200');
-          return statusCode >= 400;
-        })
-        .reduce((sum, metric) => sum + metric.value, 0) || 0;
-
-      const errorRate = totalRequests > 0 ? errorRequests / totalRequests : 0;
-
-      // Get system metrics
-      const memoryUsage = process.memoryUsage();
-      const cpuUsage = process.cpuUsage();
-
-      return {
-        responseTime: {
-          avg: 0, // Would need more complex calculation
-          p95: 0,
-          p99: 0,
-        },
-        requestCount: totalRequests,
-        errorRate,
-        cacheStats,
-        systemMetrics: {
-          memoryUsage: memoryUsage.heapUsed / memoryUsage.heapTotal,
-          cpuUsage: (cpuUsage.user + cpuUsage.system) / 1000000, // Convert to seconds
-        },
-      };
-    } catch (error) {
-      console.error('Error getting performance summary:', error);
-      return {
-        responseTime: { avg: 0, p95: 0, p99: 0 },
-        requestCount: 0,
-        errorRate: 0,
-        cacheStats: {},
-        systemMetrics: { memoryUsage: 0, cpuUsage: 0 },
-      };
-    }
-  }
-
-  // Trigger performance alert
-  private async triggerAlert(type: string, data: any): Promise<void> {
-    const alert = {
-      type,
-      timestamp: new Date().toISOString(),
-      data,
-      severity: this.getAlertSeverity(type, data),
-    };
-
-    console.warn('🚨 Performance Alert:', alert);
-
-    // Store alert in cache for dashboard
-    try {
-      const alertKey = `alerts:${type}:${Date.now()}`;
-      await cacheManager.set(alertKey, alert, 3600); // Store for 1 hour
-    } catch (error) {
-      console.error('Error storing alert:', error);
-    }
-
-    // In production, you might want to send to external monitoring service
-    // await this.sendToMonitoringService(alert);
-  }
-
-  // Get alert severity
-  private getAlertSeverity(type: string, data: any): 'low' | 'medium' | 'high' | 'critical' {
-    switch (type) {
-      case 'slow_response':
-        if (data.duration > 10000) return 'critical';
-        if (data.duration > 5000) return 'high';
-        return 'medium';
-      case 'high_error_rate':
-        if (data.errorRate > 0.1) return 'critical';
-        if (data.errorRate > 0.05) return 'high';
-        return 'medium';
-      case 'memory_usage':
-        if (data.usage > 0.95) return 'critical';
-        if (data.usage > 0.9) return 'high';
-        return 'medium';
-      default:
-        return 'low';
-    }
-  }
-
-  // Health check
-  async healthCheck(): Promise<{
-    status: 'healthy' | 'degraded' | 'unhealthy';
-    checks: Record<string, boolean>;
-    metrics: any;
-  }> {
-    const checks = {
-      redis: false,
-      database: false,
-      memory: false,
-      responseTime: false,
-    };
-
-    try {
-      // Check Redis connection
-      await cacheManager.redis.ping();
-      checks.redis = true;
-    } catch (error) {
-      console.error('Redis health check failed:', error);
-    }
-
-    // Check memory usage
-    const memoryUsage = process.memoryUsage();
-    const memoryRatio = memoryUsage.heapUsed / memoryUsage.heapTotal;
-    checks.memory = memoryRatio < this.alertThresholds.memoryUsage;
-
-    // Get performance metrics
-    const metrics = await this.getPerformanceSummary();
-    checks.responseTime = metrics.responseTime.avg < this.alertThresholds.responseTime;
-
-    // Determine overall status
-    const healthyChecks = Object.values(checks).filter(Boolean).length;
-    const totalChecks = Object.keys(checks).length;
+    const recommendations: string[] = [];
     
-    let status: 'healthy' | 'degraded' | 'unhealthy';
-    if (healthyChecks === totalChecks) {
-      status = 'healthy';
-    } else if (healthyChecks >= totalChecks * 0.7) {
-      status = 'degraded';
-    } else {
-      status = 'unhealthy';
+    // This would typically integrate with webpack-bundle-analyzer
+    // For now, we'll provide a mock implementation
+    const mockChunks = [
+      { name: 'main', size: 250 },
+      { name: 'vendors', size: 180 },
+      { name: 'ui-components', size: 45 },
+      { name: 'design-system', size: 35 },
+      { name: 'utils', size: 25 },
+    ];
+
+    const totalSize = mockChunks.reduce((sum, chunk) => sum + chunk.size, 0);
+
+    // Generate recommendations
+    if (totalSize > DEFAULT_PERFORMANCE_BUDGET.maxBundleSize) {
+      recommendations.push('Total bundle size exceeds budget. Consider code splitting.');
     }
+
+    mockChunks.forEach(chunk => {
+      if (chunk.size > 100) {
+        recommendations.push(`${chunk.name} chunk is large (${chunk.size}KB). Consider splitting further.`);
+      }
+    });
 
     return {
-      status,
-      checks,
-      metrics,
+      totalSize,
+      chunks: mockChunks,
+      recommendations,
     };
   }
 }
 
-// Export singleton instance
-export const performanceMonitor = PerformanceMonitor.getInstance();
-
-// Response time tracking middleware helper
-export function createResponseTimeTracker() {
-  return (req: any, res: any, next: any) => {
-    const startTime = Date.now();
-    
-    res.on('finish', () => {
-      const duration = Date.now() - startTime;
-      const route = req.route?.path || req.path || 'unknown';
-      
-      performanceMonitor.trackHttpRequest(
-        req.method,
-        route,
-        res.statusCode,
-        duration
-      );
-    });
-    
-    next();
-  };
-}
-
-// Database query timing helper
-export function trackDatabaseQuery<T>(
-  operation: string,
-  table: string,
-  queryFn: () => Promise<T>
-): Promise<T> {
-  const startTime = Date.now();
+// Initialize performance monitoring
+export function initializePerformanceMonitoring(
+  budget?: PerformanceBudget,
+  reportingEndpoint?: string
+): PerformanceMonitor {
+  const monitor = new PerformanceMonitor(budget, reportingEndpoint);
   
-  return queryFn().finally(() => {
-    const duration = Date.now() - startTime;
-    performanceMonitor.trackDatabaseQuery(operation, table, duration);
-  });
+  // Only initialize client-side features
+  if (typeof window !== 'undefined') {
+    // Initialize resource optimization
+    ResourceOptimizer.optimizeFontLoading();
+    
+    // Set up lazy loading when DOM is ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => {
+        ResourceOptimizer.lazyLoadImages();
+      });
+    } else {
+      ResourceOptimizer.lazyLoadImages();
+    }
+  }
+
+  return monitor;
 }
+
+// Export singleton instance (only initialize on client-side)
+export const performanceMonitor = typeof window !== 'undefined' 
+  ? initializePerformanceMonitoring() 
+  : null;

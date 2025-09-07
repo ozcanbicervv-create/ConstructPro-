@@ -216,8 +216,6 @@ async function GET(request: NextRequest) {
   }, { status: statusCode });
 }
 
-export { GET };
-
 // Apply middleware
 const handler = withErrorHandler(withRequestCorrelation(GET));
 export { handler as GET };

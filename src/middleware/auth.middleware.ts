@@ -26,7 +26,7 @@ export interface AuthMiddlewareOptions {
 /**
  * Authentication middleware for API routes
  */
-export async function withAuth(
+export function withAuth(
   handler: (req: AuthenticatedRequest) => Promise<NextResponse>,
   options: AuthMiddlewareOptions = {}
 ) {

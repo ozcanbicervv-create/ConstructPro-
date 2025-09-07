@@ -1,5 +1,8 @@
 import Redis from 'ioredis';
 
+// Check if Redis is enabled
+const isRedisEnabled = process.env.REDIS_ENABLED !== 'false';
+
 // Redis configuration
 const redisConfig = {
   host: process.env.REDIS_HOST || 'localhost',
@@ -7,19 +10,45 @@ const redisConfig = {
   password: process.env.REDIS_PASSWORD,
   db: parseInt(process.env.REDIS_DB || '0'),
   retryDelayOnFailover: 100,
-  maxRetriesPerRequest: 3,
+  maxRetriesPerRequest: isRedisEnabled ? 3 : 0,
   lazyConnect: true,
   keepAlive: 30000,
   connectTimeout: 10000,
   commandTimeout: 5000,
 };
 
-// Create Redis instances
-export const redis = new Redis(redisConfig);
-export const redisSession = new Redis({
+// Create Redis instances or mock objects
+export const redis = isRedisEnabled ? new Redis(redisConfig) : createMockRedis();
+export const redisSession = isRedisEnabled ? new Redis({
   ...redisConfig,
   db: parseInt(process.env.REDIS_SESSION_DB || '1'),
-});
+}) : createMockRedis();
+
+// Mock Redis for development without Redis server
+function createMockRedis() {
+  return {
+    get: async () => null,
+    set: async () => 'OK',
+    setex: async () => 'OK',
+    del: async () => 1,
+    exists: async () => 0,
+    expire: async () => 1,
+    mget: async (...keys: string[]) => keys.map(() => null),
+    keys: async () => [],
+    ping: async () => 'PONG',
+    info: async () => 'redis_version:mock\nused_memory_human:0B\nkeyspace_hits:0\nkeyspace_misses:0',
+    incr: async () => 1,
+    pipeline: () => ({
+      setex: () => {},
+      incr: () => {},
+      expire: () => {},
+      exec: async () => [[null, 'OK']],
+    }),
+    flushdb: async () => 'OK',
+    on: () => {},
+    emit: () => {},
+  } as any;
+}
 
 // Redis connection event handlers
 redis.on('connect', () => {

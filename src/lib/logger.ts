@@ -275,4 +275,4 @@ export function generateRequestId(): string {
 export const logger = AppLogger.getInstance();
 
 // Export types and utilities
-export { AppLogger, LogLevel };
+export { AppLogger };

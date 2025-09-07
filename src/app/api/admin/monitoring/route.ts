@@ -162,8 +162,6 @@ async function POST(request: NextRequest) {
   });
 }
 
-export { GET, POST };
-
 // Apply middleware
 const getHandler = withErrorHandler(withRequestCorrelation(GET));
 const postHandler = withErrorHandler(withRequestCorrelation(POST));
