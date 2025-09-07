@@ -1,0 +1,231 @@
+name: Performance Monitoring
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+  schedule:
+    # Run performance tests daily at 2 AM UTC
+    - cron: '0 2 * * *'
+
+jobs:
+  performance-audit:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build application
+        run: npm run build
+        env:
+          NODE_ENV: production
+
+      - name: Start application
+        run: |
+          npm start &
+          sleep 30
+        env:
+          NODE_ENV: production
+
+      - name: Wait for application to be ready
+        run: |
+          npx wait-on http://localhost:3000 --timeout 60000
+
+      - name: Run Lighthouse CI
+        run: npm run lighthouse
+        env:
+          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+
+      - name: Run performance benchmarks
+        run: npm run performance:benchmark
+        continue-on-error: true
+
+      - name: Run bundle analysis
+        run: npm run bundle:analyze
+
+      - name: Compare with baseline
+        run: |
+          npm run performance:compare
+          npm run bundle:compare
+        continue-on-error: true
+
+      - name: Upload performance reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: performance-reports-${{ github.sha }}
+          path: |
+            performance-reports/
+            bundle-analysis/
+            .lighthouseci/
+          retention-days: 30
+
+      - name: Comment PR with performance results
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+            
+            // Read performance report if it exists
+            const reportPath = 'performance-reports/latest-report.md';
+            const bundleReportPath = 'bundle-analysis/bundle-report.md';
+            
+            let comment = '## 📊 Performance Report\n\n';
+            
+            if (fs.existsSync(reportPath)) {
+              const performanceReport = fs.readFileSync(reportPath, 'utf8');
+              comment += '### Performance Metrics\n\n';
+              comment += performanceReport;
+              comment += '\n\n';
+            }
+            
+            if (fs.existsSync(bundleReportPath)) {
+              const bundleReport = fs.readFileSync(bundleReportPath, 'utf8');
+              comment += '### Bundle Analysis\n\n';
+              comment += bundleReport;
+              comment += '\n\n';
+            }
+            
+            comment += '---\n';
+            comment += '*Performance monitoring powered by Lighthouse CI and custom benchmarks*';
+            
+            // Post comment on PR
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
+
+  bundle-size-check:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Analyze bundle size
+        run: npm run bundle:analyze
+
+      - name: Check for bundle size regressions
+        run: npm run bundle:compare
+
+      - name: Upload bundle analysis
+        uses: actions/upload-artifact@v4
+        with:
+          name: bundle-analysis-${{ github.sha }}
+          path: bundle-analysis/
+          retention-days: 30
+
+  lighthouse-ci:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build and start application
+        run: |
+          npm run build
+          npm start &
+          sleep 30
+        env:
+          NODE_ENV: production
+
+      - name: Wait for application
+        run: npx wait-on http://localhost:3000 --timeout 60000
+
+      - name: Run Lighthouse CI
+        run: |
+          npm install -g @lhci/cli
+          lhci autorun
+        env:
+          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+
+      - name: Upload Lighthouse reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lighthouse-reports-${{ github.sha }}
+          path: .lighthouseci/
+          retention-days: 30
+
+  performance-regression-check:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build application
+        run: npm run build
+
+      - name: Start application
+        run: |
+          npm start &
+          sleep 30
+
+      - name: Run performance regression tests
+        run: |
+          npm run performance:benchmark
+          npm run bundle:compare
+        continue-on-error: false
+
+      - name: Fail on performance regression
+        run: |
+          if [ -f "performance-reports/bundle-comparison.json" ]; then
+            if grep -q '"isRegression": true' performance-reports/bundle-comparison.json; then
+              echo "❌ Bundle size regression detected!"
+              exit 1
+            fi
+          fi
+          
+          if [ -f "performance-reports/performance-report-*.json" ]; then
+            if grep -q '"regressions"' performance-reports/performance-report-*.json; then
+              echo "❌ Performance regression detected!"
+              exit 1
+            fi
+          fi
+          
+          echo "✅ No performance regressions detected"

@@ -5,8 +5,8 @@
  * Tests application accessibility and basic functionality after deployment
  */
 
-const https = require('https');
 const http = require('http');
+const https = require('https');
 
 // Configuration
 const config = {
@@ -216,7 +216,7 @@ async function runTests() {
     try {
       const result = await testFunction();
       results[testName] = result;
-      if (result) passedTests++;
+      if (result) {passedTests++;}
     } catch (error) {
       console.log(`❌ Test ${testName} threw error: ${error.message}`);
       results[testName] = false;

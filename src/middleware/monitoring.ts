@@ -4,7 +4,8 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { resourceMonitor } from '@/lib/monitoring';
+
+import { resourceMonitor } from '@/utils/monitoring';
 
 export interface RequestMetrics {
   method: string;
@@ -75,7 +76,7 @@ class RequestTracker {
     };
   }
 
-  getRecentRequests(limit: number = 50): RequestMetrics[] {
+  getRecentRequests(limit = 50): RequestMetrics[] {
     return this.requests.slice(-limit);
   }
 }

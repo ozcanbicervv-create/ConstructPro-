@@ -1,0 +1,288 @@
+name: Security Monitoring & Dependency Updates
+
+on:
+  schedule:
+    # Run daily at 2 AM UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+  push:
+    paths:
+      - 'package.json'
+      - 'package-lock.json'
+
+jobs:
+  # Dependency vulnerability scanning
+  dependency-scan:
+    name: Dependency Security Scan
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Run npm audit
+        id: audit
+        run: |
+          npm audit --audit-level moderate --json > audit-results.json || true
+          
+          # Check if there are any vulnerabilities
+          VULN_COUNT=$(cat audit-results.json | jq '.metadata.vulnerabilities.total // 0')
+          echo "vulnerability-count=$VULN_COUNT" >> $GITHUB_OUTPUT
+          
+          if [ "$VULN_COUNT" -gt 0 ]; then
+            echo "Found $VULN_COUNT vulnerabilities"
+            npm audit --audit-level moderate
+          else
+            echo "No vulnerabilities found"
+          fi
+        continue-on-error: true
+        
+      - name: Upload audit results
+        if: steps.audit.outputs.vulnerability-count > 0
+        uses: actions/upload-artifact@v4
+        with:
+          name: audit-results
+          path: audit-results.json
+          
+      - name: Create security issue
+        if: steps.audit.outputs.vulnerability-count > 0
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const vulnCount = '${{ steps.audit.outputs.vulnerability-count }}';
+            
+            const title = `🚨 Security Alert: ${vulnCount} vulnerabilities found in dependencies`;
+            const body = `## Security Vulnerability Report
+            
+            **Found ${vulnCount} vulnerabilities in project dependencies.**
+            
+            ### Action Required
+            - Review the audit results in the workflow artifacts
+            - Update vulnerable dependencies using \`npm audit fix\`
+            - Test the application after updates
+            - Consider using \`npm audit fix --force\` for breaking changes (with caution)
+            
+            ### Workflow Details
+            - **Workflow**: ${{ github.workflow }}
+            - **Run ID**: ${{ github.run_id }}
+            - **Commit**: ${{ github.sha }}
+            
+            This issue was automatically created by the security monitoring workflow.`;
+            
+            // Check if issue already exists
+            const issues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'security,dependencies'
+            });
+            
+            const existingIssue = issues.data.find(issue => 
+              issue.title.includes('Security Alert') && 
+              issue.title.includes('vulnerabilities found')
+            );
+            
+            if (!existingIssue) {
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: title,
+                body: body,
+                labels: ['security', 'dependencies', 'automated']
+              });
+            }
+
+  # License compliance check
+  license-check:
+    name: License Compliance
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Install license checker
+        run: npm install -g license-checker
+        
+      - name: Check licenses
+        run: |
+          license-checker --json --out licenses.json
+          
+          # Check for problematic licenses
+          PROBLEMATIC_LICENSES=("GPL-2.0" "GPL-3.0" "AGPL-1.0" "AGPL-3.0")
+          
+          for license in "${PROBLEMATIC_LICENSES[@]}"; do
+            if grep -q "$license" licenses.json; then
+              echo "⚠️ Found potentially problematic license: $license"
+              grep "$license" licenses.json
+            fi
+          done
+          
+      - name: Upload license report
+        uses: actions/upload-artifact@v4
+        with:
+          name: license-report
+          path: licenses.json
+
+  # Automated dependency updates
+  dependency-update:
+    name: Automated Dependency Updates
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Update dependencies
+        id: update
+        run: |
+          # Update patch and minor versions
+          npm update
+          
+          # Check if package-lock.json changed
+          if git diff --quiet package-lock.json; then
+            echo "No updates available"
+            echo "updates-available=false" >> $GITHUB_OUTPUT
+          else
+            echo "Updates available"
+            echo "updates-available=true" >> $GITHUB_OUTPUT
+            
+            # Get list of updated packages
+            git diff package-lock.json | grep '"version":' | head -10 > updated-packages.txt
+          fi
+          
+      - name: Run tests after updates
+        if: steps.update.outputs.updates-available == 'true'
+        run: |
+          npm run test:ci
+          npm run build
+          
+      - name: Create pull request
+        if: steps.update.outputs.updates-available == 'true'
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: 'chore: update dependencies'
+          title: '🔄 Automated dependency updates'
+          body: |
+            ## Automated Dependency Updates
+            
+            This PR contains automated updates to project dependencies.
+            
+            ### Changes
+            - Updated patch and minor versions of dependencies
+            - All tests pass with updated dependencies
+            - Build completes successfully
+            
+            ### Updated Packages
+            ```
+            $(cat updated-packages.txt || echo "See package-lock.json for details")
+            ```
+            
+            ### Verification
+            - ✅ Tests pass
+            - ✅ Build succeeds
+            - ✅ No breaking changes detected
+            
+            This PR was automatically created by the dependency update workflow.
+          branch: automated/dependency-updates
+          delete-branch: true
+          labels: |
+            dependencies
+            automated
+            maintenance
+
+  # Security policy enforcement
+  security-policy:
+    name: Security Policy Check
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Check for security policy
+        run: |
+          if [ ! -f "SECURITY.md" ]; then
+            echo "⚠️ No SECURITY.md file found"
+            echo "Creating basic security policy..."
+            
+            cat > SECURITY.md << 'EOF'
+          # Security Policy
+          
+          ## Supported Versions
+          
+          | Version | Supported          |
+          | ------- | ------------------ |
+          | 0.1.x   | :white_check_mark: |
+          
+          ## Reporting a Vulnerability
+          
+          If you discover a security vulnerability, please send an email to security@vovelet-tech.com.
+          
+          Please include the following information:
+          - Description of the vulnerability
+          - Steps to reproduce
+          - Potential impact
+          - Suggested fix (if any)
+          
+          We will respond to security reports within 48 hours.
+          EOF
+          fi
+          
+      - name: Check for sensitive files
+        run: |
+          # Check for common sensitive file patterns
+          SENSITIVE_PATTERNS=(
+            "*.key"
+            "*.pem"
+            "*.p12"
+            "*.pfx"
+            ".env.local"
+            ".env.production"
+            "config/secrets.json"
+          )
+          
+          for pattern in "${SENSITIVE_PATTERNS[@]}"; do
+            if find . -name "$pattern" -not -path "./node_modules/*" | grep -q .; then
+              echo "⚠️ Found potentially sensitive files matching: $pattern"
+              find . -name "$pattern" -not -path "./node_modules/*"
+            fi
+          done
+          
+      - name: Check environment variables
+        run: |
+          # Check for hardcoded secrets in code
+          if grep -r "password\|secret\|key\|token" --include="*.ts" --include="*.js" --include="*.tsx" --include="*.jsx" src/ | grep -v "// " | grep -v "console.log" | head -5; then
+            echo "⚠️ Potential hardcoded secrets found in source code"
+          fi

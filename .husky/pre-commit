@@ -1,0 +1,17 @@
+#!/usr/bin/env sh
+
+echo "🔍 Running pre-commit checks..."
+
+# Run lint-staged to check staged files
+echo "📝 Checking code formatting and linting..."
+npx lint-staged
+
+# Run type checking
+echo "🔧 Running TypeScript type checking..."
+npm run type-check
+
+# Run unit tests for changed files
+echo "🧪 Running unit tests..."
+npm run test:unit
+
+echo "✅ Pre-commit checks completed successfully!"

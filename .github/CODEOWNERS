@@ -1,0 +1,50 @@
+# Global owners - require review from core team for all changes
+* @vovelet-tech/core-team
+
+# Frontend components and UI
+/src/components/ @vovelet-tech/frontend-team
+/src/app/ @vovelet-tech/frontend-team
+/src/hooks/ @vovelet-tech/frontend-team
+/public/ @vovelet-tech/frontend-team
+
+# Backend API and services
+/src/app/api/ @vovelet-tech/backend-team
+/src/services/ @vovelet-tech/backend-team
+/src/utils/ @vovelet-tech/backend-team
+/server.ts @vovelet-tech/backend-team
+
+# Database and migrations
+/prisma/ @vovelet-tech/backend-team
+/db/ @vovelet-tech/backend-team
+
+# Configuration files
+/next.config.ts @vovelet-tech/devops-team
+/tailwind.config.ts @vovelet-tech/frontend-team
+/tsconfig.json @vovelet-tech/core-team
+/package.json @vovelet-tech/core-team
+/package-lock.json @vovelet-tech/core-team
+
+# CI/CD and deployment
+/.github/ @vovelet-tech/devops-team
+/scripts/ @vovelet-tech/devops-team
+/Dockerfile* @vovelet-tech/devops-team
+/.husky/ @vovelet-tech/devops-team
+
+# Documentation
+/docs/ @vovelet-tech/core-team
+/README.md @vovelet-tech/core-team
+/*.md @vovelet-tech/core-team
+
+# Security-related files
+/src/utils/security/ @vovelet-tech/security-team
+/src/middleware.ts @vovelet-tech/security-team
+/scripts/security-audit.js @vovelet-tech/security-team
+/SECURITY.md @vovelet-tech/security-team
+
+# Testing
+/tests/ @vovelet-tech/qa-team
+/jest.config.js @vovelet-tech/qa-team
+/jest.setup.js @vovelet-tech/qa-team
+
+# Kiro AI configuration
+/.kiro/ @vovelet-tech/core-team

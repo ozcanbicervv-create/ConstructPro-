@@ -1,36 +1,27 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
-import { Toaster } from "@/components/ui/toaster";
-import AuthSessionProvider from "@/components/providers/session-provider";
+import { Inter, Poppins } from "next/font/google";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+import { ToastProvider } from "@/components/ui/toast-system";
+import "./globals.css";
+import "../styles/accessibility.css";
+import "../styles/rtl.css";
+
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
+  display: "swap",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const poppins = Poppins({
+  variable: "--font-poppins",
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "ConstructPro - Construction Project Management",
-  description: "Modern construction project management and collaboration platform built by Vovelet-Tech. Built with Next.js, TypeScript, Tailwind CSS, and shadcn/ui.",
-  keywords: ["construction", "project management", "collaboration", "Next.js", "TypeScript", "Tailwind CSS", "shadcn/ui", "React"],
-  authors: [{ name: "Vovelet-Tech" }],
-  openGraph: {
-    title: "ConstructPro - Construction Project Management",
-    description: "Construction project management and collaboration platform",
-    url: "https://vovelet-tech.com",
-    siteName: "ConstructPro",
-    type: "website",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "ConstructPro - Construction Project Management",
-    description: "Construction project management and collaboration platform",
-  },
+  title: "ConstructPro - Modern Construction Management",
+  description: "Professional construction project management platform with modern design and enterprise features",
 };
 
 export default function RootLayout({
@@ -39,14 +30,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground`}
-      >
-        <AuthSessionProvider>
-          {children}
-          <Toaster />
-        </AuthSessionProvider>
+    <html lang="en" className={`${inter.variable} ${poppins.variable} a11y-typography`}>
+      <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="color-scheme" content="light dark" />
+      </head>
+      <body className="font-sans antialiased bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen">
+        <ToastProvider>
+          <div id="root">
+            {children}
+          </div>
+        </ToastProvider>
       </body>
     </html>
   );

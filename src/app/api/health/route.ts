@@ -1,182 +1,222 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
 
-/**
- * Comprehensive Health Check Endpoint for ConstructPro
- * Used by Coolify and monitoring systems to verify application health
- */
+import { prisma } from '@/lib/db';
+import { logger } from '@/lib/logger';
+import { redis } from '@/lib/redis';
+import { withRequestCorrelation } from '@/middleware/correlation.middleware';
+import { withErrorHandler } from '@/middleware/error-handler.middleware';
 
-let prisma: PrismaClient | null = null;
-
-// Initialize Prisma client for health checks
-function getPrismaClient() {
-  if (!prisma) {
-    try {
-      prisma = new PrismaClient();
-    } catch (error) {
-      console.error('Failed to initialize Prisma client:', error);
-      return null;
-    }
-  }
-  return prisma;
-}
-
-// Individual health check functions
-async function checkDatabase(): Promise<{ status: string; latency?: number; error?: string }> {
-  try {
-    const client = getPrismaClient();
-    if (!client) {
-      return { status: 'unavailable', error: 'Prisma client not initialized' };
-    }
-
-    const start = Date.now();
-    await client.$queryRaw`SELECT 1`;
-    const latency = Date.now() - start;
-
-    return { status: 'healthy', latency };
-  } catch (error) {
-    return { 
-      status: 'unhealthy', 
-      error: error instanceof Error ? error.message : 'Database connection failed' 
-    };
-  }
-}
-
-function checkMemory(): { status: string; usage: any; warning?: string } {
-  const memUsage = process.memoryUsage();
-  const usedMB = Math.round(memUsage.heapUsed / 1024 / 1024);
-  const totalMB = Math.round(memUsage.heapTotal / 1024 / 1024);
-  const usagePercent = Math.round((usedMB / totalMB) * 100);
-
-  const usage = {
-    used: usedMB,
-    total: totalMB,
-    percentage: usagePercent,
-    rss: Math.round(memUsage.rss / 1024 / 1024),
-    external: Math.round(memUsage.external / 1024 / 1024),
+interface HealthCheckResult {
+  status: 'healthy' | 'unhealthy' | 'degraded';
+  timestamp: string;
+  uptime: number;
+  version: string;
+  environment: string;
+  services: {
+    database: ServiceHealth;
+    redis: ServiceHealth;
+    fileSystem: ServiceHealth;
   };
+  metrics: {
+    memoryUsage: NodeJS.MemoryUsage;
+    cpuUsage: NodeJS.CpuUsage;
+  };
+}
 
-  let status = 'healthy';
-  let warning;
+interface ServiceHealth {
+  status: 'healthy' | 'unhealthy';
+  responseTime?: number;
+  error?: string;
+  lastChecked: string;
+}
 
-  if (usagePercent > 90) {
-    status = 'critical';
-    warning = 'Memory usage is critically high';
-  } else if (usagePercent > 75) {
-    status = 'warning';
-    warning = 'Memory usage is high';
+class HealthChecker {
+  private static instance: HealthChecker;
+  private startTime: number;
+
+  constructor() {
+    this.startTime = Date.now();
   }
 
-  return { status, usage, warning };
-}
+  public static getInstance(): HealthChecker {
+    if (!HealthChecker.instance) {
+      HealthChecker.instance = new HealthChecker();
+    }
+    return HealthChecker.instance;
+  }
 
-function checkDisk(): { status: string; warning?: string } {
-  // Basic disk check - in a real implementation, you'd check actual disk usage
-  // For now, we'll just return healthy
-  return { status: 'healthy' };
-}
+  public async performHealthCheck(): Promise<HealthCheckResult> {
+    const timestamp = new Date().toISOString();
+    const uptime = Date.now() - this.startTime;
 
-export async function GET(request: NextRequest) {
-  const startTime = Date.now();
-  
-  try {
-    // Perform all health checks
-    const [dbCheck, memoryCheck, diskCheck] = await Promise.all([
-      checkDatabase(),
-      Promise.resolve(checkMemory()),
-      Promise.resolve(checkDisk()),
+    // Check all services
+    const [database, redisHealth, fileSystem] = await Promise.all([
+      this.checkDatabase(),
+      this.checkRedis(),
+      this.checkFileSystem()
     ]);
 
-    const responseTime = Date.now() - startTime;
+    // Determine overall status
+    const services = { database, redis: redisHealth, fileSystem };
+    const overallStatus = this.determineOverallStatus(services);
 
-    // Determine overall health status
-    const checks = [dbCheck, memoryCheck, diskCheck];
-    const hasUnhealthy = checks.some(check => check.status === 'unhealthy' || check.status === 'critical');
-    const hasWarning = checks.some(check => check.status === 'warning');
+    // Get system metrics
+    const metrics = {
+      memoryUsage: process.memoryUsage(),
+      cpuUsage: process.cpuUsage()
+    };
 
-    let overallStatus = 'healthy';
-    if (hasUnhealthy) {
-      overallStatus = 'unhealthy';
-    } else if (hasWarning) {
-      overallStatus = 'warning';
-    }
-
-    const healthStatus = {
+    return {
       status: overallStatus,
-      timestamp: new Date().toISOString(),
-      service: 'ConstructPro',
+      timestamp,
+      uptime,
       version: process.env.npm_package_version || '1.0.0',
-      environment: process.env.NODE_ENV || 'production',
-      uptime: Math.round(process.uptime()),
-      responseTime,
-      checks: {
-        database: dbCheck,
-        memory: memoryCheck,
-        disk: diskCheck,
-      },
-      system: {
-        nodeVersion: process.version,
-        platform: process.platform,
-        arch: process.arch,
-        pid: process.pid,
-      },
+      environment: process.env.NODE_ENV || 'development',
+      services,
+      metrics
     };
-
-    // Return appropriate HTTP status based on health
-    const httpStatus = overallStatus === 'unhealthy' ? 503 : 200;
-
-    return NextResponse.json(healthStatus, { 
-      status: httpStatus,
-      headers: {
-        'Cache-Control': 'no-cache, no-store, must-revalidate',
-        'Pragma': 'no-cache',
-        'Expires': '0',
-        'X-Health-Status': overallStatus,
-      },
-    });
-  } catch (error) {
-    console.error('Health check failed:', error);
-    
-    const errorResponse = {
-      status: 'unhealthy',
-      timestamp: new Date().toISOString(),
-      service: 'ConstructPro',
-      error: error instanceof Error ? error.message : 'Unknown error',
-      responseTime: Date.now() - startTime,
-    };
-    
-    return NextResponse.json(errorResponse, { 
-      status: 503,
-      headers: {
-        'Cache-Control': 'no-cache, no-store, must-revalidate',
-        'Pragma': 'no-cache',
-        'Expires': '0',
-        'X-Health-Status': 'unhealthy',
-      },
-    });
   }
-}
 
-// Support HEAD requests for simple health checks
-export async function HEAD(request: NextRequest) {
-  try {
-    // Quick check without detailed response
-    const client = getPrismaClient();
-    if (client) {
-      await client.$queryRaw`SELECT 1`;
+  private async checkDatabase(): Promise<ServiceHealth> {
+    const startTime = Date.now();
+    
+    try {
+      await prisma.$queryRaw`SELECT 1`;
+      
+      return {
+        status: 'healthy',
+        responseTime: Date.now() - startTime,
+        lastChecked: new Date().toISOString()
+      };
+    } catch (error) {
+      logger.error('Database health check failed', {
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+      
+      return {
+        status: 'unhealthy',
+        responseTime: Date.now() - startTime,
+        error: error instanceof Error ? error.message : 'Unknown error',
+        lastChecked: new Date().toISOString()
+      };
     }
-    return new NextResponse(null, { 
-      status: 200,
-      headers: {
-        'X-Health-Status': 'healthy',
-      },
-    });
-  } catch (error) {
-    return new NextResponse(null, { 
-      status: 503,
-      headers: {
-        'X-Health-Status': 'unhealthy',
-      },
-    });
+  }
+
+  private async checkRedis(): Promise<ServiceHealth> {
+    const startTime = Date.now();
+    
+    try {
+      if (!redis) {
+        return {
+          status: 'unhealthy',
+          error: 'Redis client not initialized',
+          lastChecked: new Date().toISOString()
+        };
+      }
+
+      await redis.ping();
+      
+      return {
+        status: 'healthy',
+        responseTime: Date.now() - startTime,
+        lastChecked: new Date().toISOString()
+      };
+    } catch (error) {
+      logger.error('Redis health check failed', {
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+      
+      return {
+        status: 'unhealthy',
+        responseTime: Date.now() - startTime,
+        error: error instanceof Error ? error.message : 'Unknown error',
+        lastChecked: new Date().toISOString()
+      };
+    }
+  }
+
+  private async checkFileSystem(): Promise<ServiceHealth> {
+    const startTime = Date.now();
+    
+    try {
+      const fs = await import('fs/promises');
+      const path = await import('path');
+      
+      const testFile = path.join(process.cwd(), 'uploads', '.health-check');
+      const testContent = `health-check-${Date.now()}`;
+      
+      // Write test file
+      await fs.writeFile(testFile, testContent);
+      
+      // Read test file
+      const content = await fs.readFile(testFile, 'utf-8');
+      
+      // Clean up test file
+      await fs.unlink(testFile);
+      
+      if (content !== testContent) {
+        throw new Error('File system read/write mismatch');
+      }
+      
+      return {
+        status: 'healthy',
+        responseTime: Date.now() - startTime,
+        lastChecked: new Date().toISOString()
+      };
+    } catch (error) {
+      logger.error('File system health check failed', {
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+      
+      return {
+        status: 'unhealthy',
+        responseTime: Date.now() - startTime,
+        error: error instanceof Error ? error.message : 'Unknown error',
+        lastChecked: new Date().toISOString()
+      };
+    }
+  }
+
+  private determineOverallStatus(services: Record<string, ServiceHealth>): 'healthy' | 'unhealthy' | 'degraded' {
+    const statuses = Object.values(services).map(service => service.status);
+    
+    if (statuses.every(status => status === 'healthy')) {
+      return 'healthy';
+    }
+    
+    if (statuses.some(status => status === 'healthy')) {
+      return 'degraded';
+    }
+    
+    return 'unhealthy';
   }
 }
+
+const healthChecker = HealthChecker.getInstance();
+
+async function GET(request: NextRequest) {
+  const healthResult = await healthChecker.performHealthCheck();
+  
+  // Log health check
+  logger.info('Health check performed', {
+    status: healthResult.status,
+    uptime: healthResult.uptime,
+    services: Object.entries(healthResult.services).map(([name, service]) => ({
+      name,
+      status: service.status,
+      responseTime: service.responseTime
+    }))
+  });
+
+  const statusCode = healthResult.status === 'healthy' ? 200 : 
+                    healthResult.status === 'degraded' ? 200 : 503;
+
+  return NextResponse.json({
+    success: true,
+    data: healthResult
+  }, { status: statusCode });
+}
+
+// Apply middleware
+const handler = withErrorHandler(withRequestCorrelation(GET));
+export { handler as GET };

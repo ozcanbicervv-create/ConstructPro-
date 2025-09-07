@@ -1,0 +1,15 @@
+{
+    "keep": {
+        "days": true,
+        "amount": 30
+    },
+    "auditLog": "C:\\Users\\mrbcr\\OneDrive\\Desktop\\ConstructPro\\logs\\.5a30e2d57fabfcf7dd4b4171f8554d05e3838867-audit.json",
+    "files": [
+        {
+            "date": 1757243188918,
+            "name": "C:\\Users\\mrbcr\\OneDrive\\Desktop\\ConstructPro\\logs\\combined-2025-09-07.log",
+            "hash": "1f2b976089cb7430f6c742e96b6d9000e0d3e425cbd48c90ff2d72e97f11dac9"
+        }
+    ],
+    "hashType": "sha256"
+}

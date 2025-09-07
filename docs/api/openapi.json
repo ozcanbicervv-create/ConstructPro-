@@ -1,0 +1,400 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "ConstructPro API",
+    "description": "Construction project management and collaboration platform API",
+    "version": "1.0.0",
+    "contact": {
+      "name": "ConstructPro API Support",
+      "url": "https://github.com/vovelet-tech/constructpro",
+      "email": "support@constructpro.com"
+    },
+    "license": {
+      "name": "MIT",
+      "url": "https://opensource.org/licenses/MIT"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000/api",
+      "description": "API Server"
+    }
+  ],
+  "paths": {
+    "/auth\\register": {
+      "post": {
+        "summary": "POST /auth\\register",
+        "description": "",
+        "operationId": "postauthregister",
+        "tags": [
+          "API"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/signUpSchema"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth\\[...nextauth]": {},
+    "/docs": {
+      "get": {
+        "summary": "GET /docs",
+        "description": "/**\nAPI Documentation Endpoint\nServes the OpenAPI specification in JSON format\n/",
+        "operationId": "getdocs",
+        "tags": [
+          "API"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      },
+      "head": {
+        "summary": "HEAD /docs",
+        "description": "/**\nAPI Documentation Metadata\nReturns basic information about the API documentation\n/",
+        "operationId": "headdocs",
+        "tags": [
+          "API"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/health": {
+      "get": {
+        "summary": "GET /health",
+        "description": "/**\nComprehensive Health Check Endpoint for ConstructPro\nUsed by Coolify and monitoring systems to verify application health\n/",
+        "operationId": "gethealth",
+        "tags": [
+          "API"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      },
+      "head": {
+        "summary": "HEAD /health",
+        "description": "/**\nComprehensive Health Check Endpoint for ConstructPro\nUsed by Coolify and monitoring systems to verify application health\n/",
+        "operationId": "headhealth",
+        "tags": [
+          "API"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/monitoring\\dashboard": {
+      "get": {
+        "summary": "GET /monitoring\\dashboard",
+        "description": "/**\nMonitoring Dashboard API for ConstructPro\nProvides comprehensive monitoring data for dashboards and alerts\n/",
+        "operationId": "getmonitoringdashboard",
+        "tags": [
+          "API"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      },
+      "options": {
+        "summary": "OPTIONS /monitoring\\dashboard",
+        "description": "/**\nCalculate trend direction for a series of values\n/",
+        "operationId": "optionsmonitoringdashboard",
+        "tags": [
+          "API"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/monitoring\\metrics": {
+      "get": {
+        "summary": "GET /monitoring\\metrics",
+        "description": "/**\nSystem Metrics Endpoint for ConstructPro Monitoring\nProvides detailed system metrics for monitoring dashboards\n/",
+        "operationId": "getmonitoringmetrics",
+        "tags": [
+          "API"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      },
+      "options": {
+        "summary": "OPTIONS /monitoring\\metrics",
+        "description": "/**\nSystem Metrics Endpoint for ConstructPro Monitoring\nProvides detailed system metrics for monitoring dashboards\n/",
+        "operationId": "optionsmonitoringmetrics",
+        "tags": [
+          "API"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user\\profile": {
+      "patch": {
+        "summary": "PATCH /user\\profile",
+        "description": "",
+        "operationId": "patchuserprofile",
+        "tags": [
+          "API"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/updateProfileSchema"
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "GET /user\\profile",
+        "description": "",
+        "operationId": "getuserprofile",
+        "tags": [
+          "API"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "signUpSchema": {
+        "type": "object",
+        "required": [
+          "firstName",
+          "lastName",
+          "email",
+          "password",
+          "confirmPassword"
+        ],
+        "properties": {
+          "firstName": {
+            "type": "string",
+            "minLength": 2
+          },
+          "lastName": {
+            "type": "string",
+            "minLength": 2
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "password": {
+            "type": "string",
+            "minLength": 6
+          },
+          "confirmPassword": {
+            "type": "string"
+          },
+          "company": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "ADMIN",
+              "MANAGER",
+              "WORKER",
+              "CLIENT"
+            ]
+          }
+        }
+      },
+      "updateProfileSchema": {
+        "type": "object",
+        "properties": {
+          "firstName": {
+            "type": "string",
+            "minLength": 2
+          },
+          "lastName": {
+            "type": "string",
+            "minLength": 2
+          },
+          "company": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          },
+          "theme": {
+            "type": "string",
+            "enum": [
+              "light",
+              "dark"
+            ]
+          },
+          "language": {
+            "type": "string"
+          }
+        }
+      },
+      "signInSchema": {
+        "type": "object",
+        "required": [
+          "email",
+          "password"
+        ],
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "password": {
+            "type": "string",
+            "minLength": 6
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "sessionAuth": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "next-auth.session-token",
+        "description": "NextAuth.js session cookie"
+      },
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "JWT token for API access"
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "API",
+      "description": "API related endpoints"
+    }
+  ]
+}

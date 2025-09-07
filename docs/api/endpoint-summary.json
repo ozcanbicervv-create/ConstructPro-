@@ -1,0 +1,103 @@
+{
+  "totalEndpoints": 11,
+  "byMethod": {
+    "post": 1,
+    "get": 5,
+    "head": 2,
+    "options": 2,
+    "patch": 1
+  },
+  "byTag": {
+    "API": 11
+  },
+  "endpoints": [
+    {
+      "path": "/auth\\register",
+      "method": "POST",
+      "summary": "POST /auth\\register",
+      "tags": [
+        "API"
+      ]
+    },
+    {
+      "path": "/docs",
+      "method": "GET",
+      "summary": "GET /docs",
+      "tags": [
+        "API"
+      ]
+    },
+    {
+      "path": "/docs",
+      "method": "HEAD",
+      "summary": "HEAD /docs",
+      "tags": [
+        "API"
+      ]
+    },
+    {
+      "path": "/health",
+      "method": "GET",
+      "summary": "GET /health",
+      "tags": [
+        "API"
+      ]
+    },
+    {
+      "path": "/health",
+      "method": "HEAD",
+      "summary": "HEAD /health",
+      "tags": [
+        "API"
+      ]
+    },
+    {
+      "path": "/monitoring\\dashboard",
+      "method": "GET",
+      "summary": "GET /monitoring\\dashboard",
+      "tags": [
+        "API"
+      ]
+    },
+    {
+      "path": "/monitoring\\dashboard",
+      "method": "OPTIONS",
+      "summary": "OPTIONS /monitoring\\dashboard",
+      "tags": [
+        "API"
+      ]
+    },
+    {
+      "path": "/monitoring\\metrics",
+      "method": "GET",
+      "summary": "GET /monitoring\\metrics",
+      "tags": [
+        "API"
+      ]
+    },
+    {
+      "path": "/monitoring\\metrics",
+      "method": "OPTIONS",
+      "summary": "OPTIONS /monitoring\\metrics",
+      "tags": [
+        "API"
+      ]
+    },
+    {
+      "path": "/user\\profile",
+      "method": "PATCH",
+      "summary": "PATCH /user\\profile",
+      "tags": [
+        "API"
+      ]
+    },
+    {
+      "path": "/user\\profile",
+      "method": "GET",
+      "summary": "GET /user\\profile",
+      "tags": [
+        "API"
+      ]
+    }
+  ]
+}

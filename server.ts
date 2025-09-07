@@ -1,16 +1,54 @@
 // server.ts - Next.js Standalone + Socket.IO
-import { setupSocket } from '@/lib/socket';
 import { createServer } from 'http';
-import { Server } from 'socket.io';
+
+import compression from 'compression';
 import next from 'next';
+import responseTime from 'response-time';
+import { Server } from 'socket.io';
+
+import { applyDatabaseIndexes, optimizedPrisma } from './src/lib/database-optimization';
+import { performanceMonitor, createResponseTimeTracker } from './src/lib/performance';
+import { redis, redisSession } from './src/lib/redis';
+import { setupSocket } from './src/utils/socket';
 
 const dev = process.env.NODE_ENV !== 'production';
-const currentPort = 3000;
+const currentPort = 3001;
 const hostname = '0.0.0.0';
 
 // Custom server with Socket.IO integration
 async function createCustomServer() {
   try {
+    // Initialize performance monitoring
+    console.log('🚀 Initializing ConstructPro server...');
+    
+    // Test Redis connections
+    try {
+      await redis.ping();
+      console.log('✅ Redis cache connection established');
+    } catch (error) {
+      console.warn('⚠️ Redis cache connection failed:', error);
+    }
+
+    try {
+      await redisSession.ping();
+      console.log('✅ Redis session store connection established');
+    } catch (error) {
+      console.warn('⚠️ Redis session store connection failed:', error);
+    }
+
+    // Test database connection and apply indexes
+    try {
+      const isHealthy = await optimizedPrisma.healthCheck();
+      if (isHealthy) {
+        console.log('✅ Database connection established');
+        await applyDatabaseIndexes(optimizedPrisma);
+      } else {
+        console.warn('⚠️ Database health check failed');
+      }
+    } catch (error) {
+      console.warn('⚠️ Database connection failed:', error);
+    }
+
     // Create Next.js app
     const nextApp = next({ 
       dev,
@@ -28,6 +66,24 @@ async function createCustomServer() {
       if (req.url?.startsWith('/api/socketio')) {
         return;
       }
+      
+      // Apply performance monitoring middleware
+      const startTime = Date.now();
+      
+      // Track response time (only if available)
+      res.on('finish', () => {
+        const duration = Date.now() - startTime;
+        const route = req.url || 'unknown';
+        if (performanceMonitor && performanceMonitor.trackHttpRequest) {
+          performanceMonitor.trackHttpRequest(
+            req.method || 'GET',
+            route,
+            res.statusCode || 200,
+            duration
+          );
+        }
+      });
+      
       handle(req, res);
     });
 
@@ -44,8 +100,23 @@ async function createCustomServer() {
 
     // Start the server
     server.listen(currentPort, hostname, () => {
-      console.log(`> Ready on http://${hostname}:${currentPort}`);
-      console.log(`> Socket.IO server running at ws://${hostname}:${currentPort}/api/socketio`);
+      console.log(`✅ ConstructPro server ready on http://${hostname}:${currentPort}`);
+      console.log(`✅ Socket.IO server running at ws://${hostname}:${currentPort}/api/socketio`);
+      console.log(`📊 Performance monitoring enabled`);
+      console.log(`🗄️ Cache and session management active`);
+      
+      // Log initial performance metrics (only if available)
+      if (performanceMonitor) {
+        performanceMonitor.getPerformanceSummary().then(summary => {
+          console.log('📈 Initial performance metrics:', {
+            requestCount: summary.requestCount,
+            errorRate: summary.errorRate,
+            memoryUsage: `${(summary.systemMetrics.memoryUsage * 100).toFixed(2)}%`,
+          });
+        }).catch(error => {
+          console.warn('Failed to get performance summary:', error);
+        });
+      }
     });
 
   } catch (err) {

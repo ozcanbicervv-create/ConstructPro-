@@ -1,0 +1,27 @@
+#!/usr/bin/env sh
+
+echo "🚀 Running pre-push checks..."
+
+# Get the current branch name
+branch=$(git rev-parse --abbrev-ref HEAD)
+
+# Prevent direct pushes to main/master
+if [ "$branch" = "main" ] || [ "$branch" = "master" ]; then
+  echo "❌ Direct pushes to $branch are not allowed!"
+  echo "Please create a pull request instead."
+  exit 1
+fi
+
+# Run comprehensive tests
+echo "🧪 Running comprehensive test suite..."
+npm run test:ci
+
+# Run security audit
+echo "🔒 Running security audit..."
+npm run security:audit
+
+# Run build to ensure everything compiles
+echo "🏗️  Testing production build..."
+npm run build
+
+echo "✅ Pre-push checks completed successfully!"
