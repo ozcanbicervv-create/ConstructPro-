@@ -1,18 +1,6 @@
 "use client";
 
-import React, { Suspense } from 'react';
-import { useSession } from "next-auth/react";
-import { ProtectedRoute } from "@/components/auth/protected-route";
-import { Dashboard } from "@/components/design-system/organisms/Dashboard/Dashboard";
-import { NotificationSystem } from "@/components/design-system/organisms/RealTime/NotificationSystem";
-import { PresenceIndicators } from "@/components/design-system/organisms/RealTime/PresenceIndicators";
-import { PWAStatus } from "@/components/design-system/organisms/PWA/PWAStatus";
-import { PWAInstallPrompt } from "@/components/design-system/organisms/PWA/PWAInstallPrompt";
-import { PWAUpdatePrompt } from "@/components/design-system/organisms/PWA/PWAUpdatePrompt";
-import { Navigation } from "@/components/design-system/molecules/Navigation/Navigation";
-import { MobileNavigation } from "@/components/design-system/molecules/MobileNavigation/MobileNavigation";
-import { Breadcrumb } from "@/components/design-system/molecules/Breadcrumb/Breadcrumb";
-import { Button } from "@/components/ui/button";
+import { motion } from "framer-motion";
 import { 
   Settings, 
   Bell, 
@@ -27,7 +15,21 @@ import {
   Calendar,
   MessageSquare
 } from "lucide-react";
-import { motion } from "framer-motion";
+import { useSession } from "next-auth/react";
+import React, { Suspense } from 'react';
+
+import { ProtectedRoute } from "@/components/auth/protected-route";
+import { Breadcrumb } from "@/components/design-system/molecules/Breadcrumb/Breadcrumb";
+import { MobileNavigation } from "@/components/design-system/molecules/MobileNavigation/MobileNavigation";
+import { Navigation } from "@/components/design-system/molecules/Navigation/Navigation";
+import { Dashboard } from "@/components/design-system/organisms/Dashboard/Dashboard";
+import { PWAInstallPrompt } from "@/components/design-system/organisms/PWA/PWAInstallPrompt";
+import { PWAStatus } from "@/components/design-system/organisms/PWA/PWAStatus";
+import { PWAUpdatePrompt } from "@/components/design-system/organisms/PWA/PWAUpdatePrompt";
+import { NotificationSystem } from "@/components/design-system/organisms/RealTime/NotificationSystem";
+import { PresenceIndicators } from "@/components/design-system/organisms/RealTime/PresenceIndicators";
+import { Button } from "@/components/ui/button";
+
 
 // Navigation items for the main navigation
 const navigationItems = [

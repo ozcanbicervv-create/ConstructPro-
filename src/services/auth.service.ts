@@ -1,9 +1,11 @@
-import { prisma } from '@/utils/db';
+import { randomBytes } from 'crypto';
+
+import { User, UserRole } from '@prisma/client';
 import { hash, compare } from 'bcryptjs';
 import { sign, verify } from 'jsonwebtoken';
 import { authenticator } from 'otplib';
-import { randomBytes } from 'crypto';
-import { User, UserRole } from '@prisma/client';
+
+import { prisma } from '@/utils/db';
 
 export interface AuthResponse {
   user: Omit<User, 'password' | 'mfaSecret'>;

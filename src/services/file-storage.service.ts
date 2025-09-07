@@ -1,7 +1,9 @@
+import crypto from 'crypto'
 import fs from 'fs/promises'
 import path from 'path'
-import crypto from 'crypto'
+
 import mime from 'mime-types'
+
 import { StorageProvider, StorageConfig } from '@/types/document.types'
 
 export class FileStorageService {

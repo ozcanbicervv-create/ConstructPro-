@@ -1,27 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { cn } from '@/lib/utils';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Slider } from '@/components/ui/slider';
-import { 
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from '@/components/ui/collapsible';
 import {
   Search,
   Filter,
@@ -46,6 +25,29 @@ import {
   TrendingUp,
   TrendingDown
 } from 'lucide-react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import React, { useState, useMemo } from 'react';
+
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@/components/ui/collapsible';
+import { Input } from '@/components/ui/input';
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Slider } from '@/components/ui/slider';
+import { cn } from '@/lib/utils';
+
 
 // Extended mock materials data for search
 const mockMaterials = [
@@ -206,7 +208,7 @@ export default function MaterialSearchPage() {
 
   // Filter and sort materials
   const filteredMaterials = useMemo(() => {
-    let filtered = mockMaterials.filter(material => {
+    const filtered = mockMaterials.filter(material => {
       // Text search
       const matchesSearch = !searchQuery || 
         material.name.toLowerCase().includes(searchQuery.toLowerCase()) ||

@@ -140,11 +140,11 @@ const localeConfigs: Record<SupportedLocale, LocaleConfig> = {
       currency: 'ر.س',
     },
     pluralRules: (count) => {
-      if (count === 0) return 'zero';
-      if (count === 1) return 'one';
-      if (count === 2) return 'two';
-      if (count >= 3 && count <= 10) return 'few';
-      if (count >= 11 && count <= 99) return 'many';
+      if (count === 0) {return 'zero';}
+      if (count === 1) {return 'one';}
+      if (count === 2) {return 'two';}
+      if (count >= 3 && count <= 10) {return 'few';}
+      if (count >= 11 && count <= 99) {return 'many';}
       return 'other';
     },
   },
@@ -161,9 +161,9 @@ const localeConfigs: Record<SupportedLocale, LocaleConfig> = {
       currency: '₪',
     },
     pluralRules: (count) => {
-      if (count === 1) return 'one';
-      if (count === 2) return 'two';
-      if (count >= 3 && count <= 10) return 'few';
+      if (count === 1) {return 'one';}
+      if (count === 2) {return 'two';}
+      if (count >= 3 && count <= 10) {return 'few';}
       return 'other';
     },
   },
@@ -210,8 +210,8 @@ const localeConfigs: Record<SupportedLocale, LocaleConfig> = {
     pluralRules: (count) => {
       const mod10 = count % 10;
       const mod100 = count % 100;
-      if (mod10 === 1 && mod100 !== 11) return 'one';
-      if (mod10 >= 2 && mod10 <= 4 && (mod100 < 10 || mod100 >= 20)) return 'few';
+      if (mod10 === 1 && mod100 !== 11) {return 'one';}
+      if (mod10 >= 2 && mod10 <= 4 && (mod100 < 10 || mod100 >= 20)) {return 'few';}
       return 'many';
     },
   },
@@ -231,7 +231,7 @@ class I18nManager {
   }
 
   private initializeI18n() {
-    if (!this.isClient) return;
+    if (!this.isClient) {return;}
 
     // Detect browser language
     const browserLang = this.detectBrowserLanguage();
@@ -245,14 +245,14 @@ class I18nManager {
   }
 
   private detectBrowserLanguage(): SupportedLocale {
-    if (!this.isClient) return 'en';
+    if (!this.isClient) {return 'en';}
 
     const browserLang = navigator.language.split('-')[0] as SupportedLocale;
     return Object.keys(localeConfigs).includes(browserLang) ? browserLang : 'en';
   }
 
   private applyLocale(locale: SupportedLocale) {
-    if (!this.isClient) return;
+    if (!this.isClient) {return;}
 
     const config = localeConfigs[locale];
     const root = document.documentElement;

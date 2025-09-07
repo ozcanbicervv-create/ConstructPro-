@@ -114,7 +114,7 @@ export const colors = {
 export function getColor(
   category: keyof typeof colors,
   color: string,
-  shade: number = 500
+  shade = 500
 ): string {
   const colorCategory = colors[category] as any;
   const colorObject = colorCategory[color];
@@ -159,7 +159,7 @@ export function rgbToHex(r: number, g: number, b: number): string {
  */
 export function hexToHsl(hex: string): { h: number; s: number; l: number } | null {
   const rgb = hexToRgb(hex);
-  if (!rgb) return null;
+  if (!rgb) {return null;}
   
   const { r, g, b } = rgb;
   const rNorm = r / 255;
@@ -203,7 +203,7 @@ export function hexToHsl(hex: string): { h: number; s: number; l: number } | nul
  */
 export function lightenColor(hex: string, percent: number): string {
   const rgb = hexToRgb(hex);
-  if (!rgb) return hex;
+  if (!rgb) {return hex;}
   
   const { r, g, b } = rgb;
   const amount = Math.round(2.55 * percent);
@@ -220,7 +220,7 @@ export function lightenColor(hex: string, percent: number): string {
  */
 export function darkenColor(hex: string, percent: number): string {
   const rgb = hexToRgb(hex);
-  if (!rgb) return hex;
+  if (!rgb) {return hex;}
   
   const { r, g, b } = rgb;
   const amount = Math.round(2.55 * percent);
@@ -237,7 +237,7 @@ export function darkenColor(hex: string, percent: number): string {
  */
 export function addAlpha(hex: string, alpha: number): string {
   const rgb = hexToRgb(hex);
-  if (!rgb) return hex;
+  if (!rgb) {return hex;}
   
   const { r, g, b } = rgb;
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
@@ -249,7 +249,7 @@ export function addAlpha(hex: string, alpha: number): string {
 export function getContrastRatio(color1: string, color2: string): number {
   const getLuminance = (hex: string): number => {
     const rgb = hexToRgb(hex);
-    if (!rgb) return 0;
+    if (!rgb) {return 0;}
     
     const { r, g, b } = rgb;
     const [rNorm, gNorm, bNorm] = [r, g, b].map((c) => {
@@ -374,7 +374,7 @@ export function getPriorityColor(priority: keyof typeof priorityColors): string 
 export function createGradient(
   color1: string,
   color2: string,
-  direction: string = '135deg'
+  direction = '135deg'
 ): string {
   return `linear-gradient(${direction}, ${color1} 0%, ${color2} 100%)`;
 }
@@ -383,8 +383,8 @@ export function createGradient(
  * Creates a glassmorphism background
  */
 export function createGlassmorphism(
-  baseColor: string = '#ffffff',
-  opacity: number = 0.1
+  baseColor = '#ffffff',
+  opacity = 0.1
 ): string {
   return addAlpha(baseColor, opacity);
 }

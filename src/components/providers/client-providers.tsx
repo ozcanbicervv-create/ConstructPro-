@@ -6,6 +6,7 @@
 "use client";
 
 import React from 'react';
+
 import { AccessibilityProvider } from '@/components/providers/accessibility-provider';
 import { I18nProvider } from '@/components/providers/i18n-provider';
 

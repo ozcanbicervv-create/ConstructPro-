@@ -1,8 +1,10 @@
-import { prisma } from '@/utils/db';
-import { TaskAttachment } from '@prisma/client';
 import { writeFile, mkdir } from 'fs/promises';
 import { join } from 'path';
+
+import { TaskAttachment } from '@prisma/client';
 import { v4 as uuidv4 } from 'uuid';
+
+import { prisma } from '@/utils/db';
 
 // Extended task attachment type with relations
 export type TaskAttachmentWithRelations = TaskAttachment & {

@@ -5,10 +5,11 @@
 
 "use client";
 
+import { Shield, ShieldAlert, Lock, Eye, EyeOff } from 'lucide-react';
 import React from 'react';
+
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
-import { Shield, ShieldAlert, Lock, Eye, EyeOff } from 'lucide-react';
 
 export type Permission = string;
 export type Role = 'admin' | 'manager' | 'user' | 'viewer' | 'guest';
@@ -58,7 +59,7 @@ export function PermissionGuard({
   const user = providedUser || currentUser;
 
   const hasPermission = React.useMemo(() => {
-    if (!user) return false;
+    if (!user) {return false;}
 
     // Check single permission
     if (permission && !user.permissions.includes(permission)) {
@@ -187,7 +188,7 @@ export function PermissionButton({
   const currentUser = useCurrentUser();
   
   const hasPermission = React.useMemo(() => {
-    if (!currentUser) return false;
+    if (!currentUser) {return false;}
 
     if (permission && !currentUser.permissions.includes(permission)) {
       return false;

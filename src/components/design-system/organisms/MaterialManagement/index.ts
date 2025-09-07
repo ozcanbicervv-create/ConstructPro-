@@ -54,7 +54,6 @@ export {
 
 // Import components for default export
 import { MaterialComparisonTable } from './MaterialComparisonTable';
-import { SupplierDirectory } from './SupplierDirectory';
 import { 
   MaterialCostAnalysis,
   MaterialPriceTrends,
@@ -66,6 +65,7 @@ import {
   ShoppingCart,
   OrderList
 } from './MaterialOrderingWorkflow';
+import { SupplierDirectory } from './SupplierDirectory';
 
 // Default export with all components
 const MaterialManagementComponents = {

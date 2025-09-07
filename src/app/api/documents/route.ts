@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
+
 import { documentService } from '@/services/document.service'
 import { DocumentSearchFilters, DocumentType } from '@/types/document.types'
-import { z } from 'zod'
 
 // Validation schema for search filters
 const searchSchema = z.object({

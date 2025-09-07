@@ -1,6 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
+
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useToast } from "@/hooks/use-toast";
 import { 
   authService, 
   projectService, 
@@ -8,9 +12,6 @@ import {
   userService 
 } from "@/services";
 import type { Project, User } from "@/types";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useToast } from "@/hooks/use-toast";
 
 /**
  * Example component demonstrating how to use the service layer

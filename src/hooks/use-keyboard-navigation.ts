@@ -4,6 +4,7 @@
  */
 
 import { useEffect, useRef, useCallback } from 'react';
+
 import { useAccessibility } from '@/lib/accessibility';
 
 interface KeyboardNavigationOptions {
@@ -27,7 +28,7 @@ export function useKeyboardNavigation(options: KeyboardNavigationOptions = {}) {
   const { keyboardManager, screenReader } = useAccessibility();
 
   const getFocusableElements = useCallback(() => {
-    if (!containerRef.current) return [];
+    if (!containerRef.current) {return [];}
     return keyboardManager.getFocusableElements(containerRef.current);
   }, [keyboardManager]);
 
@@ -55,10 +56,10 @@ export function useKeyboardNavigation(options: KeyboardNavigationOptions = {}) {
 
   const handleKeyDown = useCallback((event: KeyboardEvent) => {
     const elements = getFocusableElements();
-    if (elements.length === 0) return;
+    if (elements.length === 0) {return;}
 
     const currentIndex = getCurrentIndex();
-    if (currentIndex === -1) return;
+    if (currentIndex === -1) {return;}
 
     let nextIndex = currentIndex;
     let handled = false;
@@ -138,7 +139,7 @@ export function useKeyboardNavigation(options: KeyboardNavigationOptions = {}) {
   // Set up keyboard event listeners
   useEffect(() => {
     const container = containerRef.current;
-    if (!container) return;
+    if (!container) {return;}
 
     container.addEventListener('keydown', handleKeyDown);
     
@@ -208,7 +209,7 @@ export function useRovingTabindex(options: KeyboardNavigationOptions = {}) {
 
   useEffect(() => {
     const container = containerRef.current;
-    if (!container) return;
+    if (!container) {return;}
 
     // Set initial tabindex values
     updateTabindices();

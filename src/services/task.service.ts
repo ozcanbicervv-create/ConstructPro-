@@ -1,7 +1,8 @@
+import { Task, Prisma } from '@prisma/client';
+
+import { PaginationParams, PaginatedResponse, createPaginatedResponse } from '@/utils/api-helpers';
 import { prisma } from '@/utils/db';
 import { CreateTaskRequest, UpdateTaskRequest, TaskFilters } from '@/utils/validation-schemas';
-import { PaginationParams, PaginatedResponse, createPaginatedResponse } from '@/utils/api-helpers';
-import { Task, Prisma } from '@prisma/client';
 
 // Extended task type with relations
 export type TaskWithRelations = Task & {
@@ -100,7 +101,7 @@ export class TaskService {
 
     if (startDate && endDate) {
       conflictingTasks = activeTasks.filter(task => {
-        if (!task.dueDate) return false;
+        if (!task.dueDate) {return false;}
         return task.dueDate >= startDate && task.dueDate <= endDate;
       }).map(task => ({
         id: task.id,
@@ -122,7 +123,7 @@ export class TaskService {
 
   // Validate task assignment
   static async validateTaskAssignment(taskData: CreateTaskRequest | UpdateTaskRequest, userId?: string): Promise<void> {
-    if (!taskData.assignedTo) return;
+    if (!taskData.assignedTo) {return;}
 
     // Check if assigned user exists and has access to the project
     const assignee = await prisma.user.findUnique({

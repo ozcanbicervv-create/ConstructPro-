@@ -1,5 +1,6 @@
 import { describe, it, expect } from '@jest/globals';
 import { NextRequest } from 'next/server';
+
 import { createSecurityHeadersMiddleware, securityConfigs } from '@/middleware/security-headers.middleware';
 
 describe('Security Headers Middleware', () => {

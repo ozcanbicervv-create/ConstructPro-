@@ -5,9 +5,9 @@
  * Provides utilities for database backup, restore, and maintenance operations
  */
 
+const { execSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
-const { execSync } = require('child_process');
 
 const DB_PATH = path.join(__dirname, '..', 'db', 'custom.db');
 const BACKUP_DIR = path.join(__dirname, '..', 'db', 'backups');

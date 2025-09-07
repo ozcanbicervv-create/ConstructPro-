@@ -1,10 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
+
 import { 
   NotificationSystem,
   PresenceIndicators,
@@ -13,6 +10,10 @@ import {
   ActivityType
 } from '@/components/design-system/organisms/RealTime';
 import type { ActivityItem, DocumentCollaboration, TaskCollaboration } from '@/components/design-system/organisms/RealTime';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
 import { 
   Notification, 
   NotificationType, 

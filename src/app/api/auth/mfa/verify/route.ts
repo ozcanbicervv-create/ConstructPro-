@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { AuthService } from '@/services/auth.service';
-import { withAuth, AuthenticatedRequest } from '@/middleware/auth.middleware';
-import { AuthAuditLogger } from '@/middleware/auth.middleware';
 import { z } from 'zod';
+
+import { withAuth, AuthenticatedRequest , AuthAuditLogger } from '@/middleware/auth.middleware';
+import { AuthService } from '@/services/auth.service';
+
 
 const verifyMFASchema = z.object({
   code: z.string().min(6, 'MFA code must be 6 digits').max(6, 'MFA code must be 6 digits')

@@ -1,8 +1,8 @@
 import { API_CONFIG, API_ERRORS, CONTENT_TYPES, REQUEST_HEADERS } from '@/constants/api';
 import type { ApiResponse, ApiRequestOptions, ApiError } from '@/types/api.types';
 import { ApiErrorHandler, apiRequest } from '@/utils/api-error-handler';
-import { logger } from '@/utils/logger';
 import { ErrorHandler } from '@/utils/error-handler';
+import { logger } from '@/utils/logger';
 
 /**
  * Centralized API service for handling HTTP requests
@@ -314,7 +314,7 @@ export class ApiService {
             statusText: xhr.statusText,
             headers: new Headers(xhr.getAllResponseHeaders().split('\r\n').reduce((headers, line) => {
               const [key, value] = line.split(': ');
-              if (key && value) headers[key] = value;
+              if (key && value) {headers[key] = value;}
               return headers;
             }, {} as Record<string, string>)),
           });

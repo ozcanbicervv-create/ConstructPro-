@@ -1,5 +1,6 @@
 import multer from 'multer'
 import { NextRequest } from 'next/server'
+
 import { fileStorageService } from '@/services/file-storage.service'
 
 // Configure multer for memory storage
@@ -48,12 +49,12 @@ export const upload = multer({
 })
 
 // Middleware for single file upload
-export const uploadSingle = (fieldName: string = 'file') => {
+export const uploadSingle = (fieldName = 'file') => {
   return upload.single(fieldName)
 }
 
 // Middleware for multiple file upload
-export const uploadMultiple = (fieldName: string = 'files', maxCount: number = 10) => {
+export const uploadMultiple = (fieldName = 'files', maxCount = 10) => {
   return upload.array(fieldName, maxCount)
 }
 

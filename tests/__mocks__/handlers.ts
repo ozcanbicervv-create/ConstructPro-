@@ -1,5 +1,6 @@
 // MSW (Mock Service Worker) handlers for API mocking
 import { http, HttpResponse } from 'msw';
+
 import { createMockUser, createMockProject, createMockApiResponse } from './factories';
 
 // API base URL

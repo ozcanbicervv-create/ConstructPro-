@@ -1,7 +1,8 @@
 import { describe, it, expect, beforeEach, afterEach } from '@jest/globals';
 import { NextRequest } from 'next/server';
-import { POST, GET } from '@/app/api/materials/route';
+
 import { GET as getById, PATCH, DELETE } from '@/app/api/materials/[id]/route';
+import { POST, GET } from '@/app/api/materials/route';
 import { materialService } from '@/services/material.service';
 
 // Mock the material service

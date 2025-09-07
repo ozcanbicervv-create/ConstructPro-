@@ -288,10 +288,10 @@ export function calculateLineHeight(fontSize: number): number {
  */
 export function calculateLetterSpacing(fontSize: number): number {
   // Smaller fonts need more letter spacing, larger fonts need less
-  if (fontSize <= 12) return 0.05;
-  if (fontSize <= 16) return 0.025;
-  if (fontSize <= 24) return 0;
-  if (fontSize <= 36) return -0.025;
+  if (fontSize <= 12) {return 0.05;}
+  if (fontSize <= 16) {return 0.025;}
+  if (fontSize <= 24) {return 0;}
+  if (fontSize <= 36) {return -0.025;}
   return -0.05;
 }
 
@@ -438,8 +438,8 @@ export function createConstructionTypographyClasses(
  */
 export function formatCurrency(
   value: number,
-  currency: string = 'USD',
-  locale: string = 'en-US'
+  currency = 'USD',
+  locale = 'en-US'
 ): string {
   return new Intl.NumberFormat(locale, {
     style: 'currency',
@@ -454,7 +454,7 @@ export function formatCurrency(
  */
 export function formatPercentage(
   value: number,
-  decimals: number = 1
+  decimals = 1
 ): string {
   return `${value.toFixed(decimals)}%`;
 }
@@ -465,7 +465,7 @@ export function formatPercentage(
 export function formatMeasurement(
   value: number,
   unit: string,
-  decimals: number = 2
+  decimals = 2
 ): string {
   return `${value.toFixed(decimals)} ${unit}`;
 }
@@ -476,7 +476,7 @@ export function formatMeasurement(
 export function formatDate(
   date: Date | string,
   format: 'short' | 'medium' | 'long' = 'medium',
-  locale: string = 'en-US'
+  locale = 'en-US'
 ): string {
   const dateObj = typeof date === 'string' ? new Date(date) : date;
   
@@ -493,7 +493,7 @@ export function formatDate(
  * Truncates text with ellipsis
  */
 export function truncateText(text: string, maxLength: number): string {
-  if (text.length <= maxLength) return text;
+  if (text.length <= maxLength) {return text;}
   return `${text.slice(0, maxLength - 3)}...`;
 }
 

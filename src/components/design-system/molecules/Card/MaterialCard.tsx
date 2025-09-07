@@ -1,17 +1,20 @@
 'use client';
 
 import React from 'react';
+
 import { cn } from '@/lib/utils';
-import Card from './Card';
-import CardHeader from './CardHeader';
-import CardContent from './CardContent';
-import CardFooter from './CardFooter';
-import CardTitle from './CardTitle';
-import CardDescription from './CardDescription';
-import { Typography } from '../../atoms/Typography';
+
 import { Badge } from '../../atoms/Badge';
 import { Button } from '../../atoms/Button';
 import { Icon } from '../../atoms/Icon';
+import { Typography } from '../../atoms/Typography';
+
+import Card from './Card';
+import CardContent from './CardContent';
+import CardDescription from './CardDescription';
+import CardFooter from './CardFooter';
+import CardHeader from './CardHeader';
+import CardTitle from './CardTitle';
 
 export interface MaterialData {
   id: string;

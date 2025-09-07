@@ -1,10 +1,12 @@
 'use client';
 
-import React, { forwardRef, useId } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import React, { forwardRef, useId } from 'react';
+
 import { cn } from '@/lib/utils';
-import { Typography } from '../../atoms/Typography';
+
 import { Icon } from '../../atoms/Icon';
+import { Typography } from '../../atoms/Typography';
 
 export interface TextareaFieldProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
   label?: string;

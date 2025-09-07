@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { documentService } from '@/services/document.service'
+
 import { uploadSingle, handleUploadError, validateFileMetadata } from '@/middleware/upload.middleware'
+import { documentService } from '@/services/document.service'
 
 interface RouteParams {
   params: {

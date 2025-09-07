@@ -264,7 +264,7 @@ class Logger {
 
   private async sendToRemote(entry: LogEntry): Promise<void> {
     try {
-      if (!this.config.remoteEndpoint) return;
+      if (!this.config.remoteEndpoint) {return;}
 
       await fetch(this.config.remoteEndpoint, {
         method: 'POST',
@@ -280,7 +280,7 @@ class Logger {
   }
 
   private saveLogsToStorage(): void {
-    if (typeof window === 'undefined') return;
+    if (typeof window === 'undefined') {return;}
 
     try {
       const recentLogs = this.logs.slice(-100); // Store only recent logs
@@ -291,7 +291,7 @@ class Logger {
   }
 
   private loadStoredLogs(): void {
-    if (typeof window === 'undefined') return;
+    if (typeof window === 'undefined') {return;}
 
     try {
       const stored = localStorage.getItem('app_logs');
@@ -310,7 +310,7 @@ class Logger {
 
   private getCurrentUserId(): string | undefined {
     // In a real app, get this from your auth context/store
-    if (typeof window === 'undefined') return undefined;
+    if (typeof window === 'undefined') {return undefined;}
     
     try {
       // Example: get from localStorage, cookie, or auth context

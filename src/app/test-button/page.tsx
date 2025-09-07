@@ -7,8 +7,6 @@
 
 'use client';
 
-import React, { useState } from 'react';
-import { Button } from '@/components/design-system/atoms/Button';
 import { 
   PlusIcon, 
   ArrowRightIcon, 
@@ -19,6 +17,9 @@ import {
   SearchIcon,
   HeartIcon
 } from 'lucide-react';
+import React, { useState } from 'react';
+
+import { Button } from '@/components/design-system/atoms/Button';
 
 export default function ButtonTestPage() {
   const [loading, setLoading] = useState<string | null>(null);

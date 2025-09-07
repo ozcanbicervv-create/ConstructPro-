@@ -1,8 +1,10 @@
-import { describe, it, expect, beforeEach, afterEach } from '@jest/globals'
-import { fileStorageService } from '@/services/file-storage.service'
-import { validateFileMetadata, generateSafeFilename } from '@/middleware/upload.middleware'
 import fs from 'fs/promises'
 import path from 'path'
+
+import { describe, it, expect, beforeEach, afterEach } from '@jest/globals'
+
+import { validateFileMetadata, generateSafeFilename } from '@/middleware/upload.middleware'
+import { fileStorageService } from '@/services/file-storage.service'
 
 describe('File Storage System', () => {
   const testUploadPath = './test-uploads'

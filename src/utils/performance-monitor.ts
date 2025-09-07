@@ -18,8 +18,8 @@ export interface WebVitalsMetric extends PerformanceMetric {
 
 class PerformanceMonitor {
   private metrics: PerformanceMetric[] = [];
-  private isEnabled: boolean = true;
-  private endpoint: string = '/api/metrics';
+  private isEnabled = true;
+  private endpoint = '/api/metrics';
 
   constructor() {
     if (typeof window !== 'undefined') {
@@ -144,7 +144,7 @@ class PerformanceMonitor {
    * Record a custom performance metric
    */
   recordMetric(metric: PerformanceMetric) {
-    if (!this.isEnabled) return;
+    if (!this.isEnabled) {return;}
 
     this.metrics.push(metric);
 
@@ -194,7 +194,7 @@ class PerformanceMonitor {
    * Send metrics to the server
    */
   private async sendMetrics() {
-    if (this.metrics.length === 0) return;
+    if (this.metrics.length === 0) {return;}
 
     const metricsToSend = [...this.metrics];
     this.metrics = [];

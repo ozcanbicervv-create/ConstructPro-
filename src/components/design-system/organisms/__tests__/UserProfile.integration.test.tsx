@@ -3,8 +3,9 @@
  * Tests complete user workflows and component interactions
  */
 
-import React from 'react';
 import { screen, waitFor, within } from '@testing-library/react';
+import React from 'react';
+
 import { 
   renderWithProviders, 
   testAccessibility, 
@@ -13,10 +14,11 @@ import {
   mockApiResponse,
   waitForApiCall
 } from '@/tests/utils/test-utils';
-import { UserProfileManagement } from '../UserProfile/UserProfileManagement';
+
+import { AccessibilitySettings } from '../UserProfile/AccessibilitySettings';
 import { AccountSettings } from '../UserProfile/AccountSettings';
 import { NotificationPreferences } from '../UserProfile/NotificationPreferences';
-import { AccessibilitySettings } from '../UserProfile/AccessibilitySettings';
+import { UserProfileManagement } from '../UserProfile/UserProfileManagement';
 
 // Mock user data
 const mockUser = {

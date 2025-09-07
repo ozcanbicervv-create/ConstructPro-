@@ -1,11 +1,13 @@
 'use client';
 
-import React from 'react';
 import { motion } from 'framer-motion';
-import { cn } from '@/lib/utils';
-import { Typography } from '../../atoms/Typography';
 import { ChevronRight, Home } from 'lucide-react';
+import React from 'react';
+
+import { cn } from '@/lib/utils';
+
 import { Button } from '../../atoms/Button';
+import { Typography } from '../../atoms/Typography';
 
 export interface BreadcrumbItem {
   id: string;

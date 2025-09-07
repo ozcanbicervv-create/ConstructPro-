@@ -1,7 +1,6 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { ReactNode } from 'react';
 import { 
   FolderOpen, 
   Search, 
@@ -13,9 +12,13 @@ import {
   Wifi,
   WifiOff
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { InteractiveButton } from './micro-interactions';
+import { ReactNode } from 'react';
+
 import { fadeInUp, staggerContainer, staggerItem } from '@/lib/animations';
+import { cn } from '@/lib/utils';
+
+import { InteractiveButton } from './micro-interactions';
+
 
 interface EmptyStateProps {
   icon?: ReactNode;

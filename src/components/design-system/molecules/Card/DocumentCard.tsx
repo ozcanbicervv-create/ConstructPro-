@@ -1,18 +1,21 @@
 'use client';
 
 import React from 'react';
+
 import { cn } from '@/lib/utils';
-import Card from './Card';
-import CardHeader from './CardHeader';
-import CardContent from './CardContent';
-import CardFooter from './CardFooter';
-import CardTitle from './CardTitle';
-import CardDescription from './CardDescription';
-import { Typography } from '../../atoms/Typography';
+
+import { Avatar } from '../../atoms/Avatar';
 import { Badge } from '../../atoms/Badge';
 import { Button } from '../../atoms/Button';
 import { Icon } from '../../atoms/Icon';
-import { Avatar } from '../../atoms/Avatar';
+import { Typography } from '../../atoms/Typography';
+
+import Card from './Card';
+import CardContent from './CardContent';
+import CardDescription from './CardDescription';
+import CardFooter from './CardFooter';
+import CardHeader from './CardHeader';
+import CardTitle from './CardTitle';
 
 export interface DocumentData {
   id: string;
@@ -119,7 +122,7 @@ const DocumentCard: React.FC<DocumentCardProps> = ({
   };
 
   const formatFileSize = (bytes: number) => {
-    if (bytes === 0) return '0 Bytes';
+    if (bytes === 0) {return '0 Bytes';}
     const k = 1024;
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));

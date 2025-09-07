@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { notificationService } from '@/utils/socket';
+
 import { authenticateRequest } from '@/middleware/auth.middleware';
+import { notificationService } from '@/utils/socket';
 
 export async function PATCH(
   request: NextRequest,

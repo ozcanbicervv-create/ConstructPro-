@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { AuthService } from '@/services/auth.service';
-import { AuthAuditLogger } from '@/middleware/auth.middleware';
 import { z } from 'zod';
+
+import { AuthAuditLogger } from '@/middleware/auth.middleware';
+import { AuthService } from '@/services/auth.service';
 
 const loginSchema = z.object({
   email: z.string().email('Invalid email address'),

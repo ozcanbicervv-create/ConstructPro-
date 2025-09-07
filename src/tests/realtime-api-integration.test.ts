@@ -1,9 +1,11 @@
 import { NextRequest } from 'next/server';
-import { GET, POST } from '@/app/api/notifications/route';
+
 import { PATCH } from '@/app/api/notifications/[id]/read/route';
+import { GET, POST } from '@/app/api/notifications/route';
 import { GET as GetOnlineUsers } from '@/app/api/presence/online-users/route';
 import { GET as GetProjectMembers } from '@/app/api/presence/projects/[id]/members/route';
 import { POST as BroadcastUpdate } from '@/app/api/realtime/broadcast/route';
+import { authenticateRequest } from '@/middleware/auth.middleware';
 import { NotificationType, NotificationPriority } from '@/types/realtime.types';
 
 // Mock the socket services
@@ -36,7 +38,6 @@ jest.mock('@/middleware/auth.middleware', () => ({
 }));
 
 import { notificationService, presenceService } from '@/utils/socket';
-import { authenticateRequest } from '@/middleware/auth.middleware';
 
 const mockAuthenticateRequest = authenticateRequest as jest.MockedFunction<typeof authenticateRequest>;
 const mockNotificationService = notificationService as jest.Mocked<typeof notificationService>;

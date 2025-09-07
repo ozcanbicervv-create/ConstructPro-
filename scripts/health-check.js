@@ -5,9 +5,9 @@
  * Comprehensive health monitoring for the application
  */
 
+const fs = require('fs');
 const http = require('http');
 const https = require('https');
-const fs = require('fs');
 const path = require('path');
 
 const DEFAULT_URL = process.env.HEALTH_CHECK_URL || 'http://localhost:3000';

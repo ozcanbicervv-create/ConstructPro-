@@ -1,11 +1,12 @@
 "use client";
 
-import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
-import { useEffect, ReactNode } from "react";
-import { useRoleAccess } from "@/hooks/use-role-access";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Loader2, ShieldAlert } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
+import { useEffect, ReactNode } from "react";
+
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { useRoleAccess } from "@/hooks/use-role-access";
 
 interface ProtectedRouteProps {
   children: ReactNode;
@@ -27,7 +28,7 @@ export function ProtectedRoute({
   const { hasAnyPermission, isRole } = useRoleAccess();
 
   useEffect(() => {
-    if (status === "loading") return; // Still loading
+    if (status === "loading") {return;} // Still loading
 
     if (!session) {
       router.push(redirectTo);
@@ -38,7 +39,7 @@ export function ProtectedRoute({
     if (requiredRoles.length > 0) {
       const hasRequiredRole = requiredRoles.some(role => isRole(role));
       if (!hasRequiredRole) {
-        if (fallback) return;
+        if (fallback) {return;}
         router.push("/dashboard"); // Redirect to dashboard if no access
         return;
       }
@@ -48,9 +49,9 @@ export function ProtectedRoute({
     if (requiredPermissions.length > 0) {
       const hasRequiredPermission = hasAnyPermission(requiredPermissions);
       if (!hasRequiredPermission) {
-        if (fallback) return;
+        if (fallback) {return;}
         router.push("/dashboard"); // Redirect to dashboard if no access
-        return;
+        
       }
     }
   }, [session, status, router, requiredPermissions, requiredRoles, hasAnyPermission, isRole, fallback, redirectTo]);

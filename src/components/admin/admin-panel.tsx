@@ -1,13 +1,5 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Input } from '@/components/ui/input'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Textarea } from '@/components/ui/textarea'
 import { 
   Shield, 
   Users, 
@@ -41,7 +33,15 @@ import {
   FileCheck,
   FileX
 } from 'lucide-react'
+import { useState, useEffect } from 'react'
 
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Textarea } from '@/components/ui/textarea'
 import type { 
   VerificationRequest,
   VerificationDocument,
@@ -219,14 +219,14 @@ export default function AdminPanel() {
   }
 
   const getRiskColor = (score: number) => {
-    if (score < 20) return 'text-green-600'
-    if (score < 40) return 'text-yellow-600'
+    if (score < 20) {return 'text-green-600'}
+    if (score < 40) {return 'text-yellow-600'}
     return 'text-red-600'
   }
 
   const getComplianceColor = (score: number) => {
-    if (score > 80) return 'text-green-600'
-    if (score > 60) return 'text-yellow-600'
+    if (score > 80) {return 'text-green-600'}
+    if (score > 60) {return 'text-yellow-600'}
     return 'text-red-600'
   }
 

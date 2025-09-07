@@ -1,10 +1,11 @@
 import { describe, it, expect, beforeEach, afterEach, jest } from '@jest/globals';
 import { NextRequest, NextResponse } from 'next/server';
-import { withErrorHandler } from '@/middleware/error-handler.middleware';
+
+import { logger } from '@/lib/logger';
 import { withRequestCorrelation } from '@/middleware/correlation.middleware';
+import { withErrorHandler } from '@/middleware/error-handler.middleware';
 import { apiMonitoringService } from '@/services/api-monitoring.service';
 import { errorNotificationService, ErrorSeverity } from '@/services/error-notification.service';
-import { logger } from '@/lib/logger';
 import { notificationService } from '@/services/notification.service';
 
 // Mock dependencies

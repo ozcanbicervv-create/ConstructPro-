@@ -1,6 +1,7 @@
-import { AuthService } from '../auth.service';
-import { apiService } from '../api.service';
 import type { LoginRequest, LoginResponse } from '@/types/api.types';
+
+import { apiService } from '../api.service';
+import { AuthService } from '../auth.service';
 
 // Mock the API service
 jest.mock('../api.service', () => ({
@@ -129,7 +130,7 @@ describe('AuthService', () => {
   describe('refreshToken', () => {
     it('should refresh token successfully', async () => {
       localStorageMock.getItem.mockImplementation((key) => {
-        if (key === 'auth_refresh_token') return 'refresh-token';
+        if (key === 'auth_refresh_token') {return 'refresh-token';}
         return null;
       });
 
@@ -179,8 +180,8 @@ describe('AuthService', () => {
       const futureDate = new Date(Date.now() + 3600000).toISOString(); // 1 hour from now
       
       localStorageMock.getItem.mockImplementation((key) => {
-        if (key === 'auth_access_token') return 'valid-token';
-        if (key === 'auth_expires_at') return futureDate;
+        if (key === 'auth_access_token') {return 'valid-token';}
+        if (key === 'auth_expires_at') {return futureDate;}
         return null;
       });
 
@@ -191,8 +192,8 @@ describe('AuthService', () => {
       const pastDate = new Date(Date.now() - 3600000).toISOString(); // 1 hour ago
       
       localStorageMock.getItem.mockImplementation((key) => {
-        if (key === 'auth_access_token') return 'expired-token';
-        if (key === 'auth_expires_at') return pastDate;
+        if (key === 'auth_access_token') {return 'expired-token';}
+        if (key === 'auth_expires_at') {return pastDate;}
         return null;
       });
 
@@ -256,8 +257,8 @@ describe('AuthService', () => {
       };
 
       localStorageMock.getItem.mockImplementation((key) => {
-        if (key === 'auth_access_token') return 'valid-token';
-        if (key === 'auth_expires_at') return futureDate;
+        if (key === 'auth_access_token') {return 'valid-token';}
+        if (key === 'auth_expires_at') {return futureDate;}
         return null;
       });
 
@@ -278,8 +279,8 @@ describe('AuthService', () => {
       const futureDate = new Date(Date.now() + 3600000).toISOString();
 
       localStorageMock.getItem.mockImplementation((key) => {
-        if (key === 'auth_access_token') return 'invalid-token';
-        if (key === 'auth_expires_at') return futureDate;
+        if (key === 'auth_access_token') {return 'invalid-token';}
+        if (key === 'auth_expires_at') {return futureDate;}
         return null;
       });
 

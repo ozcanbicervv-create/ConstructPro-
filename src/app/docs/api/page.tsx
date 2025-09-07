@@ -1,12 +1,13 @@
 'use client';
 
+import { ExternalLink, Copy, Check, Download } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { ExternalLink, Copy, Check, Download } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 interface OpenAPISpec {
   info: {
@@ -80,7 +81,7 @@ export default function APIDocumentationPage() {
   };
 
   const downloadSpec = () => {
-    if (!spec) return;
+    if (!spec) {return;}
     
     const blob = new Blob([JSON.stringify(spec, null, 2)], {
       type: 'application/json',

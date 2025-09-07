@@ -1,36 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { cn } from '@/lib/utils';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { Checkbox } from '@/components/ui/checkbox';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import {
   Search,
   Filter,
@@ -51,6 +21,38 @@ import {
   Clock,
   DollarSign
 } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
+
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { cn } from '@/lib/utils';
+
 
 // Types for material data
 export interface Material {
@@ -160,7 +162,7 @@ export const MaterialComparisonTable: React.FC<MaterialComparisonTableProps> = (
 
   // Filter and sort materials
   const filteredAndSortedMaterials = useMemo(() => {
-    let filtered = materials.filter(material => {
+    const filtered = materials.filter(material => {
       const matchesSearch = material.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         material.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
         material.supplier.name.toLowerCase().includes(searchQuery.toLowerCase());
@@ -253,7 +255,7 @@ export const MaterialComparisonTable: React.FC<MaterialComparisonTableProps> = (
   };
 
   const getPriceChange = (material: Material) => {
-    if (material.priceHistory.length < 2) return null;
+    if (material.priceHistory.length < 2) {return null;}
 
     const current = material.priceHistory[material.priceHistory.length - 1].price;
     const previous = material.priceHistory[material.priceHistory.length - 2].price;

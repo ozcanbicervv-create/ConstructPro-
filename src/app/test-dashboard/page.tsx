@@ -1,9 +1,10 @@
 'use client';
 
 import React from 'react';
+import { toast } from 'sonner';
+
 import { Dashboard } from '@/components/design-system/organisms/Dashboard';
 import { Button } from '@/components/ui/button';
-import { toast } from 'sonner';
 
 export default function TestDashboardPage() {
   const handleWidgetAdd = () => {

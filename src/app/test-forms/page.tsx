@@ -1,6 +1,11 @@
 'use client';
 
 import React, { useState } from 'react';
+
+import { Button } from '@/components/design-system/atoms/Button';
+import { Icon } from '@/components/design-system/atoms/Icon';
+import { Typography } from '@/components/design-system/atoms/Typography';
+import { Card, CardHeader, CardContent, CardTitle } from '@/components/design-system/molecules/Card';
 import {
   FormField,
   TextareaField,
@@ -25,10 +30,6 @@ import {
   MaterialSpecificationsField,
   MaterialCertificationsField,
 } from '@/components/design-system/molecules/FormField';
-import { Typography } from '@/components/design-system/atoms/Typography';
-import { Button } from '@/components/design-system/atoms/Button';
-import { Icon } from '@/components/design-system/atoms/Icon';
-import { Card, CardHeader, CardContent, CardTitle } from '@/components/design-system/molecules/Card';
 
 export default function TestFormsPage() {
   const [formData, setFormData] = useState({
@@ -86,13 +87,13 @@ export default function TestFormsPage() {
   };
 
   const validateEmail = (email: string) => {
-    if (!email) return 'Email is required';
-    if (!/\S+@\S+\.\S+/.test(email)) return 'Please enter a valid email address';
+    if (!email) {return 'Email is required';}
+    if (!/\S+@\S+\.\S+/.test(email)) {return 'Please enter a valid email address';}
     return '';
   };
 
   const validateRequired = (value: string, fieldName: string) => {
-    if (!value.trim()) return `${fieldName} is required`;
+    if (!value.trim()) {return `${fieldName} is required`;}
     return '';
   };
 

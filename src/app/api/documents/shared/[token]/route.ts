@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+
 import { documentService } from '@/services/document.service'
 
 interface RouteParams {

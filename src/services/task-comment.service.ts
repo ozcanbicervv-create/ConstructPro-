@@ -1,6 +1,7 @@
+import { TaskComment } from '@prisma/client';
+
 import { prisma } from '@/utils/db';
 import { CreateTaskCommentRequest } from '@/utils/validation-schemas';
-import { TaskComment } from '@prisma/client';
 
 // Extended task comment type with relations
 export type TaskCommentWithRelations = TaskComment & {

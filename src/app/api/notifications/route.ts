@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { notificationService } from '@/utils/socket';
-import { NotificationType, NotificationPriority } from '@/types/realtime.types';
+
 import { authenticateRequest } from '@/middleware/auth.middleware';
+import { NotificationType, NotificationPriority } from '@/types/realtime.types';
+import { notificationService } from '@/utils/socket';
 
 export async function GET(request: NextRequest) {
   try {

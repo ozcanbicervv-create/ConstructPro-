@@ -58,12 +58,12 @@ export function createResponsiveClasses<T extends string>(
 ): string {
   const classes: string[] = [];
 
-  if (value.base) classes.push(`${prefix}-${value.base}`);
-  if (value.sm) classes.push(`sm:${prefix}-${value.sm}`);
-  if (value.md) classes.push(`md:${prefix}-${value.md}`);
-  if (value.lg) classes.push(`lg:${prefix}-${value.lg}`);
-  if (value.xl) classes.push(`xl:${prefix}-${value.xl}`);
-  if (value['2xl']) classes.push(`2xl:${prefix}-${value['2xl']}`);
+  if (value.base) {classes.push(`${prefix}-${value.base}`);}
+  if (value.sm) {classes.push(`sm:${prefix}-${value.sm}`);}
+  if (value.md) {classes.push(`md:${prefix}-${value.md}`);}
+  if (value.lg) {classes.push(`lg:${prefix}-${value.lg}`);}
+  if (value.xl) {classes.push(`xl:${prefix}-${value.xl}`);}
+  if (value['2xl']) {classes.push(`2xl:${prefix}-${value['2xl']}`);}
 
   return classes.join(' ');
 }
@@ -79,7 +79,7 @@ export function createResponsiveClasses<T extends string>(
 export function conditionalClasses(
   condition: boolean,
   trueClasses: string,
-  falseClasses: string = ''
+  falseClasses = ''
 ): string {
   return condition ? trueClasses : falseClasses;
 }
@@ -157,8 +157,8 @@ export function createAnimationClasses(
 ): string {
   const classes = [`animate-${animation}`];
   
-  if (duration) classes.push(`duration-${duration}`);
-  if (delay) classes.push(`delay-${delay}`);
+  if (duration) {classes.push(`duration-${duration}`);}
+  if (delay) {classes.push(`delay-${delay}`);}
   
   return classes.join(' ');
 }

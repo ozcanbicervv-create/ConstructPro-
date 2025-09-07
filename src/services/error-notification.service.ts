@@ -346,7 +346,7 @@ class ErrorNotificationService {
     const triggeredRules: AlertRule[] = [];
     
     for (const rule of this.alertRules) {
-      if (!rule.enabled) continue;
+      if (!rule.enabled) {continue;}
       
       // Check cooldown
       const cooldownKey = `${rule.id}_${notification.error.code}`;

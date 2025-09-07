@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
+
 import { documentService } from '@/services/document.service'
 import { ApprovalStatus } from '@/types/document.types'
-import { z } from 'zod'
 
 interface RouteParams {
   params: {

@@ -1,6 +1,5 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { 
   Wifi, 
@@ -13,9 +12,11 @@ import {
   Smartphone,
   Monitor
 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Separator } from '@/components/ui/separator';
 
@@ -80,7 +81,7 @@ const OfflinePage = () => {
   }, []);
 
   const handleSync = async () => {
-    if (!isOnline || isSyncing) return;
+    if (!isOnline || isSyncing) {return;}
     
     setIsSyncing(true);
     setSyncProgress(0);
@@ -111,9 +112,9 @@ const OfflinePage = () => {
     const minutes = Math.floor(diff / 60000);
     const hours = Math.floor(diff / 3600000);
 
-    if (minutes < 1) return 'Just now';
-    if (minutes < 60) return `${minutes}m ago`;
-    if (hours < 24) return `${hours}h ago`;
+    if (minutes < 1) {return 'Just now';}
+    if (minutes < 60) {return `${minutes}m ago`;}
+    if (hours < 24) {return `${hours}h ago`;}
     return date.toLocaleDateString();
   };
 

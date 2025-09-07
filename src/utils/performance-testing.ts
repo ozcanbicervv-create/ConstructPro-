@@ -23,7 +23,7 @@ export class PerformanceTester {
   async runTest<T>(
     name: string,
     testFn: () => Promise<T> | T,
-    iterations: number = 10
+    iterations = 10
   ): Promise<PerformanceTestResult> {
     const durations: number[] = [];
     
@@ -92,7 +92,7 @@ export class PerformanceTester {
   async runBenchmark<T>(
     name: string,
     tests: Record<string, () => Promise<T> | T>,
-    iterations: number = 100
+    iterations = 100
   ): Promise<Record<string, PerformanceTestResult>> {
     console.log(`🏁 Running benchmark: ${name}`);
     
@@ -126,7 +126,7 @@ export class PerformanceTester {
   async testComponentRender(
     componentName: string,
     renderFn: () => void,
-    iterations: number = 50
+    iterations = 50
   ): Promise<PerformanceTestResult> {
     return this.runTest(`Component Render: ${componentName}`, renderFn, iterations);
   }
@@ -137,7 +137,7 @@ export class PerformanceTester {
   async testApiCall(
     endpoint: string,
     requestFn: () => Promise<any>,
-    iterations: number = 10
+    iterations = 10
   ): Promise<PerformanceTestResult> {
     return this.runTest(`API Call: ${endpoint}`, requestFn, iterations);
   }
@@ -148,7 +148,7 @@ export class PerformanceTester {
   async testDatabaseQuery(
     queryName: string,
     queryFn: () => Promise<any>,
-    iterations: number = 20
+    iterations = 20
   ): Promise<PerformanceTestResult> {
     return this.runTest(`Database Query: ${queryName}`, queryFn, iterations);
   }
@@ -254,7 +254,7 @@ export const performanceTester = new PerformanceTester();
 export const testFunction = async <T>(
   name: string,
   fn: () => Promise<T> | T,
-  iterations: number = 10
+  iterations = 10
 ): Promise<PerformanceTestResult> => {
   return performanceTester.runTest(name, fn, iterations);
 };
@@ -262,7 +262,7 @@ export const testFunction = async <T>(
 export const benchmarkFunctions = async <T>(
   name: string,
   functions: Record<string, () => Promise<T> | T>,
-  iterations: number = 100
+  iterations = 100
 ): Promise<Record<string, PerformanceTestResult>> => {
   return performanceTester.runBenchmark(name, functions, iterations);
 };

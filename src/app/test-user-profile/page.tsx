@@ -1,12 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
 import { 
   User, 
   Shield, 
@@ -16,10 +10,17 @@ import {
   CheckCircle,
   AlertCircle
 } from 'lucide-react';
-import { UserProfileManagement } from '@/components/design-system/organisms/UserProfile/UserProfileManagement';
+import React, { useState } from 'react';
+
+import { AccessibilitySettings } from '@/components/design-system/organisms/UserProfile/AccessibilitySettings';
 import { AccountSettings } from '@/components/design-system/organisms/UserProfile/AccountSettings';
 import { NotificationPreferences } from '@/components/design-system/organisms/UserProfile/NotificationPreferences';
-import { AccessibilitySettings } from '@/components/design-system/organisms/UserProfile/AccessibilitySettings';
+import { UserProfileManagement } from '@/components/design-system/organisms/UserProfile/UserProfileManagement';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const testScenarios = [
   {

@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
+
 import { materialService } from '@/services/material.service';
 import { 
   withErrorHandling, 
@@ -7,7 +9,6 @@ import {
   createErrorResponse,
   ErrorCodes 
 } from '@/utils/api-helpers';
-import { z } from 'zod';
 
 // Material comparison request schema
 const materialCompareSchema = z.object({

@@ -5,6 +5,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+
 import { performanceMonitor } from '@/utils/performance-monitor';
 
 interface WebVitalsMonitorProps {
@@ -21,11 +22,11 @@ export function WebVitalsMonitor({
   const initialized = useRef(false);
 
   useEffect(() => {
-    if (initialized.current || !enableReporting) return;
+    if (initialized.current || !enableReporting) {return;}
     initialized.current = true;
 
     // Only monitor for a sample of users to reduce server load
-    if (Math.random() > sampleRate) return;
+    if (Math.random() > sampleRate) {return;}
 
     const initializeWebVitals = async () => {
       try {
@@ -35,35 +36,35 @@ export function WebVitalsMonitor({
         // Core Web Vitals
         getCLS((metric) => {
           reportWebVital(metric);
-          if (debug) console.log('CLS:', metric);
+          if (debug) {console.log('CLS:', metric);}
         });
 
         getFID((metric) => {
           reportWebVital(metric);
-          if (debug) console.log('FID:', metric);
+          if (debug) {console.log('FID:', metric);}
         });
 
         getLCP((metric) => {
           reportWebVital(metric);
-          if (debug) console.log('LCP:', metric);
+          if (debug) {console.log('LCP:', metric);}
         });
 
         // Additional metrics
         getFCP((metric) => {
           reportWebVital(metric);
-          if (debug) console.log('FCP:', metric);
+          if (debug) {console.log('FCP:', metric);}
         });
 
         getTTFB((metric) => {
           reportWebVital(metric);
-          if (debug) console.log('TTFB:', metric);
+          if (debug) {console.log('TTFB:', metric);}
         });
 
         // Interaction to Next Paint (INP) - new Core Web Vital
         if (onINP) {
           onINP((metric) => {
             reportWebVital(metric);
-            if (debug) console.log('INP:', metric);
+            if (debug) {console.log('INP:', metric);}
           });
         }
 
@@ -124,7 +125,7 @@ export function WebVitalsMonitor({
       const startTime = performance.now();
 
       const checkInteractivity = () => {
-        if (isInteractive) return;
+        if (isInteractive) {return;}
 
         // Simple heuristic: page is interactive when main thread is idle
         const now = performance.now();
@@ -284,7 +285,7 @@ function getDeviceMemory(): number {
 // Hook for using Web Vitals in components
 export function useWebVitals(callback?: (metric: any) => void) {
   useEffect(() => {
-    if (!callback) return;
+    if (!callback) {return;}
 
     const initWebVitals = async () => {
       try {

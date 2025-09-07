@@ -12,6 +12,7 @@ jest.mock('next/server', () => ({
     }))
   }
 }));
+import { logger } from '@/lib/logger';
 import { 
   ErrorHandler, 
   AppError, 
@@ -20,7 +21,6 @@ import {
   createError
 } from '@/middleware/error-handler.middleware';
 import { ErrorSeverity } from '@/services/error-notification.service';
-import { logger } from '@/lib/logger';
 import { notificationService } from '@/services/notification.service';
 
 // Mock dependencies

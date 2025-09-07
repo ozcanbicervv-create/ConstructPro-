@@ -163,8 +163,8 @@ export function applySecurityHeaders(
   if (config.strictTransportSecurity) {
     const { maxAge, includeSubDomains, preload } = config.strictTransportSecurity;
     let hstsValue = `max-age=${maxAge}`;
-    if (includeSubDomains) hstsValue += '; includeSubDomains';
-    if (preload) hstsValue += '; preload';
+    if (includeSubDomains) {hstsValue += '; includeSubDomains';}
+    if (preload) {hstsValue += '; preload';}
     response.headers.set('Strict-Transport-Security', hstsValue);
   }
 

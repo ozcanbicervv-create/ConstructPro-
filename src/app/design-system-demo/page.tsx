@@ -7,9 +7,10 @@
 'use client';
 
 import React from 'react';
+
 import { Button } from '@/components/design-system/atoms/Button';
-import { Typography } from '@/components/design-system/atoms/Typography';
 import { Input } from '@/components/design-system/atoms/Input';
+import { Typography } from '@/components/design-system/atoms/Typography';
 
 export default function DesignSystemDemo() {
   return (

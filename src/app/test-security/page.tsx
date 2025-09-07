@@ -5,14 +5,6 @@
 
 "use client";
 
-import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { Alert, AlertDescription } from '@/components/ui/alert';
 import { 
   Shield, 
   Lock, 
@@ -28,6 +20,15 @@ import {
   ShieldAlert,
   ShieldX
 } from 'lucide-react';
+import React, { useState } from 'react';
+
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Progress } from '@/components/ui/progress';
 
 export default function SecurityTestPage() {
   const [password, setPassword] = useState('');
@@ -55,27 +56,27 @@ export default function SecurityTestPage() {
 
   const calculatePasswordStrength = (pwd: string) => {
     let score = 0;
-    if (pwd.length >= 8) score += 1;
-    if (/[A-Z]/.test(pwd)) score += 1;
-    if (/[a-z]/.test(pwd)) score += 1;
-    if (/\d/.test(pwd)) score += 1;
-    if (/[!@#$%^&*(),.?":{}|<>]/.test(pwd)) score += 1;
+    if (pwd.length >= 8) {score += 1;}
+    if (/[A-Z]/.test(pwd)) {score += 1;}
+    if (/[a-z]/.test(pwd)) {score += 1;}
+    if (/\d/.test(pwd)) {score += 1;}
+    if (/[!@#$%^&*(),.?":{}|<>]/.test(pwd)) {score += 1;}
     return Math.min(5, score);
   };
 
   const getStrengthLabel = (score: number) => {
-    if (score <= 1) return 'Very Weak';
-    if (score <= 2) return 'Weak';
-    if (score <= 3) return 'Fair';
-    if (score <= 4) return 'Good';
+    if (score <= 1) {return 'Very Weak';}
+    if (score <= 2) {return 'Weak';}
+    if (score <= 3) {return 'Fair';}
+    if (score <= 4) {return 'Good';}
     return 'Strong';
   };
 
   const getStrengthColor = (score: number) => {
-    if (score <= 1) return 'bg-red-500';
-    if (score <= 2) return 'bg-orange-500';
-    if (score <= 3) return 'bg-yellow-500';
-    if (score <= 4) return 'bg-blue-500';
+    if (score <= 1) {return 'bg-red-500';}
+    if (score <= 2) {return 'bg-orange-500';}
+    if (score <= 3) {return 'bg-yellow-500';}
+    if (score <= 4) {return 'bg-blue-500';}
     return 'bg-green-500';
   };
 

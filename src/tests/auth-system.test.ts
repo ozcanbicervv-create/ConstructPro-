@@ -1,8 +1,10 @@
 import { describe, it, expect, beforeEach, afterEach, jest } from '@jest/globals';
-import { AuthService } from '@/services/auth.service';
-import { SessionManager, AuthAuditLogger } from '@/middleware/auth.middleware';
-import { RBAC } from '@/utils/rbac';
 import { UserRole } from '@prisma/client';
+
+import { SessionManager, AuthAuditLogger } from '@/middleware/auth.middleware';
+import { AuthService } from '@/services/auth.service';
+import { RBAC } from '@/utils/rbac';
+
 
 // Mock dependencies
 jest.mock('@/utils/db', () => ({

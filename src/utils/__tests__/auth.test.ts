@@ -1,5 +1,6 @@
-import { authOptions } from '../auth';
 import { compare } from 'bcryptjs';
+
+import { authOptions } from '../auth';
 import { prisma } from '../db';
 
 // Mock dependencies

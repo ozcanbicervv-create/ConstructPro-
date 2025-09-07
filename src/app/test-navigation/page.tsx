@@ -1,10 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Navigation } from '@/components/design-system/molecules/Navigation';
-import { Breadcrumb } from '@/components/design-system/molecules/Breadcrumb';
-import { MobileNavigation } from '@/components/design-system/molecules/MobileNavigation';
-import { Typography } from '@/components/design-system/atoms/Typography';
+
 import { Button } from '@/components/design-system/atoms/Button';
 import { Icon } from '@/components/design-system/atoms/Icon';
 import { 
@@ -13,6 +10,10 @@ import {
   ExcavatorIcon, 
   ProgressIcon 
 } from '@/components/design-system/atoms/Icon/construction';
+import { Typography } from '@/components/design-system/atoms/Typography';
+import { Breadcrumb } from '@/components/design-system/molecules/Breadcrumb';
+import { MobileNavigation } from '@/components/design-system/molecules/MobileNavigation';
+import { Navigation } from '@/components/design-system/molecules/Navigation';
 
 export default function TestNavigationPage() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);

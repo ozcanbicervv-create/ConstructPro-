@@ -4,15 +4,16 @@
 
 'use client';
 
+import { Activity, Zap, Clock, TrendingUp, AlertTriangle, CheckCircle } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { performanceMonitor, PerformanceMetric } from '@/utils/performance-monitor';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useWebVitals } from '@/components/web-vitals-monitor';
-import { Activity, Zap, Clock, TrendingUp, AlertTriangle, CheckCircle } from 'lucide-react';
+import { performanceMonitor, PerformanceMetric } from '@/utils/performance-monitor';
 
 interface WebVitalMetric {
   name: string;
@@ -77,7 +78,7 @@ export function PerformanceDashboard() {
 
   const getAverageMetric = (metricName: string) => {
     const filtered = metrics.filter(m => m.name === metricName);
-    if (filtered.length === 0) return 0;
+    if (filtered.length === 0) {return 0;}
     return filtered.reduce((sum, m) => sum + m.value, 0) / filtered.length;
   };
 
@@ -109,13 +110,13 @@ export function PerformanceDashboard() {
   const getProgressValue = (name: string, value: number, threshold: { good: number; poor: number }) => {
     if (name === 'CLS') {
       // For CLS, lower is better
-      if (value <= threshold.good) return 100;
-      if (value >= threshold.poor) return 0;
+      if (value <= threshold.good) {return 100;}
+      if (value >= threshold.poor) {return 0;}
       return Math.max(0, 100 - ((value - threshold.good) / (threshold.poor - threshold.good)) * 100);
     } else {
       // For timing metrics, lower is better
-      if (value <= threshold.good) return 100;
-      if (value >= threshold.poor) return 0;
+      if (value <= threshold.good) {return 100;}
+      if (value >= threshold.poor) {return 0;}
       return Math.max(0, 100 - ((value - threshold.good) / (threshold.poor - threshold.good)) * 100);
     }
   };

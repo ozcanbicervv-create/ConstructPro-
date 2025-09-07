@@ -5,8 +5,9 @@
 'use client';
 
 import { useEffect, useState, memo } from 'react';
-import { performanceMonitor } from '@/utils/performance-monitor';
+
 import { preloadCriticalComponents } from '@/components/lazy-components';
+import { performanceMonitor } from '@/utils/performance-monitor';
 
 interface PerformanceLayoutProps {
   children: React.ReactNode;

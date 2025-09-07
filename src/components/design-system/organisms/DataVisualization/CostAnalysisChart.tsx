@@ -1,7 +1,16 @@
 'use client';
 
-import React, { useState } from 'react';
 import { motion } from 'framer-motion';
+import { 
+  DollarSign, 
+  TrendingUp, 
+  TrendingDown, 
+  AlertTriangle,
+  Target,
+  BarChart3,
+  LineChart as LineChartIcon
+} from 'lucide-react';
+import React, { useState } from 'react';
 import {
   ComposedChart,
   Line,
@@ -16,20 +25,13 @@ import {
   Scatter,
   ReferenceLine
 } from 'recharts';
-import { cn } from '@/lib/utils';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
-  DollarSign, 
-  TrendingUp, 
-  TrendingDown, 
-  AlertTriangle,
-  Target,
-  BarChart3,
-  LineChart as LineChartIcon
-} from 'lucide-react';
+import { cn } from '@/lib/utils';
+
 
 // Types for cost analysis data
 export interface CostAnalysisData {

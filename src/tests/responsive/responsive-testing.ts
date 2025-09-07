@@ -282,7 +282,7 @@ Success Rate: ${((passedTests / totalTests) * 100).toFixed(1)}%
 
     // Group by component
     const componentResults = this.testResults.reduce((acc, result) => {
-      if (!acc[result.component]) acc[result.component] = [];
+      if (!acc[result.component]) {acc[result.component] = [];}
       acc[result.component].push(result);
       return acc;
     }, {} as Record<string, typeof this.testResults>);

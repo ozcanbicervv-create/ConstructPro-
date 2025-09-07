@@ -28,8 +28,8 @@ jest.mock('@/middleware/api-key.middleware', () => ({
 }));
 
 // Import after mocking
-import { getAuditLogger } from '@/utils/audit-logger';
 import { ApiKeyService } from '@/middleware/api-key.middleware';
+import { getAuditLogger } from '@/utils/audit-logger';
 import { sanitizeText, sanitizeHtml, sanitizeFilename } from '@/utils/security/input-validation';
 import { createRateLimit } from '@/utils/security/rate-limiting';
 

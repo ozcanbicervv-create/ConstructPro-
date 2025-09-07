@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
-import { authOptions } from '@/utils/auth';
+
 import { TaskService } from '@/services/task.service';
-import { createTaskSchema, taskFiltersSchema } from '@/utils/validation-schemas';
 import { 
   withErrorHandling, 
   validateRequest, 
@@ -10,6 +9,8 @@ import {
   ErrorCodes,
   createErrorResponse 
 } from '@/utils/api-helpers';
+import { authOptions } from '@/utils/auth';
+import { createTaskSchema, taskFiltersSchema } from '@/utils/validation-schemas';
 
 // POST /api/tasks - Create a new task
 async function createTask(request: NextRequest): Promise<NextResponse> {

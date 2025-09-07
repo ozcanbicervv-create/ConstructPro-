@@ -4,6 +4,7 @@
  */
 
 import * as React from "react";
+
 import { useAccessibility } from "@/lib/accessibility";
 
 interface FocusTrapProps {
@@ -26,7 +27,7 @@ export function FocusTrap({
   const previouslyFocusedElement = React.useRef<HTMLElement | null>(null);
 
   React.useEffect(() => {
-    if (!active || !containerRef.current) return;
+    if (!active || !containerRef.current) {return;}
 
     // Store the previously focused element
     previouslyFocusedElement.current = document.activeElement as HTMLElement;
@@ -64,12 +65,12 @@ export function FocusTrap({
 }
 
 // Hook for managing focus trap
-export function useFocusTrap(active: boolean = true) {
+export function useFocusTrap(active = true) {
   const containerRef = React.useRef<HTMLElement>(null);
   const { focusManager } = useAccessibility();
 
   React.useEffect(() => {
-    if (!active || !containerRef.current) return;
+    if (!active || !containerRef.current) {return;}
 
     return focusManager.trapFocus(containerRef.current);
   }, [active, focusManager]);

@@ -1,11 +1,12 @@
 'use client';
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { PerformanceMonitor, initializePerformanceMonitoring } from '@/lib/performance';
-import { initializeCodeSplitting } from '@/lib/code-splitting';
-import { initializeAnalytics } from '@/lib/analytics';
-import { initializePerformanceBudgets, PerformanceBudgetMonitor } from '@/lib/performance-budgets';
+
 import { PerformanceMonitorComponent } from '@/components/ui/performance-monitor';
+import { initializeAnalytics } from '@/lib/analytics';
+import { initializeCodeSplitting } from '@/lib/code-splitting';
+import { PerformanceMonitor, initializePerformanceMonitoring } from '@/lib/performance';
+import { initializePerformanceBudgets, PerformanceBudgetMonitor } from '@/lib/performance-budgets';
 
 interface PerformanceContextType {
   monitor: PerformanceMonitor | null;

@@ -1,8 +1,10 @@
-import { describe, it, expect, beforeAll, afterAll } from '@jest/globals';
-import request from 'supertest';
 import { createServer } from 'http';
 import { parse } from 'url';
+
+import { describe, it, expect, beforeAll, afterAll } from '@jest/globals';
 import next from 'next';
+import request from 'supertest';
+
 import swaggerSpec from '@/lib/swagger';
 
 const dev = process.env.NODE_ENV !== 'production';

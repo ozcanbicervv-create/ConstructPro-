@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { withRequestCorrelation } from '@/middleware/correlation.middleware';
-import { withErrorHandler } from '@/middleware/error-handler.middleware';
+
+import { logger } from '@/lib/logger';
 import { authMiddleware } from '@/middleware/auth.middleware';
+import { withRequestCorrelation } from '@/middleware/correlation.middleware';
+import { withErrorHandler , createError } from '@/middleware/error-handler.middleware';
 import { apiMonitoringService } from '@/services/api-monitoring.service';
 import { errorNotificationService } from '@/services/error-notification.service';
-import { logger } from '@/lib/logger';
-import { createError } from '@/middleware/error-handler.middleware';
+
 
 async function GET(request: NextRequest) {
   // Check authentication and admin permissions

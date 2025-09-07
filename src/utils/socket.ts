@@ -1,7 +1,8 @@
 import { Server, Socket } from 'socket.io';
+
+import { CollaborativeEditingService } from '@/services/collaborative-editing.service';
 import { NotificationService } from '@/services/notification.service';
 import { PresenceService } from '@/services/presence.service';
-import { CollaborativeEditingService } from '@/services/collaborative-editing.service';
 import { 
   SocketEvents,
   ProjectUpdatePayload,

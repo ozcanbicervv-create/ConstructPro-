@@ -3,11 +3,12 @@
  * Enhanced button with comprehensive accessibility features
  */
 
-import * as React from "react";
 import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
-import { cn } from "@/lib/utils";
+import * as React from "react";
+
 import { useAccessibility } from "@/lib/accessibility";
+import { cn } from "@/lib/utils";
 
 const accessibleButtonVariants = cva(
   "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
@@ -73,15 +74,15 @@ const AccessibleButton = React.forwardRef<HTMLButtonElement, AccessibleButtonPro
     
     // Determine accessibility variant based on preferences
     const accessibilityVariant = React.useMemo(() => {
-      if (preferences.theme === 'high-contrast') return 'high_contrast';
-      if (preferences.focusIndicators) return 'enhanced';
+      if (preferences.theme === 'high-contrast') {return 'high_contrast';}
+      if (preferences.focusIndicators) {return 'enhanced';}
       return 'default';
     }, [preferences.theme, preferences.focusIndicators]);
 
     const Comp = asChild ? Slot : "button";
 
     const handleClick = React.useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
-      if (loading || disabled) return;
+      if (loading || disabled) {return;}
       
       setIsPressed(true);
       setTimeout(() => setIsPressed(false), 150);

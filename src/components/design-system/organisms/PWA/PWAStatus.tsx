@@ -1,6 +1,5 @@
 'use client';
 
-import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Wifi, 
@@ -15,11 +14,13 @@ import {
   AlertCircle,
   Info
 } from 'lucide-react';
+import React, { useState } from 'react';
+
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
+import { Switch } from '@/components/ui/switch';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { usePWA, usePushNotifications, useOfflineSync } from '@/hooks/usePWA';
 
@@ -75,14 +76,14 @@ const PWAStatus: React.FC<PWAStatusProps> = ({ className }) => {
   };
 
   const formatLastSync = (date: Date | null) => {
-    if (!date) return 'Never';
+    if (!date) {return 'Never';}
     
     const now = new Date();
     const diff = now.getTime() - date.getTime();
     const minutes = Math.floor(diff / 60000);
     
-    if (minutes < 1) return 'Just now';
-    if (minutes < 60) return `${minutes}m ago`;
+    if (minutes < 1) {return 'Just now';}
+    if (minutes < 60) {return `${minutes}m ago`;}
     return date.toLocaleTimeString();
   };
 

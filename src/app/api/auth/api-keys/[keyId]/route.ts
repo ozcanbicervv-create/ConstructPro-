@@ -1,9 +1,10 @@
+import { UserRole } from '@prisma/client';
 import { NextRequest, NextResponse } from 'next/server';
+
+import { ApiKeyService } from '@/middleware/api-key.middleware';
 import { withAuth } from '@/middleware/auth.middleware';
 import { withSecurity } from '@/middleware/security.middleware';
-import { ApiKeyService } from '@/middleware/api-key.middleware';
 import { prisma } from '@/utils/db';
-import { UserRole } from '@prisma/client';
 
 interface RouteParams {
   params: {

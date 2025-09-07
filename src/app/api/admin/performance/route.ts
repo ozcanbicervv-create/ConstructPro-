@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
+
+import { optimizedPrisma } from '@/lib/database-optimization';
 import { performanceMonitor } from '@/lib/performance';
 import { cacheManager } from '@/lib/redis';
-import { optimizedPrisma } from '@/lib/database-optimization';
+import { authMiddleware } from '@/middleware/auth.middleware';
 import { CompressionStats } from '@/middleware/compression.middleware';
 import { RateLimitStats } from '@/middleware/rate-limit.middleware';
-import { authMiddleware } from '@/middleware/auth.middleware';
 
 // GET /api/admin/performance - Get performance metrics
 export async function GET(request: NextRequest) {

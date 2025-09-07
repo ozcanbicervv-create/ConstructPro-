@@ -1,13 +1,14 @@
-import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { axe, toHaveNoViolations } from 'jest-axe';
+import React from 'react';
+
 import Card from '../Card';
-import CardHeader from '../CardHeader';
 import CardContent from '../CardContent';
-import CardFooter from '../CardFooter';
-import CardTitle from '../CardTitle';
 import CardDescription from '../CardDescription';
+import CardFooter from '../CardFooter';
+import CardHeader from '../CardHeader';
+import CardTitle from '../CardTitle';
 
 expect.extend(toHaveNoViolations);
 

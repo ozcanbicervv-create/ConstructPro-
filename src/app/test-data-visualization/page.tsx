@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+
 import {
   ProjectProgressChart,
   MilestoneTimeline,
@@ -20,6 +20,7 @@ import {
   type TimelineTask,
   type TimelineMilestone
 } from '@/components/design-system/organisms/DataVisualization';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 // Mock data for demonstrations
 const mockProgressData: ProjectProgressData[] = [

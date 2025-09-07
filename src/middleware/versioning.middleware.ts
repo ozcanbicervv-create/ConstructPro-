@@ -123,7 +123,7 @@ export class ApiVersionManager {
   }
 
   private transformSingleProjectForV09(project: any): any {
-    if (!project) return project;
+    if (!project) {return project;}
 
     return {
       ...project,
@@ -146,7 +146,7 @@ export class ApiVersionManager {
   }
 
   private transformSingleTaskForV09(task: any): any {
-    if (!task) return task;
+    if (!task) {return task;}
 
     return {
       ...task,
@@ -173,7 +173,7 @@ export class ApiVersionManager {
   }
 
   private transformSingleMaterialForV09(material: any): any {
-    if (!material) return material;
+    if (!material) {return material;}
 
     return {
       ...material,

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { AuthService } from '@/services/auth.service';
+
 import { withAuth, AuthenticatedRequest } from '@/middleware/auth.middleware';
+import { AuthService } from '@/services/auth.service';
 
 /**
  * Get user permissions based on role

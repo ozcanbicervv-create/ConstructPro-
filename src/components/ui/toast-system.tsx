@@ -1,8 +1,9 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { ReactNode, createContext, useContext, useState, useCallback } from 'react';
 import { Check, X, AlertCircle, Info, AlertTriangle } from 'lucide-react';
+import { ReactNode, createContext, useContext, useState, useCallback } from 'react';
+
 import { cn } from '@/lib/utils';
 
 // Toast types

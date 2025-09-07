@@ -1,8 +1,6 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 
 // Dashboard Components
@@ -21,15 +19,6 @@ import {
 
 // Project Management Components
 import {
-  ProjectGrid,
-  ProjectDetailView,
-  ProjectFormWizard,
-  type Project,
-  type ProjectDetail
-} from '@/components/design-system/organisms/ProjectManagement';
-
-// Material Management Components
-import {
   MaterialComparisonTable,
   SupplierDirectory,
   MaterialCostAnalysis,
@@ -42,6 +31,17 @@ import {
   type OrderItem,
   type MaterialOrder
 } from '@/components/design-system/organisms/MaterialManagement';
+import {
+  ProjectGrid,
+  ProjectDetailView,
+  ProjectFormWizard,
+  type Project,
+  type ProjectDetail
+} from '@/components/design-system/organisms/ProjectManagement';
+
+// Material Management Components
+import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 // Mock data
 const mockProjects: Project[] = [

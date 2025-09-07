@@ -1,23 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from 'react';
-import { useSession } from "next-auth/react";
-import { ProtectedRoute } from "@/components/auth/protected-route";
-import { ProjectGrid } from "@/components/design-system/organisms/ProjectManagement/ProjectGrid";
-import Navigation from "@/components/design-system/molecules/Navigation/Navigation";
-import MobileNavigation from "@/components/design-system/molecules/MobileNavigation/MobileNavigation";
-import Breadcrumb from "@/components/design-system/molecules/Breadcrumb/Breadcrumb";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { motion } from "framer-motion";
 import {
     LayoutDashboard,
     Building,
@@ -35,8 +18,26 @@ import {
     Calendar,
     ChevronRight,
 } from "lucide-react";
+import { useSession } from "next-auth/react";
+import React, { useState, useMemo } from 'react';
+
+import { ProtectedRoute } from "@/components/auth/protected-route";
 import { Typography } from "@/components/design-system/atoms/Typography";
-import { motion } from "framer-motion";
+import Breadcrumb from "@/components/design-system/molecules/Breadcrumb/Breadcrumb";
+import MobileNavigation from "@/components/design-system/molecules/MobileNavigation/MobileNavigation";
+import Navigation from "@/components/design-system/molecules/Navigation/Navigation";
+import { ProjectGrid } from "@/components/design-system/organisms/ProjectManagement/ProjectGrid";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 
 // Mock data for projects
@@ -165,7 +166,7 @@ export default function ProjectsPage() {
 
     // Filter and sort projects
     const filteredProjects = useMemo(() => {
-        let filtered = mockProjects.filter(project => {
+        const filtered = mockProjects.filter(project => {
             const matchesSearch = project.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                 project.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
                 project.manager.toLowerCase().includes(searchQuery.toLowerCase());

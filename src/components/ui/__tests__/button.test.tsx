@@ -3,8 +3,10 @@
  * Tests functionality, accessibility, performance, and visual regression
  */
 
-import React from 'react';
 import { screen, waitFor } from '@testing-library/react';
+import { Loader2, Plus } from 'lucide-react';
+import React from 'react';
+
 import { 
   renderWithProviders, 
   testAccessibility, 
@@ -13,8 +15,9 @@ import {
   testVisualRegression,
   testComponentStates
 } from '@/tests/utils/test-utils';
+
 import { Button } from '../button';
-import { Loader2, Plus } from 'lucide-react';
+
 
 describe('Button Component', () => {
   // Basic functionality tests

@@ -3,11 +3,13 @@
  * Enhanced input with comprehensive accessibility features
  */
 
-import * as React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
-import { cn } from "@/lib/utils";
-import { useAccessibility } from "@/lib/accessibility";
 import { Eye, EyeOff, AlertCircle, CheckCircle } from "lucide-react";
+import * as React from "react";
+
+import { useAccessibility } from "@/lib/accessibility";
+import { cn } from "@/lib/utils";
+
 
 const accessibleInputVariants = cva(
   "flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
@@ -87,16 +89,16 @@ const AccessibleInput = React.forwardRef<HTMLInputElement, AccessibleInputProps>
 
     // Determine accessibility variant based on preferences
     const accessibilityVariant = React.useMemo(() => {
-      if (preferences.theme === 'high-contrast') return 'high_contrast';
-      if (preferences.focusIndicators) return 'enhanced';
+      if (preferences.theme === 'high-contrast') {return 'high_contrast';}
+      if (preferences.focusIndicators) {return 'enhanced';}
       return 'default';
     }, [preferences.theme, preferences.focusIndicators]);
 
     // Determine input state
     const inputState = React.useMemo(() => {
-      if (error) return 'error';
-      if (success) return 'success';
-      if (warning) return 'warning';
+      if (error) {return 'error';}
+      if (success) {return 'success';}
+      if (warning) {return 'warning';}
       return 'default';
     }, [error, success, warning]);
 
@@ -131,10 +133,10 @@ const AccessibleInput = React.forwardRef<HTMLInputElement, AccessibleInputProps>
       const attrs: Record<string, any> = {};
       const describedBy: string[] = [];
 
-      if (description) describedBy.push(descriptionId);
-      if (error) describedBy.push(errorId);
-      if (success) describedBy.push(successId);
-      if (warning) describedBy.push(warningId);
+      if (description) {describedBy.push(descriptionId);}
+      if (error) {describedBy.push(errorId);}
+      if (success) {describedBy.push(successId);}
+      if (warning) {describedBy.push(warningId);}
 
       if (describedBy.length > 0) {
         attrs['aria-describedby'] = describedBy.join(' ');

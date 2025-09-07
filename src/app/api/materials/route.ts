@@ -1,11 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+
 import { materialService } from '@/services/material.service';
-import { 
-  createMaterialSchema, 
-  materialFiltersSchema,
-  CreateMaterialRequest,
-  MaterialFilters 
-} from '@/utils/validation-schemas';
 import { 
   withErrorHandling, 
   requireAuth, 
@@ -15,6 +10,12 @@ import {
   createErrorResponse,
   ErrorCodes 
 } from '@/utils/api-helpers';
+import { 
+  createMaterialSchema, 
+  materialFiltersSchema,
+  CreateMaterialRequest,
+  MaterialFilters 
+} from '@/utils/validation-schemas';
 
 // POST /api/materials - Create a new material
 export const POST = withErrorHandling(async (request: NextRequest) => {

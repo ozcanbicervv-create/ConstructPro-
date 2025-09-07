@@ -1,8 +1,6 @@
 'use client';
 
-import { useState } from 'react';
 import { motion } from 'framer-motion';
-import Link from 'next/link';
 import { 
   Sparkles, 
   Palette, 
@@ -15,10 +13,13 @@ import {
   BarChart3,
   CheckCircle
 } from 'lucide-react';
+import Link from 'next/link';
+import { useState } from 'react';
+
 import { DemoNavigation } from '@/components/ui/demo-navigation';
-import { PageTransition } from '@/components/ui/page-transition';
-import { InteractiveButton, InteractiveCard, StaggeredList } from '@/components/ui/micro-interactions';
 import { PageContainer, Section, Grid, Heading, Text } from '@/components/ui/layout-system';
+import { InteractiveButton, InteractiveCard, StaggeredList } from '@/components/ui/micro-interactions';
+import { PageTransition } from '@/components/ui/page-transition';
 import { useSuccessToast } from '@/components/ui/toast-system';
 
 const features = [

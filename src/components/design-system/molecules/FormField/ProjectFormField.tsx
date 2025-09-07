@@ -1,10 +1,12 @@
 'use client';
 
 import React from 'react';
+
+import { Icon } from '../../atoms/Icon';
+
 import FormField from './FormField';
 import SelectField from './SelectField';
 import TextareaField from './TextareaField';
-import { Icon } from '../../atoms/Icon';
 
 // Project-specific form field components
 export const ProjectNameField: React.FC<{

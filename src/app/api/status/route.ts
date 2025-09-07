@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { withRequestCorrelation } from '@/middleware/correlation.middleware';
-import { withErrorHandler } from '@/middleware/error-handler.middleware';
-import { logger } from '@/lib/logger';
+
 import { prisma } from '@/lib/db';
+import { logger } from '@/lib/logger';
 import { redis } from '@/lib/redis';
 import { authMiddleware } from '@/middleware/auth.middleware';
+import { withRequestCorrelation } from '@/middleware/correlation.middleware';
+import { withErrorHandler } from '@/middleware/error-handler.middleware';
 
 interface SystemStatus {
   status: 'operational' | 'degraded' | 'maintenance' | 'outage';

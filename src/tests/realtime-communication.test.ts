@@ -1,9 +1,11 @@
-import { Server } from 'socket.io';
 import { createServer } from 'http';
+
+import { Server } from 'socket.io';
 import { io as Client, Socket as ClientSocket } from 'socket.io-client';
+
+import { CollaborativeEditingService } from '@/services/collaborative-editing.service';
 import { NotificationService } from '@/services/notification.service';
 import { PresenceService } from '@/services/presence.service';
-import { CollaborativeEditingService } from '@/services/collaborative-editing.service';
 import { 
   SocketEvents,
   NotificationType,
@@ -88,7 +90,7 @@ describe('Real-time Communication System', () => {
         let count = 0;
         clientSocket.on(SocketEvents.NOTIFICATION_SENT, () => {
           count++;
-          if (count >= 1) resolve(count); // Expecting at least 1 notification
+          if (count >= 1) {resolve(count);} // Expecting at least 1 notification
         });
       });
 

@@ -93,7 +93,7 @@ export class Analytics {
   private config: AnalyticsConfig;
   private session: UserSession;
   private eventQueue: (AnalyticsEvent | ErrorEvent | PerformanceEvent)[] = [];
-  private isOnline: boolean = true;
+  private isOnline = true;
   private flushTimer?: NodeJS.Timeout;
 
   constructor(config: AnalyticsConfig = DEFAULT_ANALYTICS_CONFIG) {
@@ -167,18 +167,18 @@ export class Analytics {
 
     // Simple OS detection
     let os = 'Unknown';
-    if (userAgent.includes('Windows')) os = 'Windows';
-    else if (userAgent.includes('Mac')) os = 'macOS';
-    else if (userAgent.includes('Linux')) os = 'Linux';
-    else if (userAgent.includes('Android')) os = 'Android';
-    else if (userAgent.includes('iOS')) os = 'iOS';
+    if (userAgent.includes('Windows')) {os = 'Windows';}
+    else if (userAgent.includes('Mac')) {os = 'macOS';}
+    else if (userAgent.includes('Linux')) {os = 'Linux';}
+    else if (userAgent.includes('Android')) {os = 'Android';}
+    else if (userAgent.includes('iOS')) {os = 'iOS';}
 
     // Simple browser detection
     let browser = 'Unknown';
-    if (userAgent.includes('Chrome')) browser = 'Chrome';
-    else if (userAgent.includes('Firefox')) browser = 'Firefox';
-    else if (userAgent.includes('Safari')) browser = 'Safari';
-    else if (userAgent.includes('Edge')) browser = 'Edge';
+    if (userAgent.includes('Chrome')) {browser = 'Chrome';}
+    else if (userAgent.includes('Firefox')) {browser = 'Firefox';}
+    else if (userAgent.includes('Safari')) {browser = 'Safari';}
+    else if (userAgent.includes('Edge')) {browser = 'Edge';}
 
     return { type, os, browser, viewport };
   }
@@ -284,10 +284,10 @@ export class Analytics {
     };
 
     const threshold = thresholds[name];
-    if (!threshold) return 'good';
+    if (!threshold) {return 'good';}
 
-    if (value <= threshold.good) return 'good';
-    if (value <= threshold.needsImprovement) return 'needs-improvement';
+    if (value <= threshold.good) {return 'good';}
+    if (value <= threshold.needsImprovement) {return 'needs-improvement';}
     return 'poor';
   }
 
@@ -366,7 +366,7 @@ export class Analytics {
 
   // Public methods
   public trackEvent(name: string, properties?: Record<string, any>): void {
-    if (!this.shouldTrack()) return;
+    if (!this.shouldTrack()) {return;}
 
     const event: AnalyticsEvent = {
       name,
@@ -387,7 +387,7 @@ export class Analytics {
   }
 
   public trackError(error: Omit<ErrorEvent, 'sessionId' | 'page' | 'userAgent'>): void {
-    if (!this.shouldTrack()) return;
+    if (!this.shouldTrack()) {return;}
 
     const errorEvent: ErrorEvent = {
       ...error,
@@ -406,7 +406,7 @@ export class Analytics {
   }
 
   public trackPerformance(performance: Omit<PerformanceEvent, 'sessionId' | 'page' | 'userAgent'>): void {
-    if (!this.shouldTrack()) return;
+    if (!this.shouldTrack()) {return;}
 
     const performanceEvent: PerformanceEvent = {
       ...performance,
@@ -478,7 +478,7 @@ export class Analytics {
   }
 
   private async flushQueue(): Promise<void> {
-    if (this.eventQueue.length === 0 || !this.config.apiEndpoint) return;
+    if (this.eventQueue.length === 0 || !this.config.apiEndpoint) {return;}
 
     const events = [...this.eventQueue];
     this.eventQueue = [];

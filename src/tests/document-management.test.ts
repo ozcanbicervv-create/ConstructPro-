@@ -1,9 +1,11 @@
+import fs from 'fs/promises'
+import path from 'path'
+
 import { describe, it, expect, beforeEach, afterEach, jest } from '@jest/globals'
+
 import { documentService } from '@/services/document.service'
 import { fileStorageService } from '@/services/file-storage.service'
 import { DocumentType } from '@/types/document.types'
-import fs from 'fs/promises'
-import path from 'path'
 
 // Mock Prisma client
 const mockPrismaInstance = {

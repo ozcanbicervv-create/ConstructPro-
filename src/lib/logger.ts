@@ -1,6 +1,7 @@
+import path from 'path';
+
 import { createLogger, format, transports, Logger } from 'winston';
 import DailyRotateFile from 'winston-daily-rotate-file';
-import path from 'path';
 
 export interface LogContext {
   requestId?: string;
@@ -196,7 +197,7 @@ class AppLogger {
   public logAuthentication(
     action: string,
     userId?: string,
-    success: boolean = true,
+    success = true,
     context?: LogContext
   ): void {
     const level = success ? 'info' : 'warn';

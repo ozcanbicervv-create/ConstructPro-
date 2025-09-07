@@ -1,4 +1,5 @@
 import { describe, it, expect } from '@jest/globals';
+
 import swaggerSpec from '@/lib/swagger';
 import { migrationGuides } from '@/middleware/versioning.middleware';
 

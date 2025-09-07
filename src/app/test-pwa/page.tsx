@@ -1,6 +1,5 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { 
   Smartphone, 
@@ -16,17 +15,19 @@ import {
   Shield,
   Zap
 } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Switch } from '@/components/ui/switch';
-import { Separator } from '@/components/ui/separator';
-import { Progress } from '@/components/ui/progress';
+import React, { useState, useEffect } from 'react';
+
 import { 
   PWAInstallPrompt,
   PWAUpdatePrompt,
   PWAStatus
 } from '@/components/design-system/organisms/PWA';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Progress } from '@/components/ui/progress';
+import { Separator } from '@/components/ui/separator';
+import { Switch } from '@/components/ui/switch';
 import { usePWA, usePushNotifications, useOfflineSync } from '@/hooks/usePWA';
 
 const TestPWAPage = () => {
@@ -135,7 +136,7 @@ const TestPWAPage = () => {
   };
 
   const formatLastSync = (date: Date | null) => {
-    if (!date) return 'Never';
+    if (!date) {return 'Never';}
     return date.toLocaleString();
   };
 

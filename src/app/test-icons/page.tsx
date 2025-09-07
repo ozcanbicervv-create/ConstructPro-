@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+
 import {
   HardHatIcon,
   CraneIcon,
@@ -151,7 +152,7 @@ export default function TestIconsPage() {
                 <div className="flex flex-wrap gap-3">
                   {iconNames.map((iconName) => {
                     const iconData = CONSTRUCTION_ICONS.find(icon => icon.name === iconName);
-                    if (!iconData) return null;
+                    if (!iconData) {return null;}
                     
                     const { component: IconComponent } = iconData;
                     return (

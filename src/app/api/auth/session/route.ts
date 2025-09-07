@@ -1,7 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { SessionManager } from '@/middleware/auth.middleware';
-import { withAuth, AuthenticatedRequest } from '@/middleware/auth.middleware';
 import { UserRole } from '@prisma/client';
+import { NextRequest, NextResponse } from 'next/server';
+
+import { SessionManager , withAuth, AuthenticatedRequest } from '@/middleware/auth.middleware';
+
 
 /**
  * Get current session status

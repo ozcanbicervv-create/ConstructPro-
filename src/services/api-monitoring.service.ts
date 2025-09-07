@@ -434,7 +434,7 @@ class ApiMonitoringService {
     }
   }
 
-  public async getHistoricalMetrics(hours: number = 24): Promise<SystemMetrics[]> {
+  public async getHistoricalMetrics(hours = 24): Promise<SystemMetrics[]> {
     if (!redis) {
       return [];
     }
@@ -462,19 +462,19 @@ class ApiMonitoringService {
     return metrics.reverse(); // Return in chronological order
   }
 
-  public getTopEndpoints(limit: number = 10): ApiMetrics[] {
+  public getTopEndpoints(limit = 10): ApiMetrics[] {
     return Array.from(this.metrics.values())
       .sort((a, b) => b.totalRequests - a.totalRequests)
       .slice(0, limit);
   }
 
-  public getSlowestEndpoints(limit: number = 10): ApiMetrics[] {
+  public getSlowestEndpoints(limit = 10): ApiMetrics[] {
     return Array.from(this.metrics.values())
       .sort((a, b) => b.averageResponseTime - a.averageResponseTime)
       .slice(0, limit);
   }
 
-  public getErrorProneEndpoints(limit: number = 10): ApiMetrics[] {
+  public getErrorProneEndpoints(limit = 10): ApiMetrics[] {
     return Array.from(this.metrics.values())
       .filter(m => m.totalRequests > 10) // Only consider endpoints with significant traffic
       .sort((a, b) => b.errorRate - a.errorRate)

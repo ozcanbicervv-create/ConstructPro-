@@ -2,9 +2,10 @@
 
 import { useEffect, useState } from 'react';
 import { io } from 'socket.io-client';
+
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
 type Message = {

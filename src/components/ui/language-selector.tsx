@@ -5,8 +5,9 @@
 
 "use client";
 
-import React from 'react';
 import { Check, ChevronDown, Globe } from 'lucide-react';
+import React from 'react';
+
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,

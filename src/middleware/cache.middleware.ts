@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { cacheManager, CACHE_KEYS, CACHE_TTL } from '@/lib/redis';
+
 import { performanceMonitor } from '@/lib/performance';
+import { cacheManager, CACHE_KEYS, CACHE_TTL } from '@/lib/redis';
 
 export interface CacheOptions {
   ttl?: number;

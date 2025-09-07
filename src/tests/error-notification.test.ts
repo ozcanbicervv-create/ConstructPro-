@@ -1,13 +1,14 @@
 import { describe, it, expect, beforeEach, afterEach, jest } from '@jest/globals';
+
+import { prisma } from '@/lib/db';
+import { logger } from '@/lib/logger';
 import { 
   errorNotificationService, 
   ErrorNotification, 
   AlertRule,
   ErrorSeverity
 } from '@/services/error-notification.service';
-import { logger } from '@/lib/logger';
 import { notificationService } from '@/services/notification.service';
-import { prisma } from '@/lib/db';
 
 // Mock dependencies
 jest.mock('@/lib/logger');

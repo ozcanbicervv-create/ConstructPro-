@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
-import { prisma } from "@/utils/db";
-import { updateProfileSchema } from "@/utils/validations/auth";
+
 import { authOptions } from "@/utils/auth";
-import { applyRateLimit, RateLimitConfigs } from "@/utils/security/rate-limiting";
+import { prisma } from "@/utils/db";
 import { applyApiSecurityHeaders } from "@/utils/security/headers";
 import { sanitizeText } from "@/utils/security/input-validation";
+import { applyRateLimit, RateLimitConfigs } from "@/utils/security/rate-limiting";
+import { updateProfileSchema } from "@/utils/validations/auth";
 
 export async function PATCH(request: NextRequest) {
   try {

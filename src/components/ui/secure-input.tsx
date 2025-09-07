@@ -5,10 +5,6 @@
 
 "use client";
 
-import React, { useState, useCallback } from 'react';
-import { AccessibleInput } from '@/components/ui/accessible-input';
-import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
 import { 
   Eye, 
   EyeOff, 
@@ -19,6 +15,11 @@ import {
   RefreshCw,
   Check
 } from 'lucide-react';
+import React, { useState, useCallback } from 'react';
+
+import { AccessibleInput } from '@/components/ui/accessible-input';
+import { Button } from '@/components/ui/button';
+import { Progress } from '@/components/ui/progress';
 import { cn } from '@/lib/utils';
 
 interface PasswordStrength {
@@ -180,24 +181,24 @@ export function SecureInput({
   }, [value]);
 
   const getStrengthColor = (score: number) => {
-    if (score <= 1) return 'bg-red-500';
-    if (score <= 2) return 'bg-orange-500';
-    if (score <= 3) return 'bg-yellow-500';
-    if (score <= 4) return 'bg-blue-500';
+    if (score <= 1) {return 'bg-red-500';}
+    if (score <= 2) {return 'bg-orange-500';}
+    if (score <= 3) {return 'bg-yellow-500';}
+    if (score <= 4) {return 'bg-blue-500';}
     return 'bg-green-500';
   };
 
   const getStrengthLabel = (score: number) => {
-    if (score <= 1) return 'Very Weak';
-    if (score <= 2) return 'Weak';
-    if (score <= 3) return 'Fair';
-    if (score <= 4) return 'Good';
+    if (score <= 1) {return 'Very Weak';}
+    if (score <= 2) {return 'Weak';}
+    if (score <= 3) {return 'Fair';}
+    if (score <= 4) {return 'Good';}
     return 'Strong';
   };
 
   const getStrengthIcon = (score: number) => {
-    if (score <= 2) return ShieldAlert;
-    if (score <= 3) return Shield;
+    if (score <= 2) {return ShieldAlert;}
+    if (score <= 3) {return Shield;}
     return ShieldCheck;
   };
 

@@ -4,8 +4,9 @@
  */
 
 import * as React from "react";
-import { cn } from "@/lib/utils";
+
 import { useAccessibility } from "@/lib/accessibility";
+import { cn } from "@/lib/utils";
 
 interface SkipLink {
   href: string;

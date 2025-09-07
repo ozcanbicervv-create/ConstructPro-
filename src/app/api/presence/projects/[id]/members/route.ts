@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { presenceService } from '@/utils/socket';
+
 import { authenticateRequest } from '@/middleware/auth.middleware';
+import { presenceService } from '@/utils/socket';
 
 export async function GET(
   request: NextRequest,

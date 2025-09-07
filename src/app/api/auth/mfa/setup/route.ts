@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
+
+import { withAuth, AuthenticatedRequest , AuthAuditLogger } from '@/middleware/auth.middleware';
 import { AuthService } from '@/services/auth.service';
-import { withAuth, AuthenticatedRequest } from '@/middleware/auth.middleware';
-import { AuthAuditLogger } from '@/middleware/auth.middleware';
 
 /**
  * Setup MFA for authenticated user

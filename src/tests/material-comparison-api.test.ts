@@ -1,9 +1,10 @@
 import { describe, it, expect, beforeAll, afterAll } from '@jest/globals';
 import { NextRequest } from 'next/server';
+
 import { POST as comparePost } from '@/app/api/materials/compare/route';
-import { GET as suppliersGet } from '@/app/api/materials/suppliers/route';
-import { POST as ordersPost, GET as ordersGet } from '@/app/api/materials/orders/route';
 import { GET as costEstimationGet } from '@/app/api/materials/cost-estimation/route';
+import { POST as ordersPost, GET as ordersGet } from '@/app/api/materials/orders/route';
+import { GET as suppliersGet } from '@/app/api/materials/suppliers/route';
 
 // Mock the auth function
 jest.mock('@/utils/api-helpers', () => ({

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { documentService } from '@/services/document.service'
 import { z } from 'zod'
+
+import { documentService } from '@/services/document.service'
 
 interface RouteParams {
   params: {

@@ -1,11 +1,12 @@
 'use client';
 
-import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react';
 import { X, AlertTriangle, CheckCircle, Info, AlertCircle } from 'lucide-react';
+import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react';
+
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { ErrorHandler } from '@/utils/error-handler';
 import { ApiError } from '@/utils/api-error-handler';
+import { ErrorHandler } from '@/utils/error-handler';
 
 export type NotificationType = 'error' | 'warning' | 'success' | 'info';
 

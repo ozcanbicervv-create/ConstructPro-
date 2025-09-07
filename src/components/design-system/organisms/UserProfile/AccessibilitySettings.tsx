@@ -1,12 +1,5 @@
 "use client";
 
-import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { AccessibleButton } from '@/components/ui/accessible-button';
-import { Switch } from '@/components/ui/switch';
-import { Label } from '@/components/ui/label';
-import { Slider } from '@/components/ui/slider';
-import { Separator } from '@/components/ui/separator';
 import { 
   Eye, 
   MousePointer,
@@ -18,9 +11,17 @@ import {
   Focus,
   RotateCcw
 } from 'lucide-react';
+import React, { useState } from 'react';
+
+import { AccessibleButton } from '@/components/ui/accessible-button';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Label } from '@/components/ui/label';
+import { Separator } from '@/components/ui/separator';
+import { Slider } from '@/components/ui/slider';
+import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
 import { useAccessibility } from '@/lib/accessibility';
-import { Button } from '@/components/ui/button';
 
 
 

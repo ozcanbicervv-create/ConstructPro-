@@ -4,10 +4,11 @@
  * A foundational input component with modern styling and validation
  */
 
-import React, { forwardRef } from 'react';
 import { motion } from 'framer-motion';
-import { cn, createVariants } from '../../utils/classNames';
+import React, { forwardRef } from 'react';
+
 import { InputProps } from '../../types';
+import { cn, createVariants } from '../../utils/classNames';
 
 // Input variant styles
 const inputVariants = {

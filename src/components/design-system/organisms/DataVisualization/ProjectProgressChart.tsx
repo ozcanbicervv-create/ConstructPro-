@@ -1,7 +1,15 @@
 'use client';
 
-import React, { useState } from 'react';
 import { motion } from 'framer-motion';
+import { 
+  TrendingUp, 
+  TrendingDown, 
+  Calendar, 
+  BarChart3,
+  PieChart as PieChartIcon,
+  Activity
+} from 'lucide-react';
+import React, { useState } from 'react';
 import {
   AreaChart,
   Area,
@@ -19,19 +27,13 @@ import {
   Pie,
   Cell
 } from 'recharts';
-import { cn } from '@/lib/utils';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
-  TrendingUp, 
-  TrendingDown, 
-  Calendar, 
-  BarChart3,
-  PieChart as PieChartIcon,
-  Activity
-} from 'lucide-react';
+import { cn } from '@/lib/utils';
+
 
 // Types for project progress data
 export interface ProjectProgressData {

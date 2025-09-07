@@ -392,7 +392,7 @@ self.addEventListener('notificationclick', (event) => {
     );
   } else if (event.action === 'dismiss') {
     // Just close the notification
-    return;
+    
   } else {
     // Default action - open the app
     event.waitUntil(

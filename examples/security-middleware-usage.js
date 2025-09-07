@@ -6,8 +6,9 @@
  */
 
 // Example 1: Basic API route with authentication and rate limiting
-import { withSecureAuth } from '@/middleware/security.middleware';
 import { UserRole } from '@prisma/client';
+
+import { withSecureAuth } from '@/middleware/security.middleware';
 
 export const GET = withSecureAuth(
   async (req) => {
@@ -66,6 +67,7 @@ export const GET_API_KEY = withApiKey(
 
 // Example 4: Input validation with security middleware
 import { withInputValidation } from '@/middleware/security.middleware';
+
 import { z } from 'zod';
 
 const createProjectSchema = z.object({

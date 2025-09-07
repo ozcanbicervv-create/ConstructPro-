@@ -3,8 +3,9 @@
  * Tests functionality, accessibility, validation, and performance
  */
 
-import React from 'react';
 import { screen, waitFor } from '@testing-library/react';
+import React from 'react';
+
 import { 
   renderWithProviders, 
   testAccessibility, 
@@ -14,6 +15,7 @@ import {
   fillForm,
   testFormValidation
 } from '@/tests/utils/test-utils';
+
 import { Input } from '../input';
 
 describe('Input Component', () => {

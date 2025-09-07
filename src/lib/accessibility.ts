@@ -108,7 +108,7 @@ class AccessibilityManager {
   }
 
   private initializeAccessibility() {
-    if (!this.isClient) return;
+    if (!this.isClient) {return;}
 
     // Load preferences from localStorage
     try {
@@ -160,7 +160,7 @@ class AccessibilityManager {
   }
 
   private createFocusManager(): FocusManager {
-    let lastFocusedElement: HTMLElement | null = null;
+    const lastFocusedElement: HTMLElement | null = null;
 
     return {
       trapFocus: (element: HTMLElement) => {
@@ -338,7 +338,7 @@ class AccessibilityManager {
 
         const handleKeyDown = (e: KeyboardEvent) => {
           const currentIndex = focusableElements.indexOf(document.activeElement as HTMLElement);
-          if (currentIndex === -1) return;
+          if (currentIndex === -1) {return;}
 
           let nextIndex = currentIndex;
 
@@ -369,7 +369,7 @@ class AccessibilityManager {
   }
 
   private listenForSystemChanges() {
-    if (!this.isClient) return;
+    if (!this.isClient) {return;}
 
     // Listen for prefers-reduced-motion changes
     const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -397,7 +397,7 @@ class AccessibilityManager {
   }
 
   private initializeKeyboardShortcuts() {
-    if (!this.isClient) return;
+    if (!this.isClient) {return;}
     
     // Global keyboard shortcuts
     this.keyboardManager.registerShortcut('/', () => {
@@ -419,7 +419,7 @@ class AccessibilityManager {
   }
 
   private addColorBlindnessFilters() {
-    if (!this.isClient) return;
+    if (!this.isClient) {return;}
     
     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     svg.style.position = 'absolute';
@@ -470,7 +470,7 @@ class AccessibilityManager {
   }
 
   private savePreferences() {
-    if (!this.isClient) return;
+    if (!this.isClient) {return;}
     
     try {
       localStorage.setItem('accessibility-preferences', JSON.stringify(this.preferences));
@@ -488,7 +488,7 @@ class AccessibilityManager {
   }
 
   private applyTheme() {
-    if (!this.isClient) return;
+    if (!this.isClient) {return;}
     
     const root = document.documentElement;
     
@@ -501,7 +501,7 @@ class AccessibilityManager {
   }
 
   private applyTypography() {
-    if (!this.isClient) return;
+    if (!this.isClient) {return;}
     
     const root = document.documentElement;
     
@@ -519,7 +519,7 @@ class AccessibilityManager {
   }
 
   private applyMotion() {
-    if (!this.isClient) return;
+    if (!this.isClient) {return;}
     
     const root = document.documentElement;
     
@@ -533,7 +533,7 @@ class AccessibilityManager {
   }
 
   private applyColorBlindness() {
-    if (!this.isClient) return;
+    if (!this.isClient) {return;}
     
     const root = document.documentElement;
     
@@ -550,7 +550,7 @@ class AccessibilityManager {
   }
 
   private applyFocusIndicators() {
-    if (!this.isClient) return;
+    if (!this.isClient) {return;}
     
     const root = document.documentElement;
     

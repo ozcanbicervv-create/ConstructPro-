@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach, jest } from '@jest/globals';
-import { logger, AppLogger, generateRequestId, LogLevel } from '@/lib/logger';
 import { createLogger } from 'winston';
+
+import { logger, AppLogger, generateRequestId, LogLevel } from '@/lib/logger';
 
 // Mock winston
 jest.mock('winston', () => ({

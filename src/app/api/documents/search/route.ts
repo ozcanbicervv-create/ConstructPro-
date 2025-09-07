@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
+
 import { documentService } from '@/services/document.service'
 import { DocumentType } from '@/types/document.types'
-import { z } from 'zod'
 
 // Validation schema for advanced search
 const searchSchema = z.object({

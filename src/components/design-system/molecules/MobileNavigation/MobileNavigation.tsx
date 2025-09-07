@@ -1,12 +1,14 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence, PanInfo } from 'framer-motion';
-import { cn } from '@/lib/utils';
-import { Button } from '../../atoms/Button';
 import { ChevronRight, X } from 'lucide-react';
-import { Typography } from '../../atoms/Typography';
+import React, { useState, useEffect } from 'react';
+
+import { cn } from '@/lib/utils';
+
 import { Badge } from '../../atoms/Badge';
+import { Button } from '../../atoms/Button';
+import { Typography } from '../../atoms/Typography';
 import { NavigationItem } from '../Navigation/Navigation';
 
 export interface MobileNavigationProps {

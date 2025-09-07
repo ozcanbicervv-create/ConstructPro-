@@ -152,10 +152,10 @@ export function createMarginClasses(
 ): string {
   const classes: string[] = [];
   
-  if (top !== undefined) classes.push(`mt-${top}`);
-  if (right !== undefined) classes.push(`mr-${right}`);
-  if (bottom !== undefined) classes.push(`mb-${bottom}`);
-  if (left !== undefined) classes.push(`ml-${left}`);
+  if (top !== undefined) {classes.push(`mt-${top}`);}
+  if (right !== undefined) {classes.push(`mr-${right}`);}
+  if (bottom !== undefined) {classes.push(`mb-${bottom}`);}
+  if (left !== undefined) {classes.push(`ml-${left}`);}
   
   return classes.join(' ');
 }
@@ -171,10 +171,10 @@ export function createPaddingClasses(
 ): string {
   const classes: string[] = [];
   
-  if (top !== undefined) classes.push(`pt-${top}`);
-  if (right !== undefined) classes.push(`pr-${right}`);
-  if (bottom !== undefined) classes.push(`pb-${bottom}`);
-  if (left !== undefined) classes.push(`pl-${left}`);
+  if (top !== undefined) {classes.push(`pt-${top}`);}
+  if (right !== undefined) {classes.push(`pr-${right}`);}
+  if (bottom !== undefined) {classes.push(`pb-${bottom}`);}
+  if (left !== undefined) {classes.push(`pl-${left}`);}
   
   return classes.join(' ');
 }
@@ -231,9 +231,9 @@ export function createGapClasses(
 ): string {
   const classes: string[] = [];
   
-  if (gap !== undefined) classes.push(`gap-${gap}`);
-  if (rowGap !== undefined) classes.push(`gap-y-${rowGap}`);
-  if (columnGap !== undefined) classes.push(`gap-x-${columnGap}`);
+  if (gap !== undefined) {classes.push(`gap-${gap}`);}
+  if (rowGap !== undefined) {classes.push(`gap-y-${rowGap}`);}
+  if (columnGap !== undefined) {classes.push(`gap-x-${columnGap}`);}
   
   return classes.join(' ');
 }
@@ -271,12 +271,12 @@ export function createResponsiveMargin(
   const classes: string[] = [];
   const prefix = direction ? `m${direction}` : 'm';
   
-  if (values.base !== undefined) classes.push(`${prefix}-${values.base}`);
-  if (values.sm !== undefined) classes.push(`sm:${prefix}-${values.sm}`);
-  if (values.md !== undefined) classes.push(`md:${prefix}-${values.md}`);
-  if (values.lg !== undefined) classes.push(`lg:${prefix}-${values.lg}`);
-  if (values.xl !== undefined) classes.push(`xl:${prefix}-${values.xl}`);
-  if (values['2xl'] !== undefined) classes.push(`2xl:${prefix}-${values['2xl']}`);
+  if (values.base !== undefined) {classes.push(`${prefix}-${values.base}`);}
+  if (values.sm !== undefined) {classes.push(`sm:${prefix}-${values.sm}`);}
+  if (values.md !== undefined) {classes.push(`md:${prefix}-${values.md}`);}
+  if (values.lg !== undefined) {classes.push(`lg:${prefix}-${values.lg}`);}
+  if (values.xl !== undefined) {classes.push(`xl:${prefix}-${values.xl}`);}
+  if (values['2xl'] !== undefined) {classes.push(`2xl:${prefix}-${values['2xl']}`);}
   
   return classes.join(' ');
 }
@@ -298,12 +298,12 @@ export function createResponsivePadding(
   const classes: string[] = [];
   const prefix = direction ? `p${direction}` : 'p';
   
-  if (values.base !== undefined) classes.push(`${prefix}-${values.base}`);
-  if (values.sm !== undefined) classes.push(`sm:${prefix}-${values.sm}`);
-  if (values.md !== undefined) classes.push(`md:${prefix}-${values.md}`);
-  if (values.lg !== undefined) classes.push(`lg:${prefix}-${values.lg}`);
-  if (values.xl !== undefined) classes.push(`xl:${prefix}-${values.xl}`);
-  if (values['2xl'] !== undefined) classes.push(`2xl:${prefix}-${values['2xl']}`);
+  if (values.base !== undefined) {classes.push(`${prefix}-${values.base}`);}
+  if (values.sm !== undefined) {classes.push(`sm:${prefix}-${values.sm}`);}
+  if (values.md !== undefined) {classes.push(`md:${prefix}-${values.md}`);}
+  if (values.lg !== undefined) {classes.push(`lg:${prefix}-${values.lg}`);}
+  if (values.xl !== undefined) {classes.push(`xl:${prefix}-${values.xl}`);}
+  if (values['2xl'] !== undefined) {classes.push(`2xl:${prefix}-${values['2xl']}`);}
   
   return classes.join(' ');
 }
@@ -325,12 +325,12 @@ export function createResponsiveGap(
   const classes: string[] = [];
   const prefix = direction ? `gap-${direction}` : 'gap';
   
-  if (values.base !== undefined) classes.push(`${prefix}-${values.base}`);
-  if (values.sm !== undefined) classes.push(`sm:${prefix}-${values.sm}`);
-  if (values.md !== undefined) classes.push(`md:${prefix}-${values.md}`);
-  if (values.lg !== undefined) classes.push(`lg:${prefix}-${values.lg}`);
-  if (values.xl !== undefined) classes.push(`xl:${prefix}-${values.xl}`);
-  if (values['2xl'] !== undefined) classes.push(`2xl:${prefix}-${values['2xl']}`);
+  if (values.base !== undefined) {classes.push(`${prefix}-${values.base}`);}
+  if (values.sm !== undefined) {classes.push(`sm:${prefix}-${values.sm}`);}
+  if (values.md !== undefined) {classes.push(`md:${prefix}-${values.md}`);}
+  if (values.lg !== undefined) {classes.push(`lg:${prefix}-${values.lg}`);}
+  if (values.xl !== undefined) {classes.push(`xl:${prefix}-${values.xl}`);}
+  if (values['2xl'] !== undefined) {classes.push(`2xl:${prefix}-${values['2xl']}`);}
   
   return classes.join(' ');
 }

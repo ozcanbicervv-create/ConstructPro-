@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { presenceService, notificationService } from '@/utils/socket';
+
 import { authenticateRequest } from '@/middleware/auth.middleware';
 import { 
   SocketEvents,
   NotificationType,
   NotificationPriority 
 } from '@/types/realtime.types';
+import { presenceService, notificationService } from '@/utils/socket';
 
 export async function POST(request: NextRequest) {
   try {

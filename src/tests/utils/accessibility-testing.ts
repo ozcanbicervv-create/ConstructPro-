@@ -3,8 +3,8 @@
  * Implements automated accessibility testing with axe-core and custom checks
  */
 
-import { axe, toHaveNoViolations, AxeResults } from 'jest-axe';
 import { getByRole, getAllByRole, queryByRole } from '@testing-library/react';
+import { axe, toHaveNoViolations, AxeResults } from 'jest-axe';
 
 // Extend Jest matchers
 expect.extend(toHaveNoViolations);
@@ -182,7 +182,7 @@ export async function testKeyboardNavigation(
 ): Promise<void> {
   const focusableElements = getFocusableElements(container);
   
-  if (focusableElements.length === 0) return;
+  if (focusableElements.length === 0) {return;}
   
   // Test Tab navigation
   await testTabNavigation(focusableElements, user);
@@ -220,7 +220,7 @@ async function testTabNavigation(
   focusableElements: HTMLElement[],
   user: any
 ): Promise<void> {
-  if (focusableElements.length === 0) return;
+  if (focusableElements.length === 0) {return;}
   
   // Focus first element
   focusableElements[0].focus();

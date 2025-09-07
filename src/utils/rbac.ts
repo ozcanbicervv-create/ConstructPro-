@@ -1,4 +1,5 @@
 import { UserRole } from '@prisma/client';
+
 import { AuthService } from '@/services/auth.service';
 
 /**

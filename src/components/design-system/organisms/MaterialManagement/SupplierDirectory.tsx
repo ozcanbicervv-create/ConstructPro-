@@ -1,30 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { cn } from '@/lib/utils';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Progress } from '@/components/ui/progress';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { 
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { 
   Search, 
   Filter, 
@@ -51,6 +27,32 @@ import {
   Clock,
   DollarSign
 } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
+
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { 
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Input } from '@/components/ui/input';
+import { Progress } from '@/components/ui/progress';
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { cn } from '@/lib/utils';
+
 
 // Types for supplier data
 export interface Supplier {
@@ -159,16 +161,16 @@ const SupplierCard: React.FC<SupplierCardProps> = ({
   onToggleFavorite
 }) => {
   const getRatingColor = (rating: number) => {
-    if (rating >= 4.5) return 'text-green-600';
-    if (rating >= 4.0) return 'text-blue-600';
-    if (rating >= 3.5) return 'text-yellow-600';
+    if (rating >= 4.5) {return 'text-green-600';}
+    if (rating >= 4.0) {return 'text-blue-600';}
+    if (rating >= 3.5) {return 'text-yellow-600';}
     return 'text-red-600';
   };
 
   const getPerformanceColor = (score: number) => {
-    if (score >= 90) return 'text-green-600 bg-green-100 dark:bg-green-900/20';
-    if (score >= 80) return 'text-blue-600 bg-blue-100 dark:bg-blue-900/20';
-    if (score >= 70) return 'text-yellow-600 bg-yellow-100 dark:bg-yellow-900/20';
+    if (score >= 90) {return 'text-green-600 bg-green-100 dark:bg-green-900/20';}
+    if (score >= 80) {return 'text-blue-600 bg-blue-100 dark:bg-blue-900/20';}
+    if (score >= 70) {return 'text-yellow-600 bg-yellow-100 dark:bg-yellow-900/20';}
     return 'text-red-600 bg-red-100 dark:bg-red-900/20';
   };
 
@@ -378,7 +380,7 @@ export const SupplierDirectory: React.FC<SupplierDirectoryProps> = ({
 
   // Filter and sort suppliers
   const filteredAndSortedSuppliers = useMemo(() => {
-    let filtered = suppliers.filter(supplier => {
+    const filtered = suppliers.filter(supplier => {
       const matchesSearch = supplier.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                            supplier.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
                            supplier.specialties.some(s => s.toLowerCase().includes(searchQuery.toLowerCase()));

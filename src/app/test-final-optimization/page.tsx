@@ -1,12 +1,5 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { 
   CheckCircle, 
   XCircle, 
@@ -21,6 +14,14 @@ import {
   Users,
   Target
 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Progress } from '@/components/ui/progress';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { finalTestingSuite, type FinalTestResults } from '@/tests/final-testing-suite';
 
 export default function FinalOptimizationTestPage() {
@@ -84,9 +85,9 @@ export default function FinalOptimizationTestPage() {
     }
   };
 
-  const getScoreColor = (score: number, threshold: number = 95) => {
-    if (score >= threshold) return 'text-green-600';
-    if (score >= threshold - 10) return 'text-yellow-600';
+  const getScoreColor = (score: number, threshold = 95) => {
+    if (score >= threshold) {return 'text-green-600';}
+    if (score >= threshold - 10) {return 'text-yellow-600';}
     return 'text-red-600';
   };
 

@@ -1,9 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+
 import { materialService } from '@/services/material.service';
-import { 
-  updateMaterialSchema,
-  UpdateMaterialRequest 
-} from '@/utils/validation-schemas';
 import { 
   withErrorHandling, 
   requireAuth, 
@@ -11,6 +8,10 @@ import {
   createErrorResponse,
   ErrorCodes 
 } from '@/utils/api-helpers';
+import { 
+  updateMaterialSchema,
+  UpdateMaterialRequest 
+} from '@/utils/validation-schemas';
 
 interface RouteParams {
   params: {

@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
-import { authOptions } from '@/utils/auth';
+
 import { TaskAttachmentService } from '@/services/task-attachment.service';
 import { 
   withErrorHandling, 
   ErrorCodes,
   createErrorResponse 
 } from '@/utils/api-helpers';
+import { authOptions } from '@/utils/auth';
 
 interface RouteParams {
   params: {

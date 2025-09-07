@@ -5,12 +5,6 @@
 
 "use client";
 
-import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Separator } from '@/components/ui/separator';
 import { 
   Shield, 
   User, 
@@ -31,6 +25,13 @@ import {
   Filter,
   Search
 } from 'lucide-react';
+import React, { useState } from 'react';
+
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Separator } from '@/components/ui/separator';
 import { useI18n } from '@/lib/i18n';
 
 export interface AuditEvent {
@@ -137,10 +138,10 @@ export function AuditTrail({
 
   const formatUserAgent = (userAgent: string) => {
     // Simplified user agent parsing
-    if (userAgent.includes('Chrome')) return 'Chrome';
-    if (userAgent.includes('Firefox')) return 'Firefox';
-    if (userAgent.includes('Safari')) return 'Safari';
-    if (userAgent.includes('Edge')) return 'Edge';
+    if (userAgent.includes('Chrome')) {return 'Chrome';}
+    if (userAgent.includes('Firefox')) {return 'Firefox';}
+    if (userAgent.includes('Safari')) {return 'Safari';}
+    if (userAgent.includes('Edge')) {return 'Edge';}
     return 'Unknown Browser';
   };
 

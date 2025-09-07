@@ -115,7 +115,7 @@ export async function dynamicImport<T>(
     try {
       return await importFn();
     } catch (error) {
-      if (i === retries - 1) throw error;
+      if (i === retries - 1) {throw error;}
       
       // Wait before retrying
       await new Promise(resolve => setTimeout(resolve, delay * (i + 1)));

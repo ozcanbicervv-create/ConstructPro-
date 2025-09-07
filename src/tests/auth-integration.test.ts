@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach } from '@jest/globals';
-import { RBAC } from '@/utils/rbac';
 import { UserRole } from '@prisma/client';
+
+import { RBAC } from '@/utils/rbac';
 
 describe('Authentication Integration Tests', () => {
   describe('RBAC (Role-Based Access Control)', () => {

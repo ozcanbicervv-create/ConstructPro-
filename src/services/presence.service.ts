@@ -1,4 +1,5 @@
 import { Server } from 'socket.io';
+
 import { 
   SocketUser, 
   ProjectRoom, 
@@ -54,7 +55,7 @@ export class PresenceService {
 
   async userDisconnected(socketId: string): Promise<void> {
     const socketUser = this.connectedUsers.get(socketId);
-    if (!socketUser) return;
+    if (!socketUser) {return;}
 
     const { userId } = socketUser;
     const now = new Date();
@@ -95,7 +96,7 @@ export class PresenceService {
 
   async joinProjectRoom(socketId: string, projectId: string): Promise<void> {
     const socketUser = this.connectedUsers.get(socketId);
-    if (!socketUser) return;
+    if (!socketUser) {return;}
 
     // Add to socket's project list
     if (!socketUser.projectIds.includes(projectId)) {
@@ -138,7 +139,7 @@ export class PresenceService {
 
   leaveProjectRoom(socketId: string, projectId: string): void {
     const socketUser = this.connectedUsers.get(socketId);
-    if (!socketUser) return;
+    if (!socketUser) {return;}
 
     // Remove from socket's project list
     socketUser.projectIds = socketUser.projectIds.filter(id => id !== projectId);
@@ -224,7 +225,7 @@ export class PresenceService {
 
   private getUniqueUsersInProject(projectId: string): number {
     const projectRoom = this.projectRooms.get(projectId);
-    if (!projectRoom) return 0;
+    if (!projectRoom) {return 0;}
 
     const uniqueUserIds = new Set(projectRoom.members.map(m => m.userId));
     return uniqueUserIds.size;

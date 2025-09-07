@@ -1,7 +1,8 @@
+import { Project, Prisma } from '@prisma/client';
+
+import { PaginationParams, PaginatedResponse, createPaginatedResponse } from '@/utils/api-helpers';
 import { prisma } from '@/utils/db';
 import { CreateProjectRequest, UpdateProjectRequest, ProjectFilters } from '@/utils/validation-schemas';
-import { PaginationParams, PaginatedResponse, createPaginatedResponse } from '@/utils/api-helpers';
-import { Project, Prisma } from '@prisma/client';
 
 // Extended project type with relations
 export type ProjectWithRelations = Project & {

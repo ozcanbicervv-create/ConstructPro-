@@ -93,7 +93,7 @@ export class PerformanceMonitor {
 
   private async initializeWebVitals() {
     // Only initialize on client-side
-    if (typeof window === 'undefined') return;
+    if (typeof window === 'undefined') {return;}
     
     try {
       const vitals = await loadWebVitals();
@@ -127,10 +127,10 @@ export class PerformanceMonitor {
 
   private getRating(name: string, value: number): 'good' | 'needs-improvement' | 'poor' {
     const thresholds = PERFORMANCE_THRESHOLDS[name as keyof typeof PERFORMANCE_THRESHOLDS];
-    if (!thresholds) return 'good';
+    if (!thresholds) {return 'good';}
 
-    if (value <= thresholds.good) return 'good';
-    if (value <= thresholds.needsImprovement) return 'needs-improvement';
+    if (value <= thresholds.good) {return 'good';}
+    if (value <= thresholds.needsImprovement) {return 'needs-improvement';}
     return 'poor';
   }
 
@@ -209,7 +209,7 @@ export class PerformanceMonitor {
 
   public getAverageMetric(name: string): number {
     const metrics = this.getMetricsByName(name);
-    if (metrics.length === 0) return 0;
+    if (metrics.length === 0) {return 0;}
     return metrics.reduce((sum, metric) => sum + metric.value, 0) / metrics.length;
   }
 
@@ -244,14 +244,14 @@ export class ResourceOptimizer {
 
   // Preload critical resources
   static preloadResource(href: string, as: string, crossorigin?: string) {
-    if (typeof window === 'undefined') return;
-    if (this.preloadedResources.has(href)) return;
+    if (typeof window === 'undefined') {return;}
+    if (this.preloadedResources.has(href)) {return;}
 
     const link = document.createElement('link');
     link.rel = 'preload';
     link.href = href;
     link.as = as;
-    if (crossorigin) link.crossOrigin = crossorigin;
+    if (crossorigin) {link.crossOrigin = crossorigin;}
 
     document.head.appendChild(link);
     this.preloadedResources.add(href);
@@ -259,7 +259,7 @@ export class ResourceOptimizer {
 
   // Prefetch non-critical resources
   static prefetchResource(href: string) {
-    if (typeof window === 'undefined') return;
+    if (typeof window === 'undefined') {return;}
     
     const link = document.createElement('link');
     link.rel = 'prefetch';
@@ -274,7 +274,7 @@ export class ResourceOptimizer {
 
   // Lazy load images with intersection observer
   static lazyLoadImages() {
-    if (typeof window === 'undefined') return;
+    if (typeof window === 'undefined') {return;}
     
     if ('IntersectionObserver' in window) {
       const imageObserver = new IntersectionObserver((entries, observer) => {

@@ -1,5 +1,6 @@
-import { prisma } from '@/utils/db';
 import { NextRequest } from 'next/server';
+
+import { prisma } from '@/utils/db';
 
 /**
  * Comprehensive audit logging system for ConstructPro
@@ -261,7 +262,7 @@ export class AuditLogger {
   /**
    * Get security summary for a user
    */
-  async getSecuritySummary(userId: string, days: number = 30): Promise<{
+  async getSecuritySummary(userId: string, days = 30): Promise<{
     totalEvents: number;
     failedLogins: number;
     successfulLogins: number;

@@ -2,8 +2,9 @@
 
 import { motion } from 'framer-motion';
 import { ReactNode } from 'react';
-import { cn } from '@/lib/utils';
+
 import { fadeInUp, staggerContainer, staggerItem } from '@/lib/animations';
+import { cn } from '@/lib/utils';
 
 // Consistent spacing system
 export const spacing = {

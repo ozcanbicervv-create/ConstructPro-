@@ -1,15 +1,8 @@
 'use client';
 
-import { useState } from 'react';
 import { Plus, Download, Settings, Heart, Star, Share2 } from 'lucide-react';
-import { PageTransition } from '@/components/ui/page-transition';
-import { 
-  InteractiveButton, 
-  InteractiveCard, 
-  StaggeredList,
-  FloatingActionButton,
-  AnimatedProgress
-} from '@/components/ui/micro-interactions';
+import { useState } from 'react';
+
 import {
   NoProjectsEmpty,
   NoSearchResultsEmpty,
@@ -36,6 +29,14 @@ import {
   CardSkeleton,
   ListSkeleton
 } from '@/components/ui/loading-animations';
+import { 
+  InteractiveButton, 
+  InteractiveCard, 
+  StaggeredList,
+  FloatingActionButton,
+  AnimatedProgress
+} from '@/components/ui/micro-interactions';
+import { PageTransition } from '@/components/ui/page-transition';
 import {
   ToastProvider,
   useToast,

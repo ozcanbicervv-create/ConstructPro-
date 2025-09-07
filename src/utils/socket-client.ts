@@ -1,4 +1,5 @@
 import { io, Socket } from 'socket.io-client';
+
 import { 
   SocketEvents,
   SocketClient,
@@ -83,7 +84,7 @@ class SocketClientManager implements SocketClient {
 
   // Real-time updates
   broadcastProjectUpdate(projectId: string, changes: Record<string, any>): void {
-    if (!this.socket?.connected) return;
+    if (!this.socket?.connected) {return;}
 
     const payload: ProjectUpdatePayload = {
       projectId,
@@ -96,7 +97,7 @@ class SocketClientManager implements SocketClient {
   }
 
   broadcastTaskUpdate(taskId: string, projectId: string, changes: Record<string, any>): void {
-    if (!this.socket?.connected) return;
+    if (!this.socket?.connected) {return;}
 
     const payload: TaskUpdatePayload = {
       taskId,
@@ -111,7 +112,7 @@ class SocketClientManager implements SocketClient {
 
   // Presence and typing
   startTyping(projectId: string, taskId?: string, documentId?: string): void {
-    if (!this.socket?.connected) return;
+    if (!this.socket?.connected) {return;}
 
     const payload: TypingIndicatorPayload = {
       userId: this.userId!,
@@ -125,7 +126,7 @@ class SocketClientManager implements SocketClient {
   }
 
   stopTyping(projectId: string, taskId?: string, documentId?: string): void {
-    if (!this.socket?.connected) return;
+    if (!this.socket?.connected) {return;}
 
     const payload: TypingIndicatorPayload = {
       userId: this.userId!,
@@ -140,25 +141,25 @@ class SocketClientManager implements SocketClient {
 
   // Collaborative editing
   startEditingDocument(documentId: string): void {
-    if (!this.socket?.connected) return;
+    if (!this.socket?.connected) {return;}
 
     this.socket.emit(SocketEvents.DOCUMENT_EDIT_START, { documentId });
   }
 
   endEditingDocument(documentId: string): void {
-    if (!this.socket?.connected) return;
+    if (!this.socket?.connected) {return;}
 
     this.socket.emit(SocketEvents.DOCUMENT_EDIT_END, { documentId });
   }
 
   updateCursorPosition(documentId: string, position: number): void {
-    if (!this.socket?.connected) return;
+    if (!this.socket?.connected) {return;}
 
     this.socket.emit(SocketEvents.DOCUMENT_CURSOR_MOVE, { documentId, position });
   }
 
   updateDocumentContent(documentId: string, content: string, position?: number): void {
-    if (!this.socket?.connected) return;
+    if (!this.socket?.connected) {return;}
 
     this.socket.emit(SocketEvents.DOCUMENT_CONTENT_CHANGE, { 
       documentId, 
@@ -169,38 +170,38 @@ class SocketClientManager implements SocketClient {
 
   // Notifications
   markNotificationRead(notificationId: string): void {
-    if (!this.socket?.connected) return;
+    if (!this.socket?.connected) {return;}
 
     this.socket.emit('mark_notification_read', { notificationId });
   }
 
   getNotifications(limit?: number, unreadOnly?: boolean): void {
-    if (!this.socket?.connected) return;
+    if (!this.socket?.connected) {return;}
 
     this.socket.emit('get_notifications', { limit, unreadOnly });
   }
 
   // Presence queries
   getOnlineUsers(): void {
-    if (!this.socket?.connected) return;
+    if (!this.socket?.connected) {return;}
 
     this.socket.emit('get_online_users');
   }
 
   getProjectMembers(projectId: string): void {
-    if (!this.socket?.connected) return;
+    if (!this.socket?.connected) {return;}
 
     this.socket.emit('get_project_members', { projectId });
   }
 
   getActiveEditors(documentId: string): void {
-    if (!this.socket?.connected) return;
+    if (!this.socket?.connected) {return;}
 
     this.socket.emit('get_active_editors', { documentId });
   }
 
   getDocumentLock(documentId: string): void {
-    if (!this.socket?.connected) return;
+    if (!this.socket?.connected) {return;}
 
     this.socket.emit('get_document_lock', { documentId });
   }
@@ -216,7 +217,7 @@ class SocketClientManager implements SocketClient {
   }
 
   off(event: string, callback?: (data: any) => void): void {
-    if (!this.socket) return;
+    if (!this.socket) {return;}
 
     if (callback) {
       this.socket.off(event, callback);
@@ -240,7 +241,7 @@ class SocketClientManager implements SocketClient {
   }
 
   private setupEventHandlers(): void {
-    if (!this.socket) return;
+    if (!this.socket) {return;}
 
     // Connection events
     this.socket.on('connect', () => {

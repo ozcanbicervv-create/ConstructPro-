@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/utils/db';
+
 import { 
   withErrorHandling, 
   requireAuth, 
@@ -8,6 +8,7 @@ import {
   getPaginationParams,
   createPaginatedResponse
 } from '@/utils/api-helpers';
+import { prisma } from '@/utils/db';
 
 interface RouteContext {
   params: {

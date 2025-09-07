@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/utils/db';
+
 import { 
   withErrorHandling, 
   requireAuth, 
   createErrorResponse,
   ErrorCodes
 } from '@/utils/api-helpers';
+import { prisma } from '@/utils/db';
 
 interface RouteContext {
   params: {

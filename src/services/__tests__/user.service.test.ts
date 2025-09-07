@@ -1,7 +1,8 @@
-import { UserService } from '../user.service';
-import { apiService } from '../api.service';
 import type { UpdateUserProfileRequest, UserSearchRequest } from '@/types/api.types';
 import type { User, UserProfile, UserStats } from '@/types/user.types';
+
+import { apiService } from '../api.service';
+import { UserService } from '../user.service';
 
 // Mock the API service
 jest.mock('../api.service', () => ({

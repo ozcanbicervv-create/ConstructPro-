@@ -1,13 +1,15 @@
 // server.ts - Next.js Standalone + Socket.IO
-import { setupSocket } from './src/utils/socket';
 import { createServer } from 'http';
-import { Server } from 'socket.io';
+
+import compression from 'compression';
 import next from 'next';
+import responseTime from 'response-time';
+import { Server } from 'socket.io';
+
+import { applyDatabaseIndexes, optimizedPrisma } from './src/lib/database-optimization';
 import { performanceMonitor, createResponseTimeTracker } from './src/lib/performance';
 import { redis, redisSession } from './src/lib/redis';
-import { applyDatabaseIndexes, optimizedPrisma } from './src/lib/database-optimization';
-import compression from 'compression';
-import responseTime from 'response-time';
+import { setupSocket } from './src/utils/socket';
 
 const dev = process.env.NODE_ENV !== 'production';
 const currentPort = 3001;

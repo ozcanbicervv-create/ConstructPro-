@@ -1,9 +1,10 @@
 import { describe, it, expect, beforeAll, afterAll, beforeEach, afterEach } from '@jest/globals';
-import { cacheManager, CacheManager, cacheInvalidator, CACHE_KEYS, CACHE_TTL } from '@/lib/redis';
+
 import { performanceMonitor, PerformanceMonitor } from '@/lib/performance';
+import { cacheManager, CacheManager, cacheInvalidator, CACHE_KEYS, CACHE_TTL } from '@/lib/redis';
 import { createCacheMiddleware, ApiCacheInvalidator } from '@/middleware/cache.middleware';
-import { createRateLimitMiddleware, rateLimitConfigs } from '@/middleware/rate-limit.middleware';
 import { CompressionStats, shouldCompress } from '@/middleware/compression.middleware';
+import { createRateLimitMiddleware, rateLimitConfigs } from '@/middleware/rate-limit.middleware';
 // Mock Prisma before importing
 jest.mock('@/lib/database-optimization', () => ({
   optimizedPrisma: {
@@ -20,6 +21,7 @@ jest.mock('@/lib/database-optimization', () => ({
 }));
 
 import { optimizedPrisma } from '@/lib/database-optimization';
+
 import { NextRequest, NextResponse } from 'next/server';
 
 // Mock Redis for testing

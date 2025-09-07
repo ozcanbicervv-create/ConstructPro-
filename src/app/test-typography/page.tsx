@@ -7,6 +7,7 @@
 'use client';
 
 import React from 'react';
+
 import { Typography, ConstructionText } from '@/components/design-system/atoms/Typography';
 
 export default function TypographyTestPage() {

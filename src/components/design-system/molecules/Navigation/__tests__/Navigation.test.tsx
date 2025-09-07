@@ -1,7 +1,8 @@
-import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { axe, toHaveNoViolations } from 'jest-axe';
+import React from 'react';
+
 import Navigation, { NavigationItem } from '../Navigation';
 
 expect.extend(toHaveNoViolations);

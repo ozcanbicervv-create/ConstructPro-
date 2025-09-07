@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { AuthService } from '@/services/auth.service';
-import { withAuth, AuthenticatedRequest } from '@/middleware/auth.middleware';
-import { AuthAuditLogger } from '@/middleware/auth.middleware';
 import { z } from 'zod';
+
+import { withAuth, AuthenticatedRequest , AuthAuditLogger } from '@/middleware/auth.middleware';
+import { AuthService } from '@/services/auth.service';
+
 
 const disableMFASchema = z.object({
   password: z.string().min(1, 'Password is required')

@@ -1,6 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
-import compression from 'compression';
 import { promisify } from 'util';
+
+import compression from 'compression';
+import { NextRequest, NextResponse } from 'next/server';
 
 // Compression configuration
 const compressionConfig = {

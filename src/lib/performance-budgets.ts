@@ -158,7 +158,7 @@ export class PerformanceBudgetMonitor {
   // Check a metric against its budget
   public checkMetric(name: string, value: number, additionalData?: Record<string, any>): void {
     const budget = this.budgets.get(name);
-    if (!budget) return;
+    if (!budget) {return;}
 
     const violation = this.evaluateMetric(budget, value, additionalData);
     if (violation) {
@@ -183,7 +183,7 @@ export class PerformanceBudgetMonitor {
       threshold = budget.thresholds.warning;
     }
 
-    if (!severity) return null;
+    if (!severity) {return null;}
 
     return {
       budgetName: budget.name,
@@ -224,7 +224,7 @@ export class PerformanceBudgetMonitor {
   // Trigger alerts through configured channels
   private async triggerAlerts(violation: PerformanceViolation): Promise<void> {
     const budget = this.budgets.get(violation.budgetName);
-    if (!budget) return;
+    if (!budget) {return;}
 
     const message = this.formatAlertMessage(violation, budget);
 
@@ -275,7 +275,7 @@ export class PerformanceBudgetMonitor {
 
   // Send browser notification
   private async sendBrowserNotification(violation: PerformanceViolation, message: string): Promise<void> {
-    if (!('Notification' in window)) return;
+    if (!('Notification' in window)) {return;}
 
     // Request permission if needed
     if (Notification.permission === 'default') {
@@ -293,7 +293,7 @@ export class PerformanceBudgetMonitor {
 
   // Send webhook alert
   private async sendWebhookAlert(violation: PerformanceViolation, message: string): Promise<void> {
-    if (!this.alertConfig.webhookUrl) return;
+    if (!this.alertConfig.webhookUrl) {return;}
 
     const payload = {
       type: 'performance_violation',
@@ -313,7 +313,7 @@ export class PerformanceBudgetMonitor {
 
   // Send email alert
   private async sendEmailAlert(violation: PerformanceViolation, message: string): Promise<void> {
-    if (!this.alertConfig.emailRecipients?.length) return;
+    if (!this.alertConfig.emailRecipients?.length) {return;}
 
     // This would integrate with your email service
     const emailPayload = {

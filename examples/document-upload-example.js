@@ -144,7 +144,7 @@ async function uploadDocumentVersion(documentId, file, changelog) {
 // HTML file input handler
 function handleFileUpload(event) {
   const file = event.target.files[0]
-  if (!file) return
+  if (!file) {return}
 
   const projectId = 'proj-123' // Get from your application state
   const documentType = 'BLUEPRINT' // Determine based on file type or user selection

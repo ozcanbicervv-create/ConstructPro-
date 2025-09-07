@@ -1,11 +1,13 @@
 'use client';
 
-import React, { forwardRef, useId } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import React, { forwardRef, useId } from 'react';
+
 import { cn } from '@/lib/utils';
+
+import { Icon } from '../../atoms/Icon';
 import { Input } from '../../atoms/Input';
 import { Typography } from '../../atoms/Typography';
-import { Icon } from '../../atoms/Icon';
 
 export interface FormFieldProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'> {
   label?: string;

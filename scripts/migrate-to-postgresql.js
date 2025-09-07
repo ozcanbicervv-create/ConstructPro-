@@ -5,9 +5,10 @@
  * This script helps migrate existing data from SQLite to PostgreSQL
  */
 
-const { PrismaClient } = require('@prisma/client');
 const fs = require('fs');
 const path = require('path');
+
+const { PrismaClient } = require('@prisma/client');
 
 // SQLite client (old database)
 const sqlitePrisma = new PrismaClient({

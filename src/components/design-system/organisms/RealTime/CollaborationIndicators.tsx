@@ -1,6 +1,5 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Edit3, 
@@ -14,6 +13,8 @@ import {
   CheckCircle,
   AlertCircle
 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -80,14 +81,14 @@ const CollaborationIndicators: React.FC<CollaborationIndicatorsProps> = ({
     const minutes = Math.floor(diff / 60000);
     const hours = Math.floor(diff / 3600000);
 
-    if (minutes < 1) return 'Just now';
-    if (minutes < 60) return `${minutes}m ago`;
-    if (hours < 24) return `${hours}h ago`;
+    if (minutes < 1) {return 'Just now';}
+    if (minutes < 60) {return `${minutes}m ago`;}
+    if (hours < 24) {return `${hours}h ago`;}
     return date.toLocaleDateString();
   };
 
   const getUserColor = (user: CollaborationUser, index: number) => {
-    if (user.color) return user.color;
+    if (user.color) {return user.color;}
     const colors = ['bg-blue-500', 'bg-green-500', 'bg-purple-500', 'bg-orange-500', 'bg-pink-500'];
     return colors[index % colors.length];
   };

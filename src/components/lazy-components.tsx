@@ -3,6 +3,7 @@
  */
 
 import { lazy, Suspense, ComponentType } from 'react';
+
 import { Skeleton } from '@/components/ui/skeleton';
 
 // Loading fallback components

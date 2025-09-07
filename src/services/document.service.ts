@@ -1,5 +1,8 @@
+import crypto from 'crypto'
+import path from 'path'
+
 import { PrismaClient } from '@prisma/client'
-import { fileStorageService } from './file-storage.service'
+
 import {
   DocumentMetadata,
   DocumentVersion,
@@ -14,8 +17,8 @@ import {
   ApprovalStatus,
   DocumentApproval
 } from '@/types/document.types'
-import crypto from 'crypto'
-import path from 'path'
+
+import { fileStorageService } from './file-storage.service'
 
 const prisma = new PrismaClient()
 
@@ -163,8 +166,8 @@ export class DocumentService {
    */
   async searchDocuments(
     filters: DocumentSearchFilters,
-    page: number = 1,
-    limit: number = 20
+    page = 1,
+    limit = 20
   ): Promise<{
     documents: DocumentMetadata[]
     total: number
@@ -396,7 +399,7 @@ export class DocumentService {
         }
       })
       .sort((a, b) => {
-        if (a.major !== b.major) return b.major - a.major
+        if (a.major !== b.major) {return b.major - a.major}
         return b.minor - a.minor
       })
 
@@ -599,8 +602,8 @@ export class DocumentService {
       sortBy?: string
       sortOrder?: string
     },
-    page: number = 1,
-    limit: number = 20
+    page = 1,
+    limit = 20
   ): Promise<{
     documents: DocumentMetadata[]
     total: number

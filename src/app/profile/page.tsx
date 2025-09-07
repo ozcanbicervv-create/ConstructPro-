@@ -1,11 +1,12 @@
 "use client";
 
-import React from 'react';
 import { motion } from 'framer-motion';
-import { Button } from '@/components/ui/button';
 import { ChevronLeft, Settings } from 'lucide-react';
-import { UserProfileManagement } from '@/components/design-system/organisms/UserProfile/UserProfileManagement';
 import Link from 'next/link';
+import React from 'react';
+
+import { UserProfileManagement } from '@/components/design-system/organisms/UserProfile/UserProfileManagement';
+import { Button } from '@/components/ui/button';
 
 export default function ProfilePage() {
   const handleUserSave = async (userData: any) => {

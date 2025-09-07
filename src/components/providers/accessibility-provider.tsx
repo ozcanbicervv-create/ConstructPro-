@@ -6,9 +6,10 @@
 "use client";
 
 import * as React from "react";
-import { accessibilityManager, AccessibilityPreferences } from "@/lib/accessibility";
-import { SkipLinks } from "@/components/ui/skip-links";
+
 import { useLiveAnnouncer } from "@/components/ui/live-region";
+import { SkipLinks } from "@/components/ui/skip-links";
+import { accessibilityManager, AccessibilityPreferences } from "@/lib/accessibility";
 
 interface AccessibilityContextType {
   preferences: AccessibilityPreferences;

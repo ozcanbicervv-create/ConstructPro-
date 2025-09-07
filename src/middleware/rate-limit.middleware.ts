@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { cacheManager } from '@/lib/redis';
+
 import { performanceMonitor } from '@/lib/performance';
+import { cacheManager } from '@/lib/redis';
 
 // Rate limit configuration
 export interface RateLimitConfig {
@@ -345,7 +346,7 @@ export const bypassCheckers = {
   // Bypass for premium users
   premium: async (req: NextRequest) => {
     const userId = req.headers.get('x-user-id');
-    if (!userId) return false;
+    if (!userId) {return false;}
     
     // Check if user is premium (would need to query database)
     // For now, return false

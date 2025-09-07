@@ -15,7 +15,7 @@ export const prisma =
     },
   });
 
-if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
+if (process.env.NODE_ENV !== "production") {globalForPrisma.prisma = prisma;}
 
 // Connection pool configuration for PostgreSQL
 export const dbConfig = {

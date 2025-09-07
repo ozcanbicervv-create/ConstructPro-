@@ -1,17 +1,18 @@
 'use client';
 
 import React, { useState } from 'react';
+
+import { ErrorBoundary, FeatureErrorBoundary, useErrorHandler } from '@/components/error-boundary';
+import { useNotifications } from '@/components/error-notification';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
-import { ErrorBoundary, FeatureErrorBoundary, useErrorHandler } from '@/components/error-boundary';
-import { useNotifications } from '@/components/error-notification';
 import { apiService } from '@/services/api.service';
+import { ApiErrorHandler } from '@/utils/api-error-handler';
 import { ErrorHandler } from '@/utils/error-handler';
 import { logger } from '@/utils/logger';
-import { ApiErrorHandler } from '@/utils/api-error-handler';
 
 /**
  * Example component demonstrating various error handling patterns

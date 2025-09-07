@@ -1,7 +1,22 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
+import { 
+  TrendingUp, 
+  TrendingDown, 
+  DollarSign,
+  Calendar,
+  BarChart3,
+  LineChart as LineChartIcon,
+  PieChart as PieChartIcon,
+  AlertTriangle,
+  Target,
+  Activity,
+  Package,
+  Truck,
+  Clock
+} from 'lucide-react';
+import React, { useState, useMemo } from 'react';
 import {
   LineChart,
   Line,
@@ -21,11 +36,10 @@ import {
   ScatterChart,
   Scatter
 } from 'recharts';
-import { cn } from '@/lib/utils';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+
 import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { 
   Select,
   SelectContent,
@@ -33,21 +47,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { 
-  TrendingUp, 
-  TrendingDown, 
-  DollarSign,
-  Calendar,
-  BarChart3,
-  LineChart as LineChartIcon,
-  PieChart as PieChartIcon,
-  AlertTriangle,
-  Target,
-  Activity,
-  Package,
-  Truck,
-  Clock
-} from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { cn } from '@/lib/utils';
+
 
 // Types for cost analysis data
 export interface MaterialPriceHistory {
@@ -161,7 +163,7 @@ export const MaterialPriceTrends: React.FC<MaterialPriceTrendsProps> = ({
   const colors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4'];
 
   const chartData = useMemo(() => {
-    if (data.length === 0) return [];
+    if (data.length === 0) {return [];}
 
     // Get all unique dates
     const allDates = [...new Set(data.flatMap(m => m.data.map(d => d.date)))].sort();

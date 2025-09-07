@@ -6,6 +6,7 @@
 "use client";
 
 import React from 'react';
+
 import { SupportedLocale } from '@/lib/i18n';
 
 interface I18nProviderProps {

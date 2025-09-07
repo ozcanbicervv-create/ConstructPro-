@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+
 import { performanceMonitor } from './performance';
 
 // Database connection pool configuration
@@ -154,10 +155,10 @@ export class OptimizedPrismaClient extends PrismaClient {
 
     const where: any = {};
     
-    if (projectId) where.projectId = projectId;
-    if (assignedTo) where.assignedTo = assignedTo;
-    if (status) where.status = status;
-    if (priority) where.priority = priority;
+    if (projectId) {where.projectId = projectId;}
+    if (assignedTo) {where.assignedTo = assignedTo;}
+    if (status) {where.status = status;}
+    if (priority) {where.priority = priority;}
 
     const [tasks, total, stats] = await Promise.all([
       this.task.findMany({
@@ -217,9 +218,9 @@ export class OptimizedPrismaClient extends PrismaClient {
 
     const where: any = {};
     
-    if (projectId) where.projectId = projectId;
-    if (category) where.category = category;
-    if (supplierId) where.supplierId = supplierId;
+    if (projectId) {where.projectId = projectId;}
+    if (category) {where.category = category;}
+    if (supplierId) {where.supplierId = supplierId;}
     
     if (search) {
       where.OR = [

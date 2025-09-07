@@ -1,8 +1,9 @@
 import { describe, it, expect, beforeEach, afterEach, jest } from '@jest/globals';
-import { apiMonitoringService, ApiMetrics, SystemMetrics } from '@/services/api-monitoring.service';
+
+import { prisma } from '@/lib/db';
 import { logger } from '@/lib/logger';
 import { redis } from '@/lib/redis';
-import { prisma } from '@/lib/db';
+import { apiMonitoringService, ApiMetrics, SystemMetrics } from '@/services/api-monitoring.service';
 
 // Mock dependencies
 jest.mock('@/lib/logger');

@@ -340,8 +340,8 @@ export const materialLoadVariants: Variants = {
  * Creates a stagger animation for child elements
  */
 export function createStaggerAnimation(
-  staggerDelay: number = 0.1,
-  childDelay: number = 0
+  staggerDelay = 0.1,
+  childDelay = 0
 ): Variants {
   return {
     hidden: { opacity: 0 },
@@ -360,7 +360,7 @@ export function createStaggerAnimation(
  */
 export function createSlideAnimation(
   direction: 'left' | 'right' | 'up' | 'down',
-  distance: number = 20
+  distance = 20
 ): Variants {
   const getInitialPosition = () => {
     switch (direction) {
@@ -390,8 +390,8 @@ export function createSlideAnimation(
  * Creates a custom scale animation
  */
 export function createScaleAnimation(
-  initialScale: number = 0.9,
-  finalScale: number = 1
+  initialScale = 0.9,
+  finalScale = 1
 ): Variants {
   return {
     hidden: {

@@ -138,7 +138,7 @@ export class CrossBrowserTestRunner {
 
     // Group results by browser
     const browserResults = this.results.reduce((acc, result) => {
-      if (!acc[result.browser]) acc[result.browser] = [];
+      if (!acc[result.browser]) {acc[result.browser] = [];}
       acc[result.browser].push(result);
       return acc;
     }, {} as Record<string, TestResult[]>);

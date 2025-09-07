@@ -6,10 +6,11 @@
  * Includes proper touch targets for mobile and micro-animations
  */
 
-import React, { forwardRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { cn } from '../../utils/classNames';
+import React, { forwardRef } from 'react';
+
 import { ButtonProps } from '../../types';
+import { cn } from '../../utils/classNames';
 
 // Enhanced motion props with micro-animations
 const buttonMotionProps = {

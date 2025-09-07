@@ -1,6 +1,7 @@
-import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/utils/db";
 import { compare } from "bcryptjs";
+import { NextRequest, NextResponse } from "next/server";
+
+import { prisma } from "@/utils/db";
 
 export async function POST(request: NextRequest) {
   try {

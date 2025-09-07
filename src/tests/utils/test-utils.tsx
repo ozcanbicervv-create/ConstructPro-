@@ -3,12 +3,12 @@
  * Includes accessibility testing, visual regression testing, and performance testing
  */
 
-import React, { ReactElement } from 'react';
-import { render, RenderOptions, RenderResult } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ThemeProvider } from 'next-themes';
-import { axe, toHaveNoViolations } from 'jest-axe';
+import { render, RenderOptions, RenderResult } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { axe, toHaveNoViolations } from 'jest-axe';
+import { ThemeProvider } from 'next-themes';
+import React, { ReactElement } from 'react';
 
 // Extend Jest matchers
 expect.extend(toHaveNoViolations);
@@ -76,7 +76,7 @@ export const testKeyboardNavigation = async (
     'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
   );
 
-  if (focusableElements.length === 0) return;
+  if (focusableElements.length === 0) {return;}
 
   // Test Tab navigation
   const firstElement = focusableElements[0] as HTMLElement;

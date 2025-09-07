@@ -1,8 +1,9 @@
-import { describe, it, expect, beforeAll, afterAll, beforeEach } from '@jest/globals';
-import request from 'supertest';
 import { createServer } from 'http';
 import { parse } from 'url';
+
+import { describe, it, expect, beforeAll, afterAll, beforeEach } from '@jest/globals';
 import next from 'next';
+import request from 'supertest';
 
 const dev = process.env.NODE_ENV !== 'production';
 const hostname = 'localhost';

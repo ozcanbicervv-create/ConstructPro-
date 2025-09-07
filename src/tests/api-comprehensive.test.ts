@@ -1,8 +1,9 @@
 import { describe, it, expect, beforeEach, afterEach, jest } from '@jest/globals';
 import { NextRequest, NextResponse } from 'next/server';
+
 import { prisma } from '@/lib/db';
-import { redis } from '@/lib/redis';
 import { logger } from '@/lib/logger';
+import { redis } from '@/lib/redis';
 
 // Mock external dependencies
 jest.mock('@/lib/db');

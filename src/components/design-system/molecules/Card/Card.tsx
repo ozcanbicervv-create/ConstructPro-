@@ -1,7 +1,8 @@
 'use client';
 
-import React, { forwardRef } from 'react';
 import { motion, HTMLMotionProps } from 'framer-motion';
+import React, { forwardRef } from 'react';
+
 import { cn } from '@/lib/utils';
 
 export interface CardProps extends Omit<HTMLMotionProps<'div'>, 'children'> {
@@ -57,7 +58,7 @@ const Card = forwardRef<HTMLDivElement, CardProps>(({
   };
 
   const getHoverClasses = () => {
-    if (!hover && !interactive) return '';
+    if (!hover && !interactive) {return '';}
     
     return cn(
       'transition-all duration-200 ease-in-out',
@@ -71,7 +72,7 @@ const Card = forwardRef<HTMLDivElement, CardProps>(({
   };
 
   const getInteractiveClasses = () => {
-    if (!interactive) return '';
+    if (!interactive) {return '';}
     
     return cn(
       'cursor-pointer select-none',

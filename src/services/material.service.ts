@@ -1,7 +1,8 @@
 import { PrismaClient, OrderStatus } from '@prisma/client';
+
 import { Material, MaterialSupplier, MaterialOrder } from '@/types/project.types';
-import { CreateMaterialRequest, UpdateMaterialRequest, MaterialFilters } from '@/utils/validation-schemas';
 import { PaginationParams, PaginatedResponse } from '@/utils/api-helpers';
+import { CreateMaterialRequest, UpdateMaterialRequest, MaterialFilters } from '@/utils/validation-schemas';
 
 const prisma = new PrismaClient();
 
@@ -326,7 +327,7 @@ export class MaterialService {
     const supplierComparison = new Map();
 
     materials.forEach(material => {
-      if (!material.supplier) return;
+      if (!material.supplier) {return;}
 
       const supplierId = material.supplier.id;
       if (compareData.supplierIds && !compareData.supplierIds.includes(supplierId)) {
@@ -1006,7 +1007,7 @@ export class MaterialService {
 
   // Helper method to calculate price variance
   private calculatePriceVariance(prices: number[]): number {
-    if (prices.length === 0) return 0;
+    if (prices.length === 0) {return 0;}
 
     const mean = prices.reduce((sum, price) => sum + price, 0) / prices.length;
     const variance = prices.reduce((sum, price) => sum + Math.pow(price - mean, 2), 0) / prices.length;

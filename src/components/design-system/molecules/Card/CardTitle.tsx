@@ -1,7 +1,9 @@
 'use client';
 
 import React, { forwardRef } from 'react';
+
 import { cn } from '@/lib/utils';
+
 import { Typography } from '../../atoms/Typography';
 
 export interface CardTitleProps extends React.HTMLAttributes<HTMLHeadingElement> {

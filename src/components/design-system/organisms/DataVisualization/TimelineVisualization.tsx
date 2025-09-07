@@ -1,13 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { cn } from '@/lib/utils';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { Separator } from '@/components/ui/separator';
 import { 
   Calendar, 
   Clock, 
@@ -22,6 +15,15 @@ import {
   ZoomIn,
   ZoomOut
 } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
+
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Progress } from '@/components/ui/progress';
+import { Separator } from '@/components/ui/separator';
+import { cn } from '@/lib/utils';
+
 
 // Types for timeline data
 export interface TimelineTask {
@@ -97,7 +99,7 @@ export const GanttChart: React.FC<GanttChartProps> = ({
     const totalDays = Math.ceil((maxDate.getTime() - minDate.getTime()) / (1000 * 60 * 60 * 24));
     
     const scale = [];
-    let currentDate = new Date(minDate);
+    const currentDate = new Date(minDate);
     
     while (currentDate <= maxDate) {
       scale.push(new Date(currentDate));

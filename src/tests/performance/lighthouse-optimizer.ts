@@ -310,7 +310,7 @@ export class LighthouseOptimizer {
 
     // Group opportunities by type
     const opportunityGroups = allOpportunities.reduce((groups, opp) => {
-      if (!groups[opp.id]) groups[opp.id] = [];
+      if (!groups[opp.id]) {groups[opp.id] = [];}
       groups[opp.id].push(opp);
       return groups;
     }, {} as Record<string, PerformanceOpportunity[]>);

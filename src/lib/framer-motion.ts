@@ -4,8 +4,8 @@
  * Global configuration and performance optimizations for Framer Motion
  */
 
-import React, { ReactNode } from 'react';
 import { MotionConfig, MotionConfigProps } from 'framer-motion';
+import React, { ReactNode } from 'react';
 
 // === GLOBAL MOTION CONFIGURATION === //
 
@@ -75,7 +75,7 @@ export const performanceConfig = {
  * Checks if device is low-end based on various factors
  */
 export function isLowEndDevice(): boolean {
-  if (typeof window === 'undefined') return false;
+  if (typeof window === 'undefined') {return false;}
   
   // Check for reduced motion preference
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
@@ -350,8 +350,8 @@ export function createStaggerItem() {
  * Creates optimized hover props
  */
 export function createHoverProps(
-  scale: number = 1.02,
-  duration: number = 0.15
+  scale = 1.02,
+  duration = 0.15
 ) {
   const settings = getOptimizedMotionSettings();
   
@@ -369,8 +369,8 @@ export function createHoverProps(
  * Creates optimized tap props
  */
 export function createTapProps(
-  scale: number = 0.98,
-  duration: number = 0.1
+  scale = 0.98,
+  duration = 0.1
 ) {
   return {
     whileTap: { scale },

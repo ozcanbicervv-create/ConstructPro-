@@ -1,11 +1,12 @@
 import { PrismaClient } from '@prisma/client';
+import { Server } from 'socket.io';
+
 import { 
   Notification, 
   NotificationType, 
   NotificationPriority,
   SocketEvents 
 } from '@/types/realtime.types';
-import { Server } from 'socket.io';
 
 const prisma = new PrismaClient();
 
@@ -82,8 +83,8 @@ export class NotificationService {
 
   async getUserNotifications(
     userId: string, 
-    limit: number = 50,
-    unreadOnly: boolean = false
+    limit = 50,
+    unreadOnly = false
   ): Promise<Notification[]> {
     // This would query the database for user notifications
     // For now, return empty array as placeholder

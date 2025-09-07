@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Poppins } from "next/font/google";
+
 import { ToastProvider } from "@/components/ui/toast-system";
 import "./globals.css";
 import "../styles/accessibility.css";

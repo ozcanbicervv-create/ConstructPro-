@@ -36,8 +36,8 @@ jest.mock('@/lib/database-optimization', () => ({
   applyDatabaseIndexes: jest.fn(),
 }));
 
-import { cacheManager, CACHE_KEYS, CACHE_TTL } from '@/lib/redis';
 import { performanceMonitor } from '@/lib/performance';
+import { cacheManager, CACHE_KEYS, CACHE_TTL } from '@/lib/redis';
 import { shouldCompress, CompressionStats } from '@/middleware/compression.middleware';
 
 describe('Caching and Performance - Core Features', () => {
@@ -347,7 +347,7 @@ describe('Integration Scenarios', () => {
     const cacheKey = 'project:123';
     
     // Try to get from cache (miss)
-    let result = await cacheManager.get(cacheKey);
+    const result = await cacheManager.get(cacheKey);
     expect(result).toBeNull();
     
     // Set data in cache

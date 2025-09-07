@@ -1,5 +1,6 @@
-import { ApiService } from '../api.service';
 import { API_CONFIG, API_ERRORS } from '@/constants/api';
+
+import { ApiService } from '../api.service';
 
 // Mock fetch
 global.fetch = jest.fn();

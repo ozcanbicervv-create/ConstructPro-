@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach } from '@jest/globals';
 import { PrismaClient, OrderStatus } from '@prisma/client';
+
 import { materialService } from '@/services/material.service';
 
 const prisma = new PrismaClient();
@@ -8,7 +9,7 @@ describe('Material Orders Service', () => {
   let testProjectId: string;
   let testSupplierId: string;
   let testMaterialId: string;
-  let testUserId: string = 'test-user-id';
+  const testUserId = 'test-user-id';
   let testOrderId: string;
 
   beforeEach(async () => {

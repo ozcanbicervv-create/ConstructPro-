@@ -1,9 +1,9 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { ReactNode, useState, useEffect } from 'react';
 import { Check, X, AlertCircle, Info } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { ReactNode, useState, useEffect } from 'react';
+
 import { 
   successBounce, 
   errorShake, 
@@ -13,6 +13,7 @@ import {
   staggerContainer,
   staggerItem
 } from '@/lib/animations';
+import { cn } from '@/lib/utils';
 
 // Interactive Button with micro-interactions
 interface InteractiveButtonProps {

@@ -63,7 +63,7 @@ export function createRangeMediaQuery(
  * Hook to check if a breakpoint is active (client-side only)
  */
 export function useBreakpoint(breakpoint: Breakpoint): boolean {
-  if (typeof window === 'undefined') return false;
+  if (typeof window === 'undefined') {return false;}
   
   const mediaQuery = window.matchMedia(createMediaQuery(breakpoint));
   return mediaQuery.matches;
@@ -73,7 +73,7 @@ export function useBreakpoint(breakpoint: Breakpoint): boolean {
  * Hook to get the current active breakpoint
  */
 export function useCurrentBreakpoint(): Breakpoint | null {
-  if (typeof window === 'undefined') return null;
+  if (typeof window === 'undefined') {return null;}
   
   const breakpointEntries = Object.entries(breakpoints).reverse();
   
@@ -214,24 +214,24 @@ export function createGridClasses(
   if (typeof columns === 'number') {
     classes.push(`grid-cols-${columns}`);
   } else {
-    if (columns.base) classes.push(`grid-cols-${columns.base}`);
-    if (columns.sm) classes.push(`sm:grid-cols-${columns.sm}`);
-    if (columns.md) classes.push(`md:grid-cols-${columns.md}`);
-    if (columns.lg) classes.push(`lg:grid-cols-${columns.lg}`);
-    if (columns.xl) classes.push(`xl:grid-cols-${columns.xl}`);
-    if (columns['2xl']) classes.push(`2xl:grid-cols-${columns['2xl']}`);
+    if (columns.base) {classes.push(`grid-cols-${columns.base}`);}
+    if (columns.sm) {classes.push(`sm:grid-cols-${columns.sm}`);}
+    if (columns.md) {classes.push(`md:grid-cols-${columns.md}`);}
+    if (columns.lg) {classes.push(`lg:grid-cols-${columns.lg}`);}
+    if (columns.xl) {classes.push(`xl:grid-cols-${columns.xl}`);}
+    if (columns['2xl']) {classes.push(`2xl:grid-cols-${columns['2xl']}`);}
   }
   
   // Handle gap
   if (typeof gap === 'string') {
     classes.push(`gap-${gap}`);
   } else {
-    if (gap.base) classes.push(`gap-${gap.base}`);
-    if (gap.sm) classes.push(`sm:gap-${gap.sm}`);
-    if (gap.md) classes.push(`md:gap-${gap.md}`);
-    if (gap.lg) classes.push(`lg:gap-${gap.lg}`);
-    if (gap.xl) classes.push(`xl:gap-${gap.xl}`);
-    if (gap['2xl']) classes.push(`2xl:gap-${gap['2xl']}`);
+    if (gap.base) {classes.push(`gap-${gap.base}`);}
+    if (gap.sm) {classes.push(`sm:gap-${gap.sm}`);}
+    if (gap.md) {classes.push(`md:gap-${gap.md}`);}
+    if (gap.lg) {classes.push(`lg:gap-${gap.lg}`);}
+    if (gap.xl) {classes.push(`xl:gap-${gap.xl}`);}
+    if (gap['2xl']) {classes.push(`2xl:gap-${gap['2xl']}`);}
   }
   
   return classes.join(' ');
@@ -287,12 +287,12 @@ export function createVisibilityClasses(
 ): string {
   const classes: string[] = [];
   
-  if (visibility.base) classes.push(visibility.base);
-  if (visibility.sm) classes.push(`sm:${visibility.sm}`);
-  if (visibility.md) classes.push(`md:${visibility.md}`);
-  if (visibility.lg) classes.push(`lg:${visibility.lg}`);
-  if (visibility.xl) classes.push(`xl:${visibility.xl}`);
-  if (visibility['2xl']) classes.push(`2xl:${visibility['2xl']}`);
+  if (visibility.base) {classes.push(visibility.base);}
+  if (visibility.sm) {classes.push(`sm:${visibility.sm}`);}
+  if (visibility.md) {classes.push(`md:${visibility.md}`);}
+  if (visibility.lg) {classes.push(`lg:${visibility.lg}`);}
+  if (visibility.xl) {classes.push(`xl:${visibility.xl}`);}
+  if (visibility['2xl']) {classes.push(`2xl:${visibility['2xl']}`);}
   
   return classes.join(' ');
 }
@@ -303,7 +303,7 @@ export function createVisibilityClasses(
  * Detects if the user is on a mobile device
  */
 export function isMobile(): boolean {
-  if (typeof window === 'undefined') return false;
+  if (typeof window === 'undefined') {return false;}
   return window.innerWidth < parseInt(breakpoints.md);
 }
 
@@ -311,7 +311,7 @@ export function isMobile(): boolean {
  * Detects if the user is on a tablet device
  */
 export function isTablet(): boolean {
-  if (typeof window === 'undefined') return false;
+  if (typeof window === 'undefined') {return false;}
   const width = window.innerWidth;
   return width >= parseInt(breakpoints.md) && width < parseInt(breakpoints.lg);
 }
@@ -320,6 +320,6 @@ export function isTablet(): boolean {
  * Detects if the user is on a desktop device
  */
 export function isDesktop(): boolean {
-  if (typeof window === 'undefined') return false;
+  if (typeof window === 'undefined') {return false;}
   return window.innerWidth >= parseInt(breakpoints.lg);
 }

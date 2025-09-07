@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { validateRequestBody, ApiSchemas, sanitizeText } from "@/utils/security/input-validation";
-import { applyRateLimit, RateLimitConfigs } from "@/utils/security/rate-limiting";
-import { requireAuth } from "@/utils/security/jwt";
-import { applyApiSecurityHeaders } from "@/utils/security/headers";
 import { z } from "zod";
+
+import { applyApiSecurityHeaders } from "@/utils/security/headers";
+import { validateRequestBody, ApiSchemas, sanitizeText } from "@/utils/security/input-validation";
+import { requireAuth } from "@/utils/security/jwt";
+import { applyRateLimit, RateLimitConfigs } from "@/utils/security/rate-limiting";
 
 /**
  * Example secure API route demonstrating security best practices
@@ -206,10 +207,10 @@ export async function PUT(request: NextRequest) {
 
         // Sanitize input data
         const sanitizedData: Partial<ExampleRequest> = {};
-        if (data.title) sanitizedData.title = sanitizeText(data.title);
-        if (data.description) sanitizedData.description = sanitizeText(data.description);
-        if (data.category) sanitizedData.category = data.category;
-        if (data.priority) sanitizedData.priority = data.priority;
+        if (data.title) {sanitizedData.title = sanitizeText(data.title);}
+        if (data.description) {sanitizedData.description = sanitizeText(data.description);}
+        if (data.category) {sanitizedData.category = data.category;}
+        if (data.priority) {sanitizedData.priority = data.priority;}
 
         // Simulate database update
         const result = {

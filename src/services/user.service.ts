@@ -1,4 +1,3 @@
-import { apiService } from './api.service';
 import type { 
   UpdateUserProfileRequest,
   UserSearchRequest,
@@ -6,6 +5,8 @@ import type {
   ApiResponse 
 } from '@/types/api.types';
 import type { User, UserProfile, UserStats } from '@/types/user.types';
+
+import { apiService } from './api.service';
 
 /**
  * User service for handling user-related operations

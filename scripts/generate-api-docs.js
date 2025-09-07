@@ -11,9 +11,9 @@
  * 5. Validating API consistency
  */
 
+const { execSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
-const { execSync } = require('child_process');
 
 // Configuration
 const CONFIG = {
@@ -151,7 +151,7 @@ function parseJSDoc(jsdoc, methodInfo) {
   const lines = jsdoc.split('\n').map(line => line.trim().replace(/^\*\s?/, ''));
   
   let currentSection = 'description';
-  let description = [];
+  const description = [];
   
   for (const line of lines) {
     if (line.startsWith('@')) {
@@ -164,7 +164,7 @@ function parseJSDoc(jsdoc, methodInfo) {
           break;
         case 'description':
           currentSection = 'description';
-          if (value) description.push(value);
+          if (value) {description.push(value);}
           break;
         case 'param':
           methodInfo.parameters.push(parseParamTag(value));

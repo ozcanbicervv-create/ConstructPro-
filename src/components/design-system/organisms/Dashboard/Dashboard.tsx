@@ -1,6 +1,5 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { 
   Building, 
@@ -14,6 +13,8 @@ import {
   FileText,
   Calendar
 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+
 import { DashboardLayout, DashboardWidget } from './DashboardLayout';
 import { 
   MetricWidget, 

@@ -1,16 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { cn } from '@/lib/utils';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Progress } from '@/components/ui/progress';
-import { Separator } from '@/components/ui/separator';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   ArrowLeft,
   Star,
@@ -38,6 +28,9 @@ import {
   Shield,
   Target
 } from 'lucide-react';
+import { useParams, useRouter } from 'next/navigation';
+import React, { useState } from 'react';
+
 import {
   LineChart,
   Line,
@@ -52,6 +45,16 @@ import {
   Pie,
   Cell
 } from 'recharts';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Progress } from '@/components/ui/progress';
+import { Separator } from '@/components/ui/separator';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+
+
+import { cn } from '@/lib/utils';
 
 // Mock supplier data (in real app, this would come from API)
 const mockSupplier = {
@@ -229,16 +232,16 @@ const performanceColors = {
 };
 
 const getPerformanceColor = (score: number) => {
-  if (score >= 95) return performanceColors.excellent;
-  if (score >= 85) return performanceColors.good;
-  if (score >= 75) return performanceColors.average;
+  if (score >= 95) {return performanceColors.excellent;}
+  if (score >= 85) {return performanceColors.good;}
+  if (score >= 75) {return performanceColors.average;}
   return performanceColors.poor;
 };
 
 const getPerformanceLabel = (score: number) => {
-  if (score >= 95) return 'Excellent';
-  if (score >= 85) return 'Good';
-  if (score >= 75) return 'Average';
+  if (score >= 95) {return 'Excellent';}
+  if (score >= 85) {return 'Good';}
+  if (score >= 75) {return 'Average';}
   return 'Needs Improvement';
 };
 

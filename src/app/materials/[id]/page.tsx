@@ -1,14 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { cn } from '@/lib/utils';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   ArrowLeft,
   Star,
@@ -33,6 +25,8 @@ import {
   TrendingDown,
   BarChart3
 } from 'lucide-react';
+import { useParams, useRouter } from 'next/navigation';
+import React, { useState } from 'react';
 import {
   LineChart,
   Line,
@@ -44,6 +38,13 @@ import {
   AreaChart,
   Area
 } from 'recharts';
+
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { cn } from '@/lib/utils';
 
 // Mock material data (in real app, this would come from API)
 const mockMaterial = {
@@ -195,7 +196,7 @@ export default function MaterialDetailPage() {
 
   const getPriceChange = () => {
     const history = mockMaterial.priceHistory;
-    if (history.length < 2) return null;
+    if (history.length < 2) {return null;}
     
     const current = history[history.length - 1].price;
     const previous = history[history.length - 2].price;

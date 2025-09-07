@@ -5,9 +5,9 @@
  * Comprehensive testing for production deployment validation
  */
 
-const https = require('https');
-const http = require('http');
 const { spawn } = require('child_process');
+const http = require('http');
+const https = require('https');
 
 // Configuration
 const config = {

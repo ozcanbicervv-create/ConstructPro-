@@ -1,6 +1,7 @@
+import fs from 'fs/promises'
+
 import { describe, it, expect, beforeEach, afterEach } from '@jest/globals'
 import { NextRequest } from 'next/server'
-import fs from 'fs/promises'
 
 // Mock the document service
 jest.mock('@/services/document.service', () => ({

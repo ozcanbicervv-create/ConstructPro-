@@ -1,6 +1,11 @@
 'use client';
 
 import React, { useState } from 'react';
+
+import { Badge } from '@/components/design-system/atoms/Badge';
+import { Button } from '@/components/design-system/atoms/Button';
+import { Icon } from '@/components/design-system/atoms/Icon';
+import { Typography } from '@/components/design-system/atoms/Typography';
 import { 
   Card, 
   CardHeader, 
@@ -17,10 +22,6 @@ import {
   type MaterialData,
   type DocumentData
 } from '@/components/design-system/molecules/Card';
-import { Typography } from '@/components/design-system/atoms/Typography';
-import { Button } from '@/components/design-system/atoms/Button';
-import { Icon } from '@/components/design-system/atoms/Icon';
-import { Badge } from '@/components/design-system/atoms/Badge';
 
 export default function TestCardsPage() {
   const [selectedCard, setSelectedCard] = useState<string>('');

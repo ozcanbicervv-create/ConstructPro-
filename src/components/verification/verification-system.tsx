@@ -1,14 +1,5 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Progress } from '@/components/ui/progress'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Input } from '@/components/ui/input'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Checkbox } from '@/components/ui/checkbox'
 import { 
   User, 
   Building2, 
@@ -39,6 +30,16 @@ import {
   Users,
   TrendingUp
 } from 'lucide-react'
+import { useState, useEffect } from 'react'
+
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Input } from '@/components/ui/input'
+import { Progress } from '@/components/ui/progress'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 interface VerificationStep {
   id: string
@@ -682,7 +683,7 @@ export default function VerificationSystem() {
                                   id={`file-${doc.id}`}
                                   onChange={(e) => {
                                     const file = e.target.files?.[0]
-                                    if (file) handleDocumentUpload(doc.id, file)
+                                    if (file) {handleDocumentUpload(doc.id, file)}
                                   }}
                                 />
                                 <Button 

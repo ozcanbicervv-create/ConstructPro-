@@ -1,6 +1,5 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Activity, 
@@ -15,6 +14,8 @@ import {
   AlertTriangle,
   Zap
 } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -90,7 +91,7 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
   }, [activities, autoScroll]);
 
   const filteredActivities = activities.filter(activity => {
-    if (filter === 'all') return true;
+    if (filter === 'all') {return true;}
     if (filter === 'recent') {
       const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
       return activity.timestamp > oneHourAgo;
@@ -153,10 +154,10 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
     const hours = Math.floor(diff / 3600000);
     const days = Math.floor(diff / 86400000);
 
-    if (minutes < 1) return 'Just now';
-    if (minutes < 60) return `${minutes}m ago`;
-    if (hours < 24) return `${hours}h ago`;
-    if (days < 7) return `${days}d ago`;
+    if (minutes < 1) {return 'Just now';}
+    if (minutes < 60) {return `${minutes}m ago`;}
+    if (hours < 24) {return `${hours}h ago`;}
+    if (days < 7) {return `${days}d ago`;}
     return date.toLocaleDateString();
   };
 

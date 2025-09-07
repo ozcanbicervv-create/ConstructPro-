@@ -1,6 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/utils/db';
 import { createHash, randomBytes } from 'crypto';
+
+import { NextRequest, NextResponse } from 'next/server';
+
+import { prisma } from '@/utils/db';
 
 /**
  * API Key authentication middleware for third-party integrations

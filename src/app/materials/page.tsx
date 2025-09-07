@@ -1,20 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { cn } from '@/lib/utils';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import {
   Search,
   Package,
@@ -29,8 +15,8 @@ import {
   FileText,
   Settings
 } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
 
-// Import Material Management Components
 import {
   MaterialComparisonTable,
   SupplierDirectory,
@@ -44,6 +30,22 @@ import {
   type OrderItem,
   type MaterialOrder
 } from '@/components/design-system/organisms/MaterialManagement';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+
+
+// Import Material Management Components
+import { cn } from '@/lib/utils';
 
 // Mock data for demonstration
 const mockMaterials: Material[] = [

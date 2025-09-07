@@ -1,14 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
-import { authOptions } from '@/utils/auth';
+
 import { TaskService } from '@/services/task.service';
-import { updateTaskSchema } from '@/utils/validation-schemas';
 import { 
   withErrorHandling, 
   validateRequest,
   ErrorCodes,
   createErrorResponse 
 } from '@/utils/api-helpers';
+import { authOptions } from '@/utils/auth';
+import { updateTaskSchema } from '@/utils/validation-schemas';
 
 interface RouteParams {
   params: {

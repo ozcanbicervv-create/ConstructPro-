@@ -1,15 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { cn } from '@/lib/utils';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Separator } from '@/components/ui/separator';
 import {
     ArrowLeft,
     Calendar,
@@ -31,6 +22,18 @@ import {
     Paperclip,
     Send
 } from 'lucide-react';
+import React, { useState } from 'react';
+
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Progress } from '@/components/ui/progress';
+import { Separator } from '@/components/ui/separator';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { cn } from '@/lib/utils';
+
+
 import { Project } from './ProjectGrid';
 
 // Extended project data for detail view
@@ -329,9 +332,9 @@ const ProjectTimeline: React.FC<ProjectTimelineProps> = ({ timeline }) => {
     };
 
     const getTimelineColor = (type: string, status: string) => {
-        if (status === 'completed') return 'text-green-600 bg-green-100 dark:bg-green-900/20';
-        if (status === 'in-progress') return 'text-blue-600 bg-blue-100 dark:bg-blue-900/20';
-        if (type === 'issue') return 'text-red-600 bg-red-100 dark:bg-red-900/20';
+        if (status === 'completed') {return 'text-green-600 bg-green-100 dark:bg-green-900/20';}
+        if (status === 'in-progress') {return 'text-blue-600 bg-blue-100 dark:bg-blue-900/20';}
+        if (type === 'issue') {return 'text-red-600 bg-red-100 dark:bg-red-900/20';}
         return 'text-gray-600 bg-gray-100 dark:bg-gray-900/20';
     };
 
@@ -391,7 +394,7 @@ interface ProjectDocumentsProps {
 
 const ProjectDocuments: React.FC<ProjectDocumentsProps> = ({ documents }) => {
     const getFileIcon = (type: string) => {
-        if (type.includes('image')) return <Image className="h-5 w-5" />;
+        if (type.includes('image')) {return <Image className="h-5 w-5" />;}
         return <FileText className="h-5 w-5" />;
     };
 

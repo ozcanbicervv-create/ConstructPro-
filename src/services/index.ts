@@ -1,15 +1,11 @@
 // Service layer exports
 // Centralized exports for all services
 
+
+
+import { authService } from './auth.service';
 import { socketService } from './socket.service';
 
-import { socketService } from './socket.service';
-
-import { authService } from './auth.service';
-
-import { authService } from './auth.service';
-
-import { authService } from './auth.service';
 
 export { ApiService, apiService } from './api.service';
 export { AuthService, authService } from './auth.service';

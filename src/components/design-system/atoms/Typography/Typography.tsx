@@ -4,10 +4,11 @@
  * A modern typography component with bold styling, gradient effects, and construction-specific formatting
  */
 
-import React, { forwardRef } from 'react';
 import { motion } from 'framer-motion';
-import { cn, createVariants } from '../../utils/classNames';
+import React, { forwardRef } from 'react';
+
 import { TypographyProps, ConstructionTextProps } from '../../types';
+import { cn, createVariants } from '../../utils/classNames';
 
 // Typography variant styles with modern bold styling
 const typographyVariants = {
@@ -195,7 +196,7 @@ const ConstructionText = forwardRef<HTMLSpanElement, ConstructionTextProps>(
     const formatValue = (val: number | string, formatType: string): string => {
       const numValue = typeof val === 'string' ? parseFloat(val) : val;
       
-      if (isNaN(numValue)) return String(val);
+      if (isNaN(numValue)) {return String(val);}
 
       switch (formatType) {
         case 'currency':

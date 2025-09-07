@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
+
 import { logger } from '@/lib/logger';
-import { notificationService } from '@/services/notification.service';
 import { errorNotificationService, ErrorSeverity } from '@/services/error-notification.service';
+import { notificationService } from '@/services/notification.service';
 
 export interface ApiError extends Error {
   statusCode?: number;
@@ -62,10 +63,10 @@ export class AppError extends Error implements ApiError {
 
   constructor(
     message: string,
-    statusCode: number = 500,
+    statusCode = 500,
     code: string = ErrorCodes.INTERNAL_SERVER_ERROR,
     details?: any,
-    isOperational: boolean = true,
+    isOperational = true,
     severity: ErrorSeverity = ErrorSeverity.MEDIUM
   ) {
     super(message);
@@ -250,10 +251,10 @@ export const createError = {
   badRequest: (message: string, details?: any) =>
     new AppError(message, 400, ErrorCodes.BAD_REQUEST, details, true, ErrorSeverity.LOW),
     
-  unauthorized: (message: string = 'Unauthorized') =>
+  unauthorized: (message = 'Unauthorized') =>
     new AppError(message, 401, ErrorCodes.UNAUTHORIZED, undefined, true, ErrorSeverity.MEDIUM),
     
-  forbidden: (message: string = 'Forbidden') =>
+  forbidden: (message = 'Forbidden') =>
     new AppError(message, 403, ErrorCodes.FORBIDDEN, undefined, true, ErrorSeverity.MEDIUM),
     
   notFound: (resource: string) =>

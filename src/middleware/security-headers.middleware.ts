@@ -156,8 +156,8 @@ export function createSecurityHeadersMiddleware(config: SecurityConfig = {}) {
     if (finalConfig.hsts && request.nextUrl.protocol === 'https:') {
       const { maxAge, includeSubDomains, preload } = finalConfig.hsts;
       let hstsValue = `max-age=${maxAge}`;
-      if (includeSubDomains) hstsValue += '; includeSubDomains';
-      if (preload) hstsValue += '; preload';
+      if (includeSubDomains) {hstsValue += '; includeSubDomains';}
+      if (preload) {hstsValue += '; preload';}
       response.headers.set('Strict-Transport-Security', hstsValue);
     }
 

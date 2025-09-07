@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { documentService } from '@/services/document.service'
-import { uploadSingle, handleUploadError, validateFileMetadata } from '@/middleware/upload.middleware'
-import { DocumentType } from '@/types/document.types'
 import { z } from 'zod'
+
+import { uploadSingle, handleUploadError, validateFileMetadata } from '@/middleware/upload.middleware'
+import { documentService } from '@/services/document.service'
+import { DocumentType } from '@/types/document.types'
+
 
 // Validation schema for upload request
 const uploadSchema = z.object({

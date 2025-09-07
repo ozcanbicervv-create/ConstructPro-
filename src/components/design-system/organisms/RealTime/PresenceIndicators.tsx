@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Users, Circle, Eye, Edit3, MessageCircle } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -54,8 +55,8 @@ const PresenceIndicators: React.FC<PresenceIndicatorsProps> = ({
       if (a.isOnline !== b.isOnline) {
         return a.isOnline ? -1 : 1;
       }
-      if (a.currentActivity && !b.currentActivity) return -1;
-      if (!a.currentActivity && b.currentActivity) return 1;
+      if (a.currentActivity && !b.currentActivity) {return -1;}
+      if (!a.currentActivity && b.currentActivity) {return 1;}
       return 0;
     });
 
@@ -94,9 +95,9 @@ const PresenceIndicators: React.FC<PresenceIndicatorsProps> = ({
     const minutes = Math.floor(diff / 60000);
     const hours = Math.floor(diff / 3600000);
 
-    if (minutes < 1) return 'Just now';
-    if (minutes < 60) return `${minutes}m ago`;
-    if (hours < 24) return `${hours}h ago`;
+    if (minutes < 1) {return 'Just now';}
+    if (minutes < 60) {return `${minutes}m ago`;}
+    if (hours < 24) {return `${hours}h ago`;}
     return 'Earlier';
   };
 

@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
-import { authOptions } from '@/utils/auth';
 import { z } from 'zod';
+
+import { authOptions } from '@/utils/auth';
 
 // Error response types
 export interface ApiError {

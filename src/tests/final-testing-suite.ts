@@ -3,10 +3,10 @@
  * Coordinates all testing activities for task 9.3
  */
 
-import { crossBrowserTestRunner } from './cross-browser/cross-browser-runner';
-import { responsiveTestRunner } from './responsive/responsive-testing';
 import { accessibilityAuditor } from './accessibility/accessibility-audit';
+import { crossBrowserTestRunner } from './cross-browser/cross-browser-runner';
 import { lighthouseOptimizer } from './performance/lighthouse-optimizer';
+import { responsiveTestRunner } from './responsive/responsive-testing';
 
 export interface FinalTestResults {
   crossBrowser: {

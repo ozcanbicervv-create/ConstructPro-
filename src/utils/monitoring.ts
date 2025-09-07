@@ -125,7 +125,7 @@ class ResourceMonitor {
    * Check if metrics exceed thresholds and trigger alerts
    */
   private checkThresholds(metrics: MonitoringMetrics): void {
-    if (!this.alertConfig.enabled) return;
+    if (!this.alertConfig.enabled) {return;}
 
     // Memory check
     if (metrics.memory.percentage >= this.thresholds.memory.critical) {
@@ -219,7 +219,7 @@ class ResourceMonitor {
   /**
    * Get metrics history
    */
-  getMetricsHistory(limit: number = 50): MonitoringMetrics[] {
+  getMetricsHistory(limit = 50): MonitoringMetrics[] {
     return this.metrics.slice(-limit);
   }
 
@@ -269,7 +269,7 @@ class ResourceMonitor {
       status = 'critical';
       issues.push(`Critical memory usage: ${latest.memory.percentage}%`);
     } else if (latest.memory.percentage >= this.thresholds.memory.warning) {
-      if (status !== 'critical') status = 'warning';
+      if (status !== 'critical') {status = 'warning';}
       issues.push(`High memory usage: ${latest.memory.percentage}%`);
     }
 
@@ -278,7 +278,7 @@ class ResourceMonitor {
       status = 'critical';
       issues.push(`Critical CPU usage: ${latest.cpu.usage}%`);
     } else if (latest.cpu.usage >= this.thresholds.cpu.warning) {
-      if (status !== 'critical') status = 'warning';
+      if (status !== 'critical') {status = 'warning';}
       issues.push(`High CPU usage: ${latest.cpu.usage}%`);
     }
 
@@ -287,7 +287,7 @@ class ResourceMonitor {
       status = 'critical';
       issues.push(`Critical response time: ${latest.responseTime}ms`);
     } else if (latest.responseTime >= this.thresholds.responseTime.warning) {
-      if (status !== 'critical') status = 'warning';
+      if (status !== 'critical') {status = 'warning';}
       issues.push(`High response time: ${latest.responseTime}ms`);
     }
 

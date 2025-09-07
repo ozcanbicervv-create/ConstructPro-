@@ -1,9 +1,11 @@
 'use client';
 
+import { Activity, Zap, AlertTriangle, CheckCircle, TrendingUp } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { 
   PerformanceMonitor, 
@@ -11,7 +13,6 @@ import {
   PERFORMANCE_THRESHOLDS,
   BundleAnalyzer 
 } from '@/lib/performance';
-import { Activity, Zap, AlertTriangle, CheckCircle, TrendingUp } from 'lucide-react';
 
 interface PerformanceMonitorComponentProps {
   monitor: PerformanceMonitor;

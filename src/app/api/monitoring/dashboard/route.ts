@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { resourceMonitor } from '@/utils/monitoring';
+
 import { requestTracker } from '@/middleware/monitoring';
+import { resourceMonitor } from '@/utils/monitoring';
 
 /**
  * Monitoring Dashboard API for ConstructPro
@@ -161,7 +162,7 @@ function formatUptime(seconds: number): string {
  * Calculate trend direction for a series of values
  */
 function calculateTrend(values: number[]): 'up' | 'down' | 'stable' {
-  if (values.length < 2) return 'stable';
+  if (values.length < 2) {return 'stable';}
   
   const first = values[0];
   const last = values[values.length - 1];
@@ -169,8 +170,8 @@ function calculateTrend(values: number[]): 'up' | 'down' | 'stable' {
   
   const percentChange = ((last - first) / first) * 100;
   
-  if (percentChange > threshold) return 'up';
-  if (percentChange < -threshold) return 'down';
+  if (percentChange > threshold) {return 'up';}
+  if (percentChange < -threshold) {return 'down';}
   return 'stable';
 }
 

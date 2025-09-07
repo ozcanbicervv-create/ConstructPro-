@@ -363,24 +363,24 @@ export class AccessibilityTester {
    */
   private hasLabel(element: HTMLElement): boolean {
     // Check for aria-label
-    if (element.hasAttribute('aria-label')) return true;
+    if (element.hasAttribute('aria-label')) {return true;}
     
     // Check for aria-labelledby
-    if (element.hasAttribute('aria-labelledby')) return true;
+    if (element.hasAttribute('aria-labelledby')) {return true;}
     
     // Check for associated label element
     const id = element.id;
     if (id) {
       const label = document.querySelector(`label[for="${id}"]`);
-      if (label) return true;
+      if (label) {return true;}
     }
     
     // Check if wrapped in label
     const parentLabel = element.closest('label');
-    if (parentLabel) return true;
+    if (parentLabel) {return true;}
     
     // Check for title attribute (not ideal but acceptable)
-    if (element.hasAttribute('title')) return true;
+    if (element.hasAttribute('title')) {return true;}
     
     return false;
   }
@@ -486,7 +486,7 @@ export function useAccessibilityTesting() {
   const [testResults, setTestResults] = React.useState<AccessibilityTestResult | null>(null);
 
   const testElement = React.useCallback(async (element: HTMLElement) => {
-    if (!isTestingEnabled) return;
+    if (!isTestingEnabled) {return;}
     
     const results = await accessibilityTester.testElement(element);
     setTestResults(results);

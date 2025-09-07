@@ -1,4 +1,5 @@
 import { Server } from 'socket.io';
+
 import { 
   CollaborativeEditPayload,
   TypingIndicatorPayload,
@@ -265,7 +266,7 @@ export class CollaborativeEditingService {
     return undefined;
   }
 
-  extendLock(userId: string, documentId: string, minutes: number = 30): boolean {
+  extendLock(userId: string, documentId: string, minutes = 30): boolean {
     const lock = this.documentLocks.get(documentId);
     if (lock && lock.userId === userId) {
       lock.expiresAt = new Date(Date.now() + minutes * 60 * 1000);

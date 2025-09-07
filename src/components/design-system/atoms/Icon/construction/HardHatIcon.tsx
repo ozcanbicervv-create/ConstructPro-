@@ -1,4 +1,5 @@
 import React from 'react';
+
 import { Icon, type IconProps } from '../Icon';
 
 interface HardHatIconProps extends Omit<IconProps, 'children'> {}
